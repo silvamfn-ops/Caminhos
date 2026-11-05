@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestor de Orçamento e Poupança Familiar</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#1a73e8">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary: #1a73e8;
+            --primary-dark: #1557b0;
+            --success: #34a853;
+            --background: #f8f9fa;
+            --surface: #ffffff;
+            --text: #202124;
+            --text-secondary: #5f6368;
+            --border: #dadce0;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+        body { background-color: var(--background); color: var(--text); padding-bottom: 40px; }
+        header { background-color: var(--primary); color: white; padding: 20px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); position: relative; }
+        h1 { font-size: 1.3rem; margin-bottom: 5px; }
+        p.subtitle { font-size: 0.9rem; opacity: 0.9; }
+        .container { max-width: 600px; margin: 20px auto; padding: 0 15px; }
+        .card { background: var(--surface); border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: 1px solid var(--border); }
+        .card h2 { font-size: 1.1rem; margin-bottom: 15px; color: var(--primary); display: flex; justify-content: space-between; align-items: center; }
+        .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; }
+        .stat-box { background: #f1f3f4; padding: 12px; border-radius: 8px; text-align: center; }
+        .stat-box span { display: block; font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 4px; }
+        .stat-box strong { font-size: 1.1rem; color: var(--text); }
+        .stat-box.highlight { background: #e8f0fe; color: var(--primary); }
+        .stat-box.highlight strong { color: var(--primary); }
+        .input-group { margin-bottom: 15px; }
+        .input-group label { display: block; font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 5px; }
+        .input-group input, .input-group select { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 1rem; }
+        .slider-group { margin-bottom: 15px; }
+        .slider-header { display: flex; justify-content: space-between; font-size: 0.9rem; margin-bottom: 5px; }
+        .slider-header span:last-child { font-weight: bold; color: var(--primary); }
+        input[type="range"] { width: 100%; accent-color: var(--primary); cursor: pointer; }
+        .btn { background: var(--primary); color: white; border: none; padding: 12px 20px; border-radius: 8px; font-size: 1rem; width: 100%; cursor: pointer; font-weight: bold; transition: background 0.2s; }
+        .btn:hover { background: var(--primary-dark); }
+        .btn-install { background: var(--success); margin-bottom: 15px; display: none; }
+        .progress-bar-container { background: var(--border); border-radius: 10px; height: 14px; overflow: hidden; margin: 10px 0; }
+        .progress-bar { background: var(--success); height: 100%; width: 0%; transition: width 0.4s ease; }
+        .month-list { display: flex; flex-direction: column; gap: 10px; }
+        .month-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; background: #f8f9fa; border-radius: 8px; border: 1px solid var(--border); font-size: 0.9rem; }
+        .month-item input[type="checkbox"] { width: 20px; height: 20px; accent-color: var(--success); cursor: pointer; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Gestor Familiar 2026/2027</h1>
+        <p class="subtitle">Meta: Poupar 6.000 € até Agosto de 2027</p>
+    </header>
+
+    <div class="container">
+        <!-- Botão de Instalação PWA (Disponível quando o browser deteta o app) -->
+        <button id="installBtn" class="btn btn-install">📱 Instalar Aplicação no Telemóvel</button>
+
+        <!-- Dashboard Geral -->
+        <div class="card">
+            <h2>Resumo da Meta</h2>
+            <div class="stat-grid">
+                <div class="stat-box highlight">
+                    <span>Poupança Acumulada</span>
+                    <strong id="savedAmount">0.00 €</strong>
+                </div>
+                <div class="stat-box">
+                    <span>Meta Global</span>
+                    <strong>6.000,00 €</strong>
+                </div>
+            </div>
+            <div style="font-size: 0.85rem; color: var(--text-secondary); display: flex; justify-content: space-between;">
+                <span>Progresso Total</span>
+                <span id="progressPercent">0%</span>
+            </div>
+            <div class="progress-bar-container">
+                <div id="progressBar" class="progress-bar"></div>
+            </div>
+        </div>
+
+        <!-- Rendimento e Categorias -->
+        <div class="card">
+            <h2>Orçamento e Despesas</h2>
+            
+            <div class="input-group">
+                <label for="incomeInput">Vencimento Líquido Familiar (€)</label>
+                <input type="number" id="incomeInput" value="3000" step="50" min="0">
+            </div>
+
+            <div id="slidersContainer"></div>
+
+            <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; border: 1px solid var(--border); margin-top: 15px;">
+                <div style="display: flex; justify-content: space-between; font-size: 0.95rem; margin-bottom: 5px;">
+                    <span>Total Despesas:</span>
+                    <strong id="totalExpenses">0 €</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-size: 1.1rem; color: var(--success); font-weight: bold;">
+                    <span>Poupança Mensal Estimada:</span>
+                    <span id="monthlySavings">0 €</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Controlo Mensal -->
+        <div class="card">
+            <h2>Controlo Mensal (Nov 2026 - Ago 2027)</h2>
+            <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 15px;">Confirme os meses em que concretizou a poupança:</p>
+            <div id="monthListContainer" class="month-list"></div>
+        </div>
+    </div>
+
+    <script>
+        // Registo do Service Worker para suporte offline
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js').catch(err => console.log('SW falhou:', err));
+            });
+        }
+
+        // Evento de instalação PWA
+        let deferredPrompt;
+        const installBtn = document.getElementById('installBtn');
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            installBtn.style.display = 'block';
+        });
+
+        installBtn.addEventListener('click', async () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                if (outcome === 'accepted') {
+                    installBtn.style.display = 'none';
+                }
+                deferredPrompt = null;
+            }
+        });
+
+        // Configuração de Categorias e Dados
+        const categories = [
+            { id: 'housing', name: 'Crédito Habitação / Renda', value: 900, max: 1800 },
+            { id: 'utilities', name: 'Água, Luz, Gás e Telecom.', value: 180, max: 400 },
+            { id: 'insurance', name: 'Seguros e Impostos Fixos', value: 120, max: 300 },
+            { id: 'supermarket', name: 'Supermercado e Despensa', value: 600, max: 1200 },
+            { id: 'vehicles', name: 'Despesas com Viaturas (Combustível/Manutenção)', value: 250, max: 600 },
+            { id: 'credits', name: 'Créditos Pessoais', value: 150, max: 500 },
+            { id: 'health_leisure', name: 'Saúde, Lazer e Restaurantes', value: 283, max: 600 },
+            { id: 'others', name: 'Outros / Imprevistos', value: 50, max: 300 }
+        ];
+
+        const months = [
+            "Novembro 2026", "Dezembro 2026", "Janeiro 2027", "Fevereiro 2027",
+            "Março 2027", "Abril 2027", "Maio 2027", "Junho 2027", "Julho 2027", "Agosto 2027"
+        ];
+
+        // Carregar do LocalStorage ou usar padrões
+        let savedData = JSON.parse(localStorage.getItem('family_budget_data')) || {
+            income: 3000,
+            categories: categories.reduce((acc, cat) => ({ ...acc, [cat.id]: cat.value }), {}),
+            monthsChecked: {}
+        };
+
+        const incomeInput = document.getElementById('incomeInput');
+        incomeInput.value = savedData.income;
+
+        const slidersContainer = document.getElementById('slidersContainer');
+
+        function renderSliders() {
+            slidersContainer.innerHTML = '';
+            categories.forEach(cat => {
+                const val = savedData.categories[cat.id] !== undefined ? savedData.categories[cat.id] : cat.value;
+                const div = document.createElement('div');
+                div.className = 'slider-group';
+                div.innerHTML = `
+                    <div class="slider-header">
+                        <span>${cat.name}</span>
+                        <span id="val_${cat.id}">${val} €</span>
+                    </div>
+                    <input type="range" id="range_${cat.id}" min="0" max="${cat.max}" step="10" value="${val}">
+                `;
+                slidersContainer.appendChild(div);
+
+                const rangeInput = div.querySelector(`#range_${cat.id}`);
+                rangeInput.addEventListener('input', (e) => {
+                    const newVal = Number(e.target.value);
+                    savedData.categories[cat.id] = newVal;
+                    document.getElementById(`val_${cat.id}`).innerText = newVal + ' €';
+                    calculateTotals();
+                    saveState();
+                });
+            });
+        }
+
+        const monthListContainer = document.getElementById('monthListContainer');
+        function renderMonths() {
+            monthListContainer.innerHTML = '';
+            months.forEach((m, idx) => {
+                const isChecked = savedData.monthsChecked[idx] || false;
+                const div = document.createElement('div');
+                div.className = 'month-item';
+                div.innerHTML = `
+                    <span>${m} (Objetivo: ~667€)</span>
+                    <input type="checkbox" data-month="${idx}" ${isChecked ? 'checked' : ''}>
+                `;
+                monthListContainer.appendChild(div);
+            });
+
+            monthListContainer.querySelectorAll('input[type="checkbox"]').forEach(chk => {
+                chk.addEventListener('change', (e) => {
+                    const mIdx = e.target.getAttribute('data-month');
+                    savedData.monthsChecked[mIdx] = e.target.checked;
+                    calculateTotals();
+                    saveState();
+                });
+            });
+        }
+
+        function calculateTotals() {
+            const income = Number(incomeInput.value);
+            savedData.income = income;
+
+            let totalExp = 0;
+            Object.values(savedData.categories).forEach(v => totalExp += v);
+
+            const monthlySav = income - totalExp;
+
+            document.getElementById('totalExpenses').innerText = totalExp + ' €';
+            document.getElementById('monthlySavings').innerText = monthlySav + ' €';
+
+            // Calcular acumulado com base nos meses marcados
+            let checkedCount = 0;
+            Object.keys(savedData.monthsChecked).forEach(k => {
+                if (savedData.monthsChecked[k]) checkedCount++;
+            });
+
+            const accumulated = checkedCount * Math.max(0, monthlySav);
+            document.getElementById('savedAmount').innerText = accumulated.toLocaleString('pt-PT', { style: 'currency', currency: 'EUR' });
+
+            const percent = Math.min(100, Math.round((accumulated / 6000) * 100));
+            document.getElementById('progressPercent').innerText = percent + '%';
+            document.getElementById('progressBar').style.width = percent + '%';
+        }
+
+        function saveState() {
+            localStorage.setItem('family_budget_data', JSON.stringify(savedData));
+        }
+
+        incomeInput.addEventListener('input', () => {
+            calculateTotals();
+            saveState();
+        });
+
+        // Inicialização
+        renderSliders();
+        renderMonths();
+        calculateTotals();
+    </script>
+</body>
+</html>
