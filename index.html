@@ -1,0 +1,1367 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Caminhos do Sul" />
+  <meta name="theme-color" content="#0F172A" />
+  <title>Caminhos do Sul — Moto-Turismo & Guia Cultural</title>
+  <link rel="manifest" href="manifest.json" />
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- JSZip para leitura real de .pptx e .kmz no browser -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            navy: {
+              900: '#0B1120',
+              800: '#131C31',
+              700: '#1E293B',
+            },
+            gold: {
+              400: '#FBBF24',
+              500: '#D97706',
+              600: '#B45309',
+            },
+            sand: {
+              50: '#FAF8F5',
+              100: '#F3EFEA',
+              200: '#E5DEC9',
+            }
+          },
+          fontFamily: {
+            display: ['Cinzel', 'serif'],
+            sans: ['Plus Jakarta Sans', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: #FAF8F5;
+      color: #0F172A;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .font-editorial {
+      font-family: 'Cinzel', serif;
+    }
+    /* Hide scrollbar for Chrome, Safari and Opera */
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    /* Hide scrollbar for IE, Edge and Firefox */
+    .no-scrollbar {
+      -ms-overflow-style: none;  /* IE and Edge */
+      scrollbar-width: none;  /* Firefox */
+    }
+    .tab-active {
+      background-color: #0B1120;
+      color: #FBBF24;
+      box-shadow: 0 4px 12px rgba(11, 17, 32, 0.25);
+    }
+    .pulse-dot {
+      animation: pulse-ring 2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+    }
+    @keyframes pulse-ring {
+      0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(217, 119, 6, 0.7); }
+      70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(217, 119, 6, 0); }
+      100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(217, 119, 6, 0); }
+    }
+  </style>
+</head>
+<body class="bg-sand-50 min-h-screen flex flex-col">
+
+  <!-- TOP BAR: Seletor de Ambiente (Modo Mota/iPhone vs Modo Planeador PC) -->
+  <header class="bg-navy-900 text-white sticky top-0 z-50 border-b border-gold-500/30 shadow-lg">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between gap-2">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-gold-400 to-gold-600 flex items-center justify-center text-navy-900 shadow-md shrink-0">
+          <i data-lucide="compass" class="w-6 h-6 stroke-[2.2]"></i>
+        </div>
+        <div>
+          <h1 class="font-editorial text-base sm:text-lg font-bold tracking-wider text-gold-400 leading-tight" id="app-title">CAMINHOS DO SUL</h1>
+          <p class="text-[11px] text-slate-300 tracking-wide uppercase" id="app-subtitle">Andaluzia em Duas Rodas • 7 Dias • ~1.750 km</p>
+        </div>
+      </div>
+
+      <!-- Switch Mode -->
+      <div class="flex items-center bg-navy-800 p-1 rounded-xl border border-slate-700">
+        <button onclick="switchMode('mobile')" id="btn-mode-mobile" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all bg-gold-500 text-navy-900 shadow">
+          <i data-lucide="smartphone" class="w-3.5 h-3.5"></i>
+          <span>Viagem (iPhone)</span>
+        </button>
+        <button onclick="switchMode('desktop')" id="btn-mode-desktop" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all text-slate-300 hover:text-white">
+          <i data-lucide="monitor" class="w-3.5 h-3.5"></i>
+          <span>Planeador (PC)</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===================================================================== -->
+  <!-- AMBIENTE 1: MODO VIAGEM (IPHONE / ANDROID / COCKPIT & VISITAS A PÉ)    -->
+  <!-- ===================================================================== -->
+  <main id="view-mobile" class="flex-1 max-w-2xl w-full mx-auto pb-28">
+    
+    <!-- Seletor Horizontal de Dias (Etapas 01 a 07) -->
+    <div class="bg-navy-800 text-white px-4 pt-3 pb-4 shadow-md">
+      <div class="flex items-center justify-between mb-2">
+        <span class="text-[11px] font-semibold uppercase tracking-wider text-gold-400">Selecionar Etapa</span>
+        <span id="offline-badge" class="inline-flex items-center gap-1 text-[11px] bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded-full border border-emerald-500/30">
+          <i data-lucide="wifi-off" class="w-3 h-3"></i> Pronto Offline
+        </span>
+      </div>
+      <div id="day-selector" class="flex gap-2 overflow-x-auto no-scrollbar pb-1">
+        <!-- Injetado via JS -->
+      </div>
+    </div>
+
+    <!-- Banner Resumo da Etapa Atual -->
+    <section id="stage-hero" class="px-4 pt-4">
+      <!-- Injetado via JS -->
+    </section>
+
+    <!-- Sub-Navegação da Etapa (Cockpit Mota | Visita a Pé | Fichas Técnicas) -->
+    <div class="px-4 mt-4">
+      <div class="grid grid-cols-3 gap-1.5 bg-sand-200/70 p-1 rounded-xl border border-sand-200">
+        <button onclick="switchSubTab('cockpit')" id="subtab-cockpit" class="tab-active py-2.5 px-2 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 transition-all">
+          <i data-lucide="navigation" class="w-4 h-4"></i>
+          <span>Estrada & Plano</span>
+        </button>
+        <button onclick="switchSubTab('walking')" id="subtab-walking" class="text-slate-700 py-2.5 px-2 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 transition-all hover:bg-white/60">
+          <i data-lucide="footprints" class="w-4 h-4"></i>
+          <span>Roteiro a Pé</span>
+        </button>
+        <button onclick="switchSubTab('monuments')" id="subtab-monuments" class="text-slate-700 py-2.5 px-2 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 transition-all hover:bg-white/60">
+          <i data-lucide="landmark" class="w-4 h-4"></i>
+          <span>Monumentos</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Conteúdo Dinâmico das Sub-Abas -->
+    <div id="mobile-content" class="px-4 mt-4 space-y-4">
+      <!-- Injetado via JS -->
+    </div>
+
+    <!-- Secções Globais (Bilhetes, Checklist, Diário) -->
+    <div id="mobile-global-view" class="px-4 mt-4 hidden space-y-4">
+      <!-- Injetado via JS -->
+    </div>
+
+    <!-- Barra de Navegação Inferior Fixa (iPhone Style) -->
+    <nav class="fixed bottom-0 inset-x-0 bg-navy-900/95 backdrop-blur-md border-t border-slate-800 text-slate-300 z-40">
+      <div class="max-w-2xl mx-auto grid grid-cols-4 py-2 px-2">
+        <button onclick="showMainMobileSection('route')" id="nav-route" class="flex flex-col items-center justify-center gap-1 py-1 text-gold-400">
+          <i data-lucide="map" class="w-5 h-5"></i>
+          <span class="text-[10px] font-bold">Roteiro</span>
+        </button>
+        <button onclick="showMainMobileSection('wallet')" id="nav-wallet" class="flex flex-col items-center justify-center gap-1 py-1 hover:text-white">
+          <i data-lucide="ticket" class="w-5 h-5"></i>
+          <span class="text-[10px] font-semibold">Bilhetes & ZBE</span>
+        </button>
+        <button onclick="showMainMobileSection('checklist')" id="nav-checklist" class="flex flex-col items-center justify-center gap-1 py-1 hover:text-white">
+          <i data-lucide="check-square" class="w-5 h-5"></i>
+          <span class="text-[10px] font-semibold">Checklist</span>
+        </button>
+        <button onclick="showMainMobileSection('diary')" id="nav-diary" class="flex flex-col items-center justify-center gap-1 py-1 hover:text-white">
+          <i data-lucide="book-open" class="w-5 h-5"></i>
+          <span class="text-[10px] font-semibold">Diário & Km</span>
+        </button>
+      </div>
+    </nav>
+  </main>
+
+  <!-- ===================================================================== -->
+  <!-- AMBIENTE 2: PLANEADOR & IMPORTADOR (COMPUTADOR / DESKTOP)             -->
+  <!-- ===================================================================== -->
+  <main id="view-desktop" class="hidden flex-1 max-w-6xl w-full mx-auto px-4 py-6 space-y-6">
+    
+    <!-- Cabeçalho do Planeador -->
+    <div class="bg-white rounded-2xl p-6 shadow-sm border border-sand-200 flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div>
+        <span class="text-xs font-bold uppercase tracking-wider text-gold-600 bg-gold-400/20 px-2.5 py-1 rounded-full">Estúdio de Preparação</span>
+        <h2 class="text-2xl font-bold text-navy-900 mt-2">Importador de Roteiros & Sincronização</h2>
+        <p class="text-sm text-slate-600 mt-1">Importa o teu ficheiro <strong>PowerPoint (.pptx)</strong> e o traçado do <strong>Google Maps (.kmz / .kml)</strong> para atualizar automaticamente a aplicação para o iPhone e Android.</p>
+      </div>
+      <div class="flex flex-wrap gap-2">
+        <button onclick="exportTripJSON()" class="inline-flex items-center gap-2 bg-navy-900 hover:bg-navy-800 text-gold-400 font-bold text-xs px-4 py-3 rounded-xl shadow transition">
+          <i data-lucide="download" class="w-4 h-4"></i>
+          <span>Exportar Viagem (.json)</span>
+        </button>
+        <button onclick="resetToDefaultTrip()" class="inline-flex items-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs px-4 py-3 rounded-xl transition">
+          <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+          <span>Repor "Caminhos do Sul"</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Grelha de Importação (PPTX + KMZ/KML + Bilhetes) -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+      
+      <!-- Card 1: Importar PowerPoint (.pptx) -->
+      <div class="bg-white rounded-2xl p-5 shadow-sm border border-sand-200 flex flex-col justify-between">
+        <div>
+          <div class="w-11 h-11 rounded-xl bg-orange-100 text-orange-600 flex items-center justify-center mb-4">
+            <i data-lucide="presentation" class="w-6 h-6"></i>
+          </div>
+          <h3 class="font-bold text-base text-navy-900">1. Importar PowerPoint (.pptx)</h3>
+          <p class="text-xs text-slate-600 mt-1.5 leading-relaxed">
+            Lê diretamente os slides da tua apresentação: extrai títulos das etapas, horários, textos históricos e fichas técnicas dos monumentos.
+          </p>
+        </div>
+        <div class="mt-5">
+          <label class="flex flex-col items-center justify-center border-2 border-dashed border-slate-300 hover:border-gold-500 rounded-xl p-4 cursor-pointer bg-sand-50/50 transition text-center">
+            <i data-lucide="upload-cloud" class="w-6 h-6 text-slate-400 mb-1"></i>
+            <span class="text-xs font-bold text-navy-900">Selecionar ficheiro .PPTX</span>
+            <span class="text-[10px] text-slate-500 mt-0.5">Processamento local no navegador</span>
+            <input type="file" accept=".pptx" class="hidden" onchange="handlePptxUpload(event)" />
+          </label>
+          <div id="pptx-status" class="mt-2 text-xs text-slate-500"></div>
+        </div>
+      </div>
+
+      <!-- Card 2: Importar Rota Google Maps (.kmz / .kml) -->
+      <div class="bg-white rounded-2xl p-5 shadow-sm border border-sand-200 flex flex-col justify-between">
+        <div>
+          <div class="w-11 h-11 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center mb-4">
+            <i data-lucide="map-pin" class="w-6 h-6"></i>
+          </div>
+          <h3 class="font-bold text-base text-navy-900">2. Importar Mapa (.kmz / .kml)</h3>
+          <p class="text-xs text-slate-600 mt-1.5 leading-relaxed">
+            Extrai todos os marcadores (<em>Placemarks</em>), coordenadas GPS, paragens de combustível, restaurantes e pontos dos roteiros apeados.
+          </p>
+        </div>
+        <div class="mt-5">
+          <label class="flex flex-col items-center justify-center border-2 border-dashed border-slate-300 hover:border-emerald-500 rounded-xl p-4 cursor-pointer bg-sand-50/50 transition text-center">
+            <i data-lucide="globe" class="w-6 h-6 text-slate-400 mb-1"></i>
+            <span class="text-xs font-bold text-navy-900">Selecionar .KMZ ou .KML</span>
+            <span class="text-[10px] text-slate-500 mt-0.5">Exportado do Google My Maps</span>
+            <input type="file" accept=".kmz,.kml" class="hidden" onchange="handleKmzUpload(event)" />
+          </label>
+          <div id="kmz-status" class="mt-2 text-xs text-slate-500"></div>
+        </div>
+      </div>
+
+      <!-- Card 3: Anexar Bilhetes & Reservas -->
+      <div class="bg-white rounded-2xl p-5 shadow-sm border border-sand-200 flex flex-col justify-between">
+        <div>
+          <div class="w-11 h-11 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center mb-4">
+            <i data-lucide="qr-code" class="w-6 h-6"></i>
+          </div>
+          <h3 class="font-bold text-base text-navy-900">3. Adicionar Reserva / Bilhete</h3>
+          <p class="text-xs text-slate-600 mt-1.5 leading-relaxed">
+            Adiciona códigos de reserva (Alhambra, Alcázar, Hotéis) ou links diretos para ficarem acessíveis num toque no telemóvel.
+          </p>
+        </div>
+        <form onsubmit="addNewTicket(event)" class="mt-4 space-y-2">
+          <input type="text" id="ticket-title" required placeholder="Ex: Alhambra - Palácios Nasridas" class="w-full text-xs px-3 py-2 rounded-lg border border-slate-300 focus:outline-none focus:border-gold-500" />
+          <div class="grid grid-cols-2 gap-2">
+            <input type="text" id="ticket-day" required placeholder="Dia (ex: Dia 02 • 15:30)" class="w-full text-xs px-3 py-2 rounded-lg border border-slate-300 focus:outline-none focus:border-gold-500" />
+            <input type="text" id="ticket-code" required placeholder="Código / Refª" class="w-full text-xs px-3 py-2 rounded-lg border border-slate-300 focus:outline-none focus:border-gold-500" />
+          </div>
+          <button type="submit" class="w-full bg-gold-500 hover:bg-gold-600 text-navy-900 font-bold text-xs py-2.5 rounded-lg transition">
+            + Guardar no Cofre Offline
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Resultado da Extração / Editor Rápido de Etapas -->
+    <div id="import-preview-box" class="hidden bg-navy-900 text-white rounded-2xl p-5 shadow-lg border border-gold-500/40">
+      <div class="flex items-center justify-between mb-3">
+        <div class="flex items-center gap-2">
+          <i data-lucide="sparkles" class="w-5 h-5 text-gold-400"></i>
+          <h3 class="font-bold text-sm text-gold-400" id="import-preview-title">Dados Extraídos do Ficheiro</h3>
+        </div>
+        <button onclick="document.getElementById('import-preview-box').classList.add('hidden')" class="text-slate-400 hover:text-white text-xs">Fechar</button>
+      </div>
+      <div id="import-preview-content" class="text-xs text-slate-200 max-h-64 overflow-y-auto space-y-2 bg-navy-800 p-4 rounded-xl border border-slate-700"></div>
+    </div>
+
+    <!-- Tabela de Gestão das Etapas -->
+    <div class="bg-white rounded-2xl p-6 shadow-sm border border-sand-200">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="font-bold text-lg text-navy-900">Estrutura Atual do Roteiro (Sincronizada com Mobile)</h3>
+        <span class="text-xs text-slate-500" id="desktop-stage-count">7 Etapas carregadas</span>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+          <thead>
+            <tr class="border-b border-slate-200 text-[11px] uppercase text-slate-500">
+              <th class="py-3 px-3">Dia</th>
+              <th class="py-3 px-3">Etapa</th>
+              <th class="py-3 px-3">Distância</th>
+              <th class="py-3 px-3">Paragens & Visitas</th>
+              <th class="py-3 px-3 text-right">Ação</th>
+            </tr>
+          </thead>
+          <tbody id="desktop-stages-table" class="divide-y divide-slate-100 text-sm">
+            <!-- Injetado via JS -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <!-- MODAL PARA DETALHE DE FICHA TÉCNICA / BILHETE -->
+  <div id="modal-overlay" class="fixed inset-0 bg-navy-900/80 backdrop-blur-sm z-50 hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
+    <div class="bg-white w-full max-w-lg rounded-t-3xl sm:rounded-2xl max-h-[88vh] flex flex-col overflow-hidden shadow-2xl animate-fade-in">
+      <div class="bg-navy-900 text-white px-5 py-4 flex items-center justify-between border-b border-gold-500/30">
+        <div>
+          <span id="modal-tag" class="text-[10px] uppercase tracking-widest text-gold-400 font-bold">Ficha Técnica</span>
+          <h3 id="modal-title" class="font-editorial text-lg font-bold text-white mt-0.5">Título</h3>
+        </div>
+        <button onclick="closeModal()" class="w-8 h-8 rounded-full bg-navy-800 flex items-center justify-center text-slate-300 hover:text-white">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+      <div id="modal-body" class="p-5 overflow-y-auto space-y-4 text-sm text-slate-700 leading-relaxed">
+        <!-- Injetado via JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- DADOS E LÓGICA DA APLICAÇÃO                                           -->
+  <!-- ===================================================================== -->
+  <script>
+    // Dados completos extraídos do PDF "Caminhos do Sul"
+    const DEFAULT_TRIP_DATA = {
+      title: "CAMINHOS DO SUL",
+      subtitle: "Andaluzia em Duas Rodas • 7 Dias • ~1.750 km",
+      days: [
+        {
+          dayNumber: "01",
+          route: "Lisboa → Córdoba",
+          via: "Lisboa • Estremoz • Badajoz • Zafra • Belmez • Córdoba",
+          distance: "511 km",
+          duration: "≈ 6h45",
+          roadType: "Estradas Panorâmicas (EN4 / N-432)",
+          difficulty: "Moderada",
+          summary: "Saída tranquila de Lisboa atravessando as planícies alentejanas até à fronteira de Badajoz, paragem cultural e almoço na elegante Zafra e chegada triunfal a Córdoba ao entardecer.",
+          zbeWarning: null,
+          fuelRule: "Abastecimento programado aos 180 km em Estremoz antes de cruzar a fronteira.",
+          timeline: [
+            { time: "08:00", title: "Saída de Lisboa", desc: "Saída em direção a Espanha pela EN4.", km: "0 km", type: "ride", lat: 38.7223, lng: -9.1393 },
+            { time: "10:00", title: "Combustível em Estremoz", desc: "Paragem rápida para atestar depósitos antes da fronteira.", km: "180 km", type: "fuel", lat: 38.8422, lng: -7.5858 },
+            { time: "12:30", title: "Pausa em Badajoz (Hora ES)", desc: "30 min para café e esticar as pernas (+1h fuso horário).", km: "240 km", type: "coffee", lat: 38.8794, lng: -6.9706 },
+            { time: "14:00", title: "Almoço & Visita a Zafra", desc: "Estacionar junto à Plaza del Corazón de María / Alcázar. Almoço leve e passeio a pé.", km: "322 km", type: "visit", lat: 38.4256, lng: -6.4184 },
+            { time: "17:00", title: "Miradouro em Belmez", desc: "Breve paragem fotográfica junto ao castelo sobre o rochedo.", km: "444 km", type: "photo", lat: 38.2731, lng: -5.2114 },
+            { time: "18:30", title: "Chegada a Córdoba", desc: "Check-in no hotel, descanso e passeio noturno pela Judería e Plaza de la Corredera.", km: "511 km", type: "hotel", lat: 37.8789, lng: -4.7794 }
+          ],
+          walkingRoute: {
+            city: "Zafra & Córdoba (Final de Dia)",
+            estimatedTime: "1h20 em Zafra + 2h30 em Córdoba",
+            parkingNote: "Em Zafra: estacionar na Plaza del Corazón de María (ponto de partida imediato).",
+            stops: [
+              { num: 1, name: "Plaza del Corazón de María (Zafra)", desc: "Ponto de estacionamento das motas e início do percurso.", lat: 38.4265, lng: -6.4162 },
+              { num: 2, name: "Plaza Grande & Plaza Chica", desc: "Coração histórico de Zafra com arcadas e fachadas brancas ligadas pelo Arquillo del Pan.", lat: 38.4253, lng: -6.4189 },
+              { num: 3, name: "Ponte Romana & Puerta del Puente (Córdoba)", desc: "Caminhar até meio da ponte sobre o Guadalquivir ao entardecer para a melhor vista da Mesquita.", lat: 37.8768, lng: -4.7779 },
+              { num: 4, name: "Calleja de las Flores & Plaza de la Corredera", desc: "Labirinto da Judería, Templo Romano iluminado e jantar de tapas na Corredera.", lat: 37.8801, lng: -4.7782 }
+            ]
+          },
+          monuments: [
+            {
+              name: "Centro Histórico de Zafra",
+              location: "Zafra, Extremadura",
+              classification: "Conjunto Histórico-Artístico",
+              schedule: "14:00 – 15:30",
+              highlights: ["Plaza Grande e Plaza Chica", "Arquillo del Pan", "Igreja da Candelária", "Arco del Cubo"],
+              tip: "Privilegiar uma refeição rápida de tapas nas arcadas para cumprir o horário de chegada a Córdoba."
+            }
+          ]
+        },
+        {
+          dayNumber: "02",
+          route: "Córdoba → Granada",
+          via: "Córdoba • N-432 • Alcalá la Real (La Mota) • Granada",
+          distance: "201 km",
+          duration: "2h45 – 3h15",
+          roadType: "Interior Andaluz & Montanha",
+          difficulty: "Moderada",
+          summary: "Visita matinal gratuita à Mesquita-Catedral de Córdoba, travessia pela N-432 até à imponente Fortaleza de La Mota e tarde dedicada à Alhambra e ao miradouro de San Nicolás.",
+          zbeWarning: "ATENÇÃO ZBE GRANADA: O Centro Histórico tem câmaras de acesso condicionado. Não entrar de mota até à Catedral. Estacionar fora da ZBE para almoçar e seguir depois para o parque oficial da Alhambra.",
+          fuelRule: "Atestar à saída de Córdoba antes de entrar nos troços serranos da N-432.",
+          timeline: [
+            { time: "08:30", title: "Mesquita-Catedral de Córdoba", desc: "Entrada gratuita (08:30–09:30) em silêncio antes das multidões.", km: "0 km", type: "visit", lat: 37.8789, lng: -4.7794 },
+            { time: "09:30", title: "Partida para Alcalá la Real", desc: "Saída pela N-432 rumo ao interior montanhoso.", km: "0 km", type: "ride", lat: 37.8789, lng: -4.7794 },
+            { time: "11:15", title: "Fortaleza de La Mota", desc: "Explorar a cidade-fronteira medieval a 1.029m de altitude.", km: "110 km", type: "visit", lat: 37.4614, lng: -3.9277 },
+            { time: "14:00", title: "Almoço em Granada (Fora ZBE)", desc: "Estacionar fora da zona restrita e caminhar até à Plaza Nueva.", km: "201 km", type: "food", lat: 37.1773, lng: -3.5986 },
+            { time: "15:30", title: "Visita à Alhambra", desc: "Palácios Nasridas (hora fixa obrigatória no bilhete), Generalife e Alcazaba.", km: "201 km", type: "ticket", lat: 37.1761, lng: -3.5881 },
+            { time: "20:00", title: "Granada ao Entardecer & Albaicín", desc: "Alcaicería, Paseo de los Tristes e pôr do sol no Mirador de San Nicolás.", km: "201 km", type: "walk", lat: 37.1811, lng: -3.5927 }
+          ],
+          walkingRoute: {
+            city: "Granada ao Entardecer (Albaicín)",
+            estimatedTime: "2h45 (20:00 – 22:45)",
+            parkingNote: "Deixar a mota no hotel após a Alhambra e fazer o percurso todo a pé.",
+            stops: [
+              { num: 1, name: "Catedral & Alcaicería", desc: "Antigo mercado da seda e Calle Calderería Nueva (casas de chá).", lat: 37.1765, lng: -3.5990 },
+              { num: 2, name: "Carrera del Darro & Paseo de los Tristes", desc: "Caminhada junto ao rio Darro sob as muralhas iluminadas da Alhambra.", lat: 37.1786, lng: -3.5912 },
+              { num: 3, name: "Mirador de San Nicolás", desc: "Subida ao bairro do Albaicín para a vista icónica da Alhambra com a Sierra Nevada.", lat: 37.1811, lng: -3.5927 }
+            ]
+          },
+          monuments: [
+            {
+              name: "Mesquita-Catedral de Córdoba",
+              location: "Centro Histórico de Córdoba",
+              classification: "Património Mundial UNESCO (1984)",
+              schedule: "08:30 – 09:30 (Entrada Gratuita)",
+              highlights: ["Floresta de +850 colunas e arcos bicolores", "Mihrab bizantino", "Nave central renascentista", "Patio de los Naranjos"],
+              tip: "Permanece em silêncio no centro da floresta de colunas com a luz suave da manhã."
+            },
+            {
+              name: "Fortaleza de La Mota",
+              location: "Alcalá la Real, Jaén (1.029m altitude)",
+              classification: "Monumento Nacional",
+              schedule: "11:15 – 12:45",
+              highlights: ["Torre de Menagem (20m)", "Igreja Mayor Abacial", "Galerias subterrâneas (Cueva de la Mora)", "Neveiro medieval"],
+              tip: "Percorre as passagens subterrâneas secretas e fotografa a silhueta da fortaleza a partir do monte em frente."
+            },
+            {
+              name: "Alhambra e Generalife",
+              location: "Colina de Sabika, Granada",
+              classification: "Património Mundial UNESCO (1984)",
+              schedule: "15:30 – 18:30 (Hora fixa nos Palácios Nasridas)",
+              highlights: ["Pátio dos Leões", "Pátio das Arrayanes", "Palácio de Carlos V", "Jardins do Generalife"],
+              tip: "Coloca-te no topo sul do Pátio das Arrayanes ao nível da água para captar o reflexo simétrico da Torre de Comares."
+            }
+          ]
+        },
+        {
+          dayNumber: "03",
+          route: "Granada → Málaga",
+          via: "Granada • Nerja (Cuevas & Balcón) • Frigiliana • N-340 • Málaga",
+          distance: "171 km",
+          duration: "3h54 – 4h15",
+          roadType: "Montanha & Estrada Costeira (N-340)",
+          difficulty: "Baixa / Relaxada",
+          summary: "Descida das encostas da Sierra Nevada até ao azul do Mediterrâneo em Nerja, curvas panorâmicas até à aldeia branca de Frigiliana e pôr do sol no Castelo de Gibralfaro em Málaga.",
+          zbeWarning: "Málaga possui ZBE no centro histórico. Sobe diretamente de mota até ao parque do Castelo de Gibralfaro.",
+          fuelRule: "Percurso curto (171 km) com postos frequentes ao longo da costa.",
+          timeline: [
+            { time: "09:00", title: "Saída de Granada", desc: "Descida para a costa contornando a Sierra Nevada.", km: "0 km", type: "ride", lat: 37.1773, lng: -3.5986 },
+            { time: "10:15", title: "Cuevas de Nerja & Balcón de Europa", desc: "Visita às grutas pré-históricas seguida de miradouro sobre o mar.", km: "100 km", type: "visit", lat: 36.7621, lng: -3.8448 },
+            { time: "12:30", title: "Curvas até Frigiliana & Almoço", desc: "7 km de curvas suaves pelas colinas. Almoço panorâmico e passeio no bairro mudéjar.", km: "107 km", type: "food", lat: 36.7915, lng: -3.8955 },
+            { time: "15:30", title: "Rota Costeira N-340", desc: "Trajeto junto ao Mediterrâneo pela Costa del Sol até Málaga.", km: "171 km", type: "ride", lat: 36.7213, lng: -4.4214 },
+            { time: "17:30", title: "Castelo de Gibralfaro & Alcazaba", desc: "Subida de mota a Gibralfaro para o pôr do sol e descida à Alcazaba.", km: "171 km", type: "visit", lat: 36.7235, lng: -4.4111 },
+            { time: "20:45", title: "Jantar Tradicional em Málaga", desc: "Sugestão: Bodega El Pimpi junto ao Teatro Romano.", km: "171 km", type: "food", lat: 36.7216, lng: -4.4170 }
+          ],
+          walkingRoute: {
+            city: "Frigiliana & Centro de Málaga",
+            estimatedTime: "1h30 em Frigiliana + 2h em Málaga",
+            parkingNote: "Em Frigiliana: Parking Municipal à entrada da aldeia. Em Málaga: subir de mota a Gibralfaro.",
+            stops: [
+              { num: 1, name: "Balcón de Europa (Nerja)", desc: "Miradouro sobre falésias construído numa antiga fortaleza.", lat: 36.7443, lng: -3.8755 },
+              { num: 2, name: "Bairro Mudéjar de Frigiliana", desc: "Ruas em calçada, portas azuis e painéis de azulejos das Rebeliões das Alpujarras.", lat: 36.7924, lng: -3.8962 },
+              { num: 3, name: "Calle Larios, Catedral & Muelle Uno (Málaga)", desc: "Passeio pelo centro histórico e zona portuária ao entardecer.", lat: 36.7185, lng: -4.4192 }
+            ]
+          },
+          monuments: [
+            {
+              name: "Cuevas de Nerja",
+              location: "Maro, Nerja, Málaga",
+              classification: "Bem de Interesse Cultural",
+              schedule: "10:15 – 11:30",
+              highlights: ["Coluna natural de 32m (Recorde Guinness)", "Sala del Cataclismo", "Pinturas rupestres paleolíticas"],
+              tip: "Visitar logo às 10:15 garante estacionamento fácil e frescura antes do calor do meio-dia."
+            },
+            {
+              name: "Castelo de Gibralfaro & Alcazaba",
+              location: "Monte de Gibralfaro, Málaga",
+              classification: "Conjunto Monumental Defensivo",
+              schedule: "17:30 – 19:45",
+              highlights: ["La Coracha (muralha dupla)", "Pozo Airoso", "Patio de los Surtidores", "Teatro Romano na base"],
+              tip: "Compra o bilhete combinado (~5,50 €) na bilheteira do Castelo de Gibralfaro e usa-o depois para entrar na Alcazaba."
+            }
+          ]
+        },
+        {
+          dayNumber: "04",
+          route: "Málaga → Ronda",
+          via: "Málaga • El Chorro (Caminito) • Ardales • Sierra de las Nieves • Ronda",
+          distance: "169 km",
+          duration: "3h30 – 4h00",
+          roadType: "Estradas Sinuosas de Serra",
+          difficulty: "Média / Técnica",
+          summary: "Regresso à Andaluzia selvagem e montanhosa: desfiladeiro de El Chorro, curvas entre florestas de pinsapos na Sierra de las Nieves e pôr do sol sobre o abismo da Puente Nuevo em Ronda.",
+          zbeWarning: null,
+          fuelRule: "Atestar à saída de Málaga ou em Ardales antes de entrar na Sierra de las Nieves.",
+          timeline: [
+            { time: "09:00", title: "Saída de Málaga", desc: "Rumo ao interior montanhoso e barragens do Guadalhorce.", km: "0 km", type: "ride", lat: 36.7213, lng: -4.4214 },
+            { time: "10:15", title: "El Chorro & Miradouros Caminito", desc: "Paragem nas barragens azul-turquesa e paredes verticais de 300m.", km: "60 km", type: "photo", lat: 36.9150, lng: -4.7731 },
+            { time: "11:30", title: "Parque Nacional Sierra de las Nieves", desc: "Estradas sinuosas por Ardales, Casarabonela e Alozaina.", km: "75 km", type: "ride", lat: 36.7336, lng: -4.9500 },
+            { time: "13:00", title: "Almoço Serrano", desc: "Paragem gastronómica em Alozaina ou Casarabonela.", km: "100 km", type: "food", lat: 36.7267, lng: -4.8586 },
+            { time: "15:45", title: "Chegada a Ronda", desc: "Check-in no hotel e preparação para o roteiro a pé ao pôr do sol.", km: "169 km", type: "hotel", lat: 36.7462, lng: -5.1612 },
+            { time: "17:30", title: "Roteiro a Pé em Ronda", desc: "Alameda del Tajo, Plaza de Toros, Puente Nuevo e La Ciudad.", km: "169 km", type: "walk", lat: 36.7406, lng: -5.1659 }
+          ],
+          walkingRoute: {
+            city: "Ronda ao Pôr do Sol",
+            estimatedTime: "3h30 (17:30 – 21:00)",
+            parkingNote: "Deixar as motas no parque do hotel; Ronda percorre-se integralmente a pé.",
+            stops: [
+              { num: 1, name: "Alameda del Tajo & Balcón del Coño", desc: "Jardins do séc. XIX com miradouros vertiginosos sobre a Serranía.", lat: 36.7438, lng: -5.1678 },
+              { num: 2, name: "Plaza de Toros & Paseo de Hemingway", desc: "Uma das praças mais antigas de Espanha e passeio junto à escarpa.", lat: 36.7422, lng: -5.1671 },
+              { num: 3, name: "Puente Nuevo & Mirador de Aldehuela", desc: "Ponte monumental a mais de 100m sobre o desfiladeiro do rio Guadalevín.", lat: 36.7406, lng: -5.1659 },
+              { num: 4, name: "Plaza Duquesa de Parcent & Palácio Mondragón", desc: "Núcleo antigo mourisco (La Ciudad) e jantar com vista para o desfiladeiro.", lat: 36.7374, lng: -5.1653 }
+            ]
+          },
+          monuments: [
+            {
+              name: "Puente Nuevo & Desfiladeiro El Tajo",
+              location: "Ronda, Málaga",
+              classification: "Ex-líbris da Andaluzia",
+              schedule: "19:00 – 19:45 (Hora Dourada)",
+              highlights: ["Altura superior a 100 metros", "Mirador de Aldehuela", "Descida aos miradouros inferiores do vale"],
+              tip: "Atravessa a ponte ao entardecer quando a luz dourada ilumina as fachadas brancas suspensas na falésia."
+            }
+          ]
+        },
+        {
+          dayNumber: "05",
+          route: "Ronda → Sevilha",
+          via: "Ronda • Setenil de las Bodegas • Grazalema • Zahara de la Sierra • Sevilha",
+          distance: "178 km",
+          duration: "4h30 – 5h00",
+          roadType: "Estradas de Montanha (Pueblos Blancos)",
+          difficulty: "Média / Cénica",
+          summary: "O dia rainha das Aldeias Brancas: casas sob rochedos em Setenil, curvas na Serra de Grazalema, almoço sobre o lago em Zahara de la Sierra e roteiro crepuscular na Plaza de España de Sevilha.",
+          zbeWarning: "Sevilha tem restrições na Isla de la Cartuja e centro histórico. Seguir direto para o hotel com parque.",
+          fuelRule: "Regra de ouro: nunca baixar de meio depósito na Serra de Grazalema (postos escassos).",
+          timeline: [
+            { time: "08:30", title: "Saída de Ronda", desc: "Primeiras estradas panorâmicas rumo a Setenil.", km: "0 km", type: "ride", lat: 36.7462, lng: -5.1612 },
+            { time: "09:00", title: "Setenil de las Bodegas", desc: "Caminhar sob as falésias nas Calle Cuevas del Sol e Cuevas de la Sombra.", km: "18 km", type: "visit", lat: 36.8639, lng: -5.1814 },
+            { time: "10:45", title: "Grazalema", desc: "Pausa para café na Plaza de España no coração do Parque Natural.", km: "52 km", type: "coffee", lat: 36.7586, lng: -5.3661 },
+            { time: "12:00", title: "Zahara de la Sierra & Almoço", desc: "Almoço com vista para o Embalse azul-turquesa e subida ao castelo.", km: "70 km", type: "food", lat: 36.8403, lng: -5.3908 },
+            { time: "14:30", title: "Partida para Sevilha", desc: "Descida da serra rumo à capital andaluza.", km: "178 km", type: "ride", lat: 37.3891, lng: -5.9845 },
+            { time: "17:30", title: "Roteiro Crepuscular em Sevilha", desc: "Plaza de España, Parque María Luisa, Torre del Oro, Triana e Santa Cruz.", km: "178 km", type: "walk", lat: 37.3772, lng: -5.9869 }
+          ],
+          walkingRoute: {
+            city: "Sevilha Crepuscular (Plaza de España → Triana)",
+            estimatedTime: "4h30 (17:30 – 22:00)",
+            parkingNote: "Motas estacionadas no hotel em Sevilha durante os próximos 2 dias.",
+            stops: [
+              { num: 1, name: "Plaza de España & Parque de María Luisa", desc: "Os 48 bancos de azulejos das províncias, canal e Plaza de América.", lat: 37.3772, lng: -5.9869 },
+              { num: 2, name: "Palácio de San Telmo & Torre del Oro", desc: "Fachada barroca e margens do Guadalquivir.", lat: 37.3824, lng: -5.9964 },
+              { num: 3, name: "Ponte de Triana & Jantar de Tapas", desc: "Travessia ao entardecer para o bairro dos oleiros e flamenco.", lat: 37.3861, lng: -6.0025 },
+              { num: 4, name: "Bairro de Santa Cruz à Noite", desc: "Regresso pelas vielas iluminadas junto à Catedral e Giralda.", lat: 37.3858, lng: -5.9901 }
+            ]
+          },
+          monuments: [
+            {
+              name: "Plaza de España de Sevilha",
+              location: "Parque de María Luisa, Sevilha",
+              classification: "Bem de Interesse Cultural",
+              schedule: "17:30 – 18:20 (Pôr do Sol)",
+              highlights: ["Semi-círculo de 50.000 m²", "48 Bancos de Azulejos de Triana", "4 Pontes dos antigos reinos", "Cenário de Star Wars"],
+              tip: "Sobe às varandas do primeiro andar pelas escadarias laterais para uma foto panorâmica elevada sobre o canal."
+            }
+          ]
+        },
+        {
+          dayNumber: "06",
+          route: "Sevilha (Dia Completo)",
+          via: "Dia sem mota • Descoberta cultural e gastronómica da capital",
+          distance: "0 km (Mota)",
+          duration: "Dia Inteiro a Pé",
+          roadType: "Descanso de Condução",
+          difficulty: "Leve (Caminhada)",
+          summary: "Dia inteiro sem equipamentos de mota para absorver a alma de Sevilha: Catedral, Giralda, Real Alcázar, Bairro de Santa Cruz, Casa de Pilatos, Las Setas e jantar de despedida.",
+          zbeWarning: "Dia sem condução. Mantém as motas na garagem do hotel.",
+          fuelRule: "Aproveitar o final do dia para verificar pressão dos pneus e nível de óleo para o regresso.",
+          timeline: [
+            { time: "09:00", title: "Catedral de Sevilha & Giralda", desc: "Subida pelas 35 rampas da Giralda e túmulo de Cristóvão Colombo.", km: "A pé", type: "ticket", lat: 37.3861, lng: -5.9926 },
+            { time: "10:50", title: "Archivo General de Indias", desc: "Visita focada (40 min) ao pátio renascentista e mapas dos Descobrimentos.", km: "A pé", type: "visit", lat: 37.3847, lng: -5.9931 },
+            { time: "11:30", title: "Real Alcázar de Sevilha", desc: "Palácio Mudéjar, Patio de las Doncellas e jardins centenários.", km: "A pé", type: "ticket", lat: 37.3831, lng: -5.9902 },
+            { time: "14:30", title: "Almoço em Santa Cruz", desc: "Tapas tradicionais nas tabernas do antigo bairro judeu.", km: "A pé", type: "food", lat: 37.3855, lng: -5.9892 },
+            { time: "15:45", title: "Casa de Pilatos & Museu Flamenco", desc: "Arquitetura aristocrática sevilhana e história do flamenco.", km: "A pé", type: "visit", lat: 37.3900, lng: -5.9872 },
+            { time: "20:20", title: "Las Setas (Metropol Parasol)", desc: "Passadiço panorâmico 360° na transição do pôr do sol para a noite.", km: "A pé", type: "ticket", lat: 37.3933, lng: -5.9917 }
+          ],
+          walkingRoute: {
+            city: "Sevilha Monumental (Circuito Completo)",
+            estimatedTime: "Dia inteiro",
+            parkingNote: "Mota estacionada no hotel.",
+            stops: [
+              { num: 1, name: "Catedral, Giralda & Archivo de Indias", desc: "Triângulo Património Mundial da UNESCO.", lat: 37.3861, lng: -5.9926 },
+              { num: 2, name: "Real Alcázar", desc: "O palácio real em uso mais antigo da Europa.", lat: 37.3831, lng: -5.9902 },
+              { num: 3, name: "Casa de Pilatos & Igreja do Salvador", desc: "Percurso pelo coração comercial e histórico (Calle Sierpes).", lat: 37.3900, lng: -5.9872 },
+              { num: 4, name: "Las Setas de Sevilla", desc: "Maior estrutura de madeira do mundo com vista noturna sobre a Giralda.", lat: 37.3933, lng: -5.9917 }
+            ]
+          },
+          monuments: [
+            {
+              name: "Catedral de Sevilha & Giralda",
+              location: "Plaza del Triunfo, Sevilha",
+              classification: "Património Mundial UNESCO (1987)",
+              schedule: "09:00 – 10:50",
+              highlights: ["Maior catedral gótica do mundo", "35 rampas da Giralda", "Retábulo-Mor dourado", "Túmulo de Colombo"],
+              tip: "Faz pequenas paragens nas janelas em arco durante a subida da Giralda para fotografar o Pátio dos Laranjeiros."
+            },
+            {
+              name: "Real Alcázar de Sevilha",
+              location: "Patio de Banderas, Sevilha",
+              classification: "Património Mundial UNESCO (1987)",
+              schedule: "11:30 – 13:30 (Reserva antecipada)",
+              highlights: ["Palacio del Rey Don Pedro", "Patio de las Doncellas", "Jardín de Mercurio"],
+              tip: "Entrada sujeita a controlo rigoroso de horário. Leva o bilhete descarregado no Cofre desta app."
+            },
+            {
+              name: "Las Setas (Metropol Parasol)",
+              location: "Plaza de la Encarnación, Sevilha",
+              classification: "Arquitetura Contemporânea",
+              schedule: "20:20 – 21:15",
+              highlights: ["Passadiço panorâmico de 250m", "Antiquarium romano subterrâneo", "Vista 360° iluminada"],
+              tip: "Para na curva do setor sudoeste do passadiço para enquadrar a Giralda iluminada com a estrutura de madeira."
+            }
+          ]
+        },
+        {
+          dayNumber: "07",
+          route: "Sevilha → Lisboa",
+          via: "Sevilha • Pomarão • Mina de São Domingos • Beja • Lisboa",
+          distance: "430 km",
+          duration: "≈ 5h00",
+          roadType: "Fronteira Guadiana & Planície Alentejana",
+          difficulty: "Moderada",
+          summary: "Regresso a Portugal cruzando o Guadiana pelo Pomarão, exploração das ruínas industriais da Mina de São Domingos, pausa para café em Beja e chegada a Lisboa.",
+          zbeWarning: null,
+          fuelRule: "Abastecer em Espanha antes de cruzar para o Pomarão ou em Mértola/Beja.",
+          timeline: [
+            { time: "09:30", title: "Saída de Sevilha", desc: "Rumo à fronteira portuguesa pelo interior andaluz.", km: "0 km", type: "ride", lat: 37.3891, lng: -5.9845 },
+            { time: "11:00", title: "Mina de São Domingos (Hora PT)", desc: "Atenção ao recuo de 1h no relógio ao entrar em Portugal! Exploração das ruínas mineiras.", km: "184 km", type: "visit", lat: 37.6736, lng: -7.5019 },
+            { time: "14:30", title: "Partida para Beja", desc: "Travessia pelo coração do Baixo Alentejo.", km: "184 km", type: "ride", lat: 37.6736, lng: -7.5019 },
+            { time: "15:30", title: "Pausa em Beja", desc: "Café e descanso antes da tirada final até à capital.", km: "249 km", type: "coffee", lat: 38.0151, lng: -7.8632 },
+            { time: "18:30", title: "Chegada a Lisboa", desc: "Conclusão da aventura Caminhos do Sul (~1.750 km percorridos).", km: "430 km", type: "hotel", lat: 38.7223, lng: -9.1393 }
+          ],
+          walkingRoute: {
+            city: "Mina de São Domingos (Mértola)",
+            estimatedTime: "2h00 (11:00 – 13:00)",
+            parkingNote: "Estacionamento amplo junto ao Núcleo Museológico ou Praia Fluvial da Tapada Grande.",
+            stops: [
+              { num: 1, name: "Complexo Mineiro & Oficinas", desc: "Ruínas industriais da antiga exploração britânica Mason & Barry.", lat: 37.6736, lng: -7.5019 },
+              { num: 2, name: "Achada do Gamo", desc: "Corta mineira a céu aberto com lago de águas avermelhadas.", lat: 37.6582, lng: -7.5056 },
+              { num: 3, name: "Praia Fluvial da Tapada Grande", desc: "Albufeira tranquila rodeada de sobreiros para pausa.", lat: 37.6789, lng: -7.4981 }
+            ]
+          },
+          monuments: [
+            {
+              name: "Complexo Mineiro de São Domingos",
+              location: "Mértola, Baixo Alentejo, Portugal",
+              classification: "Conjunto de Interesse Público",
+              schedule: "11:00 – 14:30",
+              highlights: ["Antiga linha férrea até ao Pomarão", "Bairros operários e Palácio dos Ingleses", "Achada do Gamo", "Tapada Grande"],
+              tip: "Excelente local para a fotografia de despedida do grupo com as motas junto às ruínas industriais."
+            }
+          ]
+        }
+      ],
+      tickets: [
+        { id: 1, title: "Alhambra & Palácios Nasridas", day: "Dia 02 • 15:30 (Hora Fixa)", code: "ALH-2026-88492", note: "Chegar 30 min antes. Apresentar Cartão de Cidadão original na entrada dos Palácios." },
+        { id: 2, title: "Castelo de Gibralfaro + Alcazaba", day: "Dia 03 • 17:30", code: "MLG-COMB-550", note: "Bilhete combinado (~5,50 €) comprado na bilheteira do topo de Gibralfaro." },
+        { id: 3, title: "Catedral de Sevilha & Giralda", day: "Dia 06 • 09:00", code: "SEV-CAT-1049", note: "Acesso pela Puerta del Lagarto / Patio de los Naranjos." },
+        { id: 4, title: "Real Alcázar de Sevilha", day: "Dia 06 • 11:30", code: "SEV-ALC-7731", note: "Entrada pela Puerta del León (Patio de Banderas)." },
+        { id: 5, title: "Las Setas de Sevilla (Mirador)", day: "Dia 06 • 20:20", code: "SEV-SET-360", note: "Inclui acesso ao passadiço noturno Feeling Sevilla." }
+      ],
+      checklist: [
+        { category: "Documentação & Emergência", items: ["Cartão de Cidadão / Passaporte", "Carta de Condução", "DUA / Livrete da Mota", "Seguro + Carta Verde", "Cartão Europeu Seguro Doença", "Assistência em Viagem (Apólice)"] },
+        { category: "Mota & Ferramentas", items: ["Pressão e desgaste dos pneus", "Nível de óleo e líquido refrigeração", "Corrente limpa e lubrificada", "Kit reparação furos + compressor", "Abraçadeiras, fita americana e lanterna", "Suporte telemóvel + cabo USB/12V"] },
+        { category: "Equipamento (Regra das 4 Estações)", items: ["Capacete + Intercomunicador carregado", "Casaco e calças com proteções", "Camada térmica (manhãs frescas na serra)", "Fato de chuva acessível", "2 pares de luvas (verão + impermeável)", "Powerbank + saco estanque"] }
+      ]
+    };
+
+    // Estado da Aplicação (persistido em LocalStorage para uso Offline)
+    let appState = JSON.parse(localStorage.getItem('caminhos_do_sul_state')) || {
+      tripData: DEFAULT_TRIP_DATA,
+      currentDayIdx: 0,
+      currentSubTab: 'cockpit',
+      mainSection: 'route',
+      checkedItems: {},
+      diaryLogs: {}
+    };
+
+    function saveState() {
+      localStorage.setItem('caminhos_do_sul_state', JSON.stringify(appState));
+    }
+
+    // Alternar Modo Viagem (iPhone) vs Modo Planeador (PC)
+    function switchMode(mode) {
+      const mobileView = document.getElementById('view-mobile');
+      const desktopView = document.getElementById('view-desktop');
+      const btnMobile = document.getElementById('btn-mode-mobile');
+      const btnDesktop = document.getElementById('btn-mode-desktop');
+
+      if (mode === 'mobile') {
+        mobileView.classList.remove('hidden');
+        desktopView.classList.add('hidden');
+        btnMobile.className = "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all bg-gold-500 text-navy-900 shadow";
+        btnDesktop.className = "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all text-slate-300 hover:text-white";
+        renderMobileApp();
+      } else {
+        mobileView.classList.add('hidden');
+        desktopView.classList.remove('hidden');
+        btnDesktop.className = "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all bg-gold-500 text-navy-900 shadow";
+        btnMobile.className = "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all text-slate-300 hover:text-white";
+        renderDesktopPlanner();
+      }
+      lucide.createIcons();
+    }
+
+    // Links Externos de Navegação GPS (Google Maps, Waze, Apple Maps)
+    function openGPS(app, lat, lng, label) {
+      const encodedLabel = encodeURIComponent(label);
+      let url = '';
+      if (app === 'google') {
+        url = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}&travelmode=driving`;
+      } else if (app === 'waze') {
+        url = `https://waze.com/ul?ll=${lat},${lng}&navigate=yes`;
+      } else if (app === 'apple') {
+        url = `http://maps.apple.com/?daddr=${lat},${lng}&dirflg=d`;
+      } else if (app === 'walk') {
+        url = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}&travelmode=walking`;
+      }
+      window.open(url, '_blank');
+    }
+
+    // Selecionar Dia
+    function selectDay(idx) {
+      appState.currentDayIdx = idx;
+      appState.mainSection = 'route';
+      saveState();
+      renderMobileApp();
+    }
+
+    // Alternar Sub-Aba (Estrada | Roteiro a Pé | Monumentos)
+    function switchSubTab(tab) {
+      appState.currentSubTab = tab;
+      saveState();
+      renderMobileApp();
+    }
+
+    // Alternar Secção Principal Inferior (Roteiro | Bilhetes | Checklist | Diário)
+    function showMainMobileSection(section) {
+      appState.mainSection = section;
+      saveState();
+      renderMobileApp();
+    }
+
+    // Renderizar Interface Mobile (iPhone/Android)
+    function renderMobileApp() {
+      const trip = appState.tripData;
+      document.getElementById('app-title').textContent = trip.title;
+      document.getElementById('app-subtitle').textContent = trip.subtitle;
+
+      // Atualizar botões da barra inferior
+      ['route', 'wallet', 'checklist', 'diary'].forEach(sec => {
+        const el = document.getElementById(`nav-${sec}`);
+        if (appState.mainSection === sec) {
+          el.classList.add('text-gold-400');
+          el.classList.remove('text-slate-300');
+        } else {
+          el.classList.remove('text-gold-400');
+          el.classList.add('text-slate-300');
+        }
+      });
+
+      const routeSubTabs = document.querySelector('#view-mobile > div:nth-child(3)');
+      const stageHero = document.getElementById('stage-hero');
+      const mobileContent = document.getElementById('mobile-content');
+      const globalView = document.getElementById('mobile-global-view');
+
+      if (appState.mainSection !== 'route') {
+        stageHero.classList.add('hidden');
+        routeSubTabs.classList.add('hidden');
+        mobileContent.classList.add('hidden');
+        globalView.classList.remove('hidden');
+        renderGlobalSection(appState.mainSection);
+        lucide.createIcons();
+        return;
+      }
+
+      stageHero.classList.remove('hidden');
+      routeSubTabs.classList.remove('hidden');
+      mobileContent.classList.remove('hidden');
+      globalView.classList.add('hidden');
+
+      // Renderizar Seletor de Dias
+      const daySelector = document.getElementById('day-selector');
+      daySelector.innerHTML = trip.days.map((d, idx) => {
+        const active = idx === appState.currentDayIdx;
+        return `
+          <button onclick="selectDay(${idx})" class="shrink-0 px-3.5 py-2 rounded-xl border text-left transition-all ${
+            active 
+              ? 'bg-gold-500 text-navy-900 border-gold-400 font-bold shadow-md' 
+              : 'bg-navy-900/60 text-slate-300 border-slate-700 hover:border-slate-500'
+          }">
+            <div class="text-[10px] uppercase tracking-wider opacity-80">Dia ${d.dayNumber}</div>
+            <div class="text-xs font-extrabold whitespace-nowrap">${d.route.split('→')[1]?.trim() || d.route}</div>
+          </button>
+        `;
+      }).join('');
+
+      const day = trip.days[appState.currentDayIdx];
+      const finalStop = day.timeline[day.timeline.length - 1];
+
+      // Renderizar Hero Card da Etapa
+      stageHero.innerHTML = `
+        <div class="bg-navy-900 text-white rounded-2xl p-4 shadow-lg border border-gold-500/30 relative overflow-hidden">
+          <div class="flex items-start justify-between gap-2">
+            <div>
+              <span class="inline-block text-[10px] font-bold uppercase tracking-widest bg-gold-500/20 text-gold-400 px-2.5 py-0.5 rounded-full border border-gold-500/30">
+                Etapa ${day.dayNumber} • ${day.roadType}
+              </span>
+              <h2 class="font-editorial text-xl font-bold text-white mt-1.5">${day.route}</h2>
+              <p class="text-xs text-slate-300 mt-0.5">${day.via}</p>
+            </div>
+            <div class="text-right shrink-0 bg-navy-800 px-3 py-2 rounded-xl border border-slate-700">
+              <div class="text-sm font-extrabold text-gold-400">${day.distance}</div>
+              <div class="text-[11px] text-slate-300">${day.duration}</div>
+            </div>
+          </div>
+
+          <p class="text-xs text-slate-300 mt-3 leading-relaxed border-t border-slate-800 pt-2.5">
+            ${day.summary}
+          </p>
+
+          ${day.zbeWarning ? `
+            <div class="mt-3 bg-red-950/70 border border-red-500/50 rounded-xl p-3 flex items-start gap-2.5">
+              <i data-lucide="alert-triangle" class="w-5 h-5 text-red-400 shrink-0 mt-0.5"></i>
+              <div class="text-xs text-red-100 leading-snug">
+                <strong class="text-red-300 block mb-0.5">Alerta de Circulação (ZBE):</strong>
+                ${day.zbeWarning}
+              </div>
+            </div>
+          ` : ''}
+
+          <!-- Botões Grandes de Navegação Rápida (Cockpit Mota) -->
+          ${finalStop && finalStop.lat ? `
+            <div class="mt-3 pt-3 border-t border-slate-800">
+              <div class="text-[10px] uppercase tracking-wider text-slate-400 font-bold mb-2">Iniciar Navegação da Etapa Completa:</div>
+              <div class="grid grid-cols-3 gap-2">
+                <button onclick="openGPS('google', ${finalStop.lat}, ${finalStop.lng}, '${day.route}')" class="bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white font-bold text-xs py-2.5 px-2 rounded-xl flex items-center justify-center gap-1.5 shadow transition">
+                  <i data-lucide="navigation" class="w-4 h-4"></i>
+                  <span>Google Maps</span>
+                </button>
+                <button onclick="openGPS('waze', ${finalStop.lat}, ${finalStop.lng}, '${day.route}')" class="bg-sky-600 hover:bg-sky-500 active:scale-95 text-white font-bold text-xs py-2.5 px-2 rounded-xl flex items-center justify-center gap-1.5 shadow transition">
+                  <i data-lucide="compass" class="w-4 h-4"></i>
+                  <span>Waze</span>
+                </button>
+                <button onclick="openGPS('apple', ${finalStop.lat}, ${finalStop.lng}, '${day.route}')" class="bg-slate-700 hover:bg-slate-600 active:scale-95 text-white font-bold text-xs py-2.5 px-2 rounded-xl flex items-center justify-center gap-1.5 shadow transition">
+                  <i data-lucide="map-pin" class="w-4 h-4"></i>
+                  <span>Apple Mapas</span>
+                </button>
+              </div>
+            </div>
+          ` : ''}
+        </div>
+      `;
+
+      // Atualizar estilo das Sub-Abas
+      ['cockpit', 'walking', 'monuments'].forEach(t => {
+        const btn = document.getElementById(`subtab-${t}`);
+        if (appState.currentSubTab === t) {
+          btn.className = "tab-active py-2.5 px-2 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 transition-all";
+        } else {
+          btn.className = "text-slate-700 py-2.5 px-2 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 transition-all hover:bg-white/60";
+        }
+      });
+
+      // Renderizar Conteúdo da Sub-Aba Ativa
+      if (appState.currentSubTab === 'cockpit') {
+        renderCockpitTimeline(day);
+      } else if (appState.currentSubTab === 'walking') {
+        renderWalkingGuide(day);
+      } else if (appState.currentSubTab === 'monuments') {
+        renderMonumentsList(day);
+      }
+
+      lucide.createIcons();
+    }
+
+    function getTypeBadge(type) {
+      const map = {
+        ride: { icon: 'bike', color: 'bg-slate-100 text-slate-700', label: 'Estrada' },
+        fuel: { icon: 'fuel', color: 'bg-amber-100 text-amber-800', label: 'Combustível' },
+        coffee: { icon: 'coffee', color: 'bg-orange-100 text-orange-800', label: 'Pausa' },
+        food: { icon: 'utensils', color: 'bg-emerald-100 text-emerald-800', label: 'Refeição' },
+        visit: { icon: 'landmark', color: 'bg-indigo-100 text-indigo-800', label: 'Visita' },
+        photo: { icon: 'camera', color: 'bg-pink-100 text-pink-800', label: 'Miradouro' },
+        hotel: { icon: 'bed', color: 'bg-purple-100 text-purple-800', label: 'Alojamento' },
+        ticket: { icon: 'ticket', color: 'bg-red-100 text-red-800', label: 'Bilhete Fixo' },
+        walk: { icon: 'footprints', color: 'bg-teal-100 text-teal-800', label: 'A Pé' }
+      };
+      return map[type] || map.ride;
+    }
+
+    // Sub-Aba 1: Timeline Horária & Navegação por Paragem
+    function renderCockpitTimeline(day) {
+      const container = document.getElementById('mobile-content');
+      container.innerHTML = `
+        <div class="bg-amber-50 border border-amber-200 rounded-xl p-3 flex items-center gap-2.5 text-xs text-amber-900">
+          <i data-lucide="fuel" class="w-4 h-4 text-amber-600 shrink-0"></i>
+          <span><strong>Gestão de Autonomia:</strong> ${day.fuelRule}</span>
+        </div>
+
+        <div class="space-y-3">
+          ${day.timeline.map((item, index) => {
+            const badge = getTypeBadge(item.type);
+            return `
+              <div class="bg-white rounded-2xl p-4 shadow-sm border border-sand-200 relative">
+                <div class="flex items-start justify-between gap-3">
+                  <div class="flex items-center gap-2.5">
+                    <span class="bg-navy-900 text-gold-400 font-extrabold text-xs px-2.5 py-1 rounded-lg">${item.time}</span>
+                    <span class="inline-flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-md ${badge.color}">
+                      <i data-lucide="${badge.icon}" class="w-3 h-3"></i> ${badge.label}
+                    </span>
+                  </div>
+                  <span class="text-xs font-bold text-slate-400">${item.km}</span>
+                </div>
+
+                <h4 class="font-bold text-base text-navy-900 mt-2">${item.title}</h4>
+                <p class="text-xs text-slate-600 mt-1 leading-relaxed">${item.desc}</p>
+
+                ${item.lat ? `
+                  <div class="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between gap-2">
+                    <span class="text-[11px] text-slate-400 font-mono">${item.lat.toFixed(4)}, ${item.lng.toFixed(4)}</span>
+                    <div class="flex gap-1.5">
+                      <button onclick="openGPS('google', ${item.lat}, ${item.lng}, '${item.title}')" class="bg-navy-900 hover:bg-navy-800 text-gold-400 text-xs font-bold px-3 py-1.5 rounded-lg flex items-center gap-1 transition">
+                        <i data-lucide="navigation" class="w-3.5 h-3.5"></i> Ir para aqui
+                      </button>
+                      <button onclick="openGPS('waze', ${item.lat}, ${item.lng}, '${item.title}')" class="bg-sky-100 hover:bg-sky-200 text-sky-800 text-xs font-bold px-2.5 py-1.5 rounded-lg transition">
+                        Waze
+                      </button>
+                    </div>
+                  </div>
+                ` : ''}
+              </div>
+            `;
+          }).join('')}
+        </div>
+      `;
+    }
+
+    // Sub-Aba 2: Roteiro Apeado nas Localidades
+    function renderWalkingGuide(day) {
+      const walk = day.walkingRoute;
+      const container = document.getElementById('mobile-content');
+      container.innerHTML = `
+        <div class="bg-white rounded-2xl p-4 shadow-sm border border-sand-200">
+          <div class="flex items-center justify-between">
+            <div>
+              <span class="text-[10px] font-bold uppercase tracking-wider text-teal-700 bg-teal-50 px-2 py-0.5 rounded-full border border-teal-200">Modo Explorador a Pé</span>
+              <h3 class="font-editorial text-lg font-bold text-navy-900 mt-1">${walk.city}</h3>
+            </div>
+            <div class="text-right text-xs text-slate-500">
+              <i data-lucide="clock" class="w-3.5 h-3.5 inline mr-0.5"></i> ${walk.estimatedTime}
+            </div>
+          </div>
+
+          <div class="mt-3 bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs text-slate-700 flex items-start gap-2">
+            <i data-lucide="parking-circle" class="w-4 h-4 text-navy-900 shrink-0 mt-0.5"></i>
+            <div><strong>Estacionamento Motas:</strong> ${walk.parkingNote}</div>
+          </div>
+
+          <!-- Mapa Esquemático Interativo do Percurso Pedonal -->
+          <div class="mt-4 bg-sand-100 rounded-xl p-4 border border-sand-200 relative overflow-hidden">
+            <div class="text-[11px] font-bold uppercase text-slate-500 mb-3 flex items-center justify-between">
+              <span>Sequência do Percurso Pedonal</span>
+              <span class="text-gold-600">Toca num ponto para navegar a pé</span>
+            </div>
+            <div class="relative pl-6 space-y-4 before:content-[''] before:absolute before:left-[11px] before:top-2 before:bottom-2 before:w-0.5 before:bg-dashed before:border-l-2 before:border-dashed before:border-gold-600">
+              ${walk.stops.map(stop => `
+                <div class="relative bg-white p-3.5 rounded-xl shadow-sm border border-sand-200">
+                  <div class="absolute -left-6 top-3.5 w-6 h-6 rounded-full bg-navy-900 text-gold-400 font-extrabold text-xs flex items-center justify-center shadow">
+                    ${stop.num}
+                  </div>
+                  <div class="flex items-start justify-between gap-2">
+                    <h4 class="font-bold text-sm text-navy-900">${stop.name}</h4>
+                    <button onclick="openGPS('walk', ${stop.lat}, ${stop.lng}, '${stop.name}')" class="shrink-0 bg-teal-600 hover:bg-teal-700 text-white text-[11px] font-bold px-2.5 py-1 rounded-lg flex items-center gap-1">
+                      <i data-lucide="footprints" class="w-3 h-3"></i> Guiar a Pé
+                    </button>
+                  </div>
+                  <p class="text-xs text-slate-600 mt-1 leading-relaxed">${stop.desc}</p>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    // Sub-Aba 3: Fichas Técnicas dos Monumentos
+    function renderMonumentsList(day) {
+      const container = document.getElementById('mobile-content');
+      if (!day.monuments || day.monuments.length === 0) {
+        container.innerHTML = `<div class="bg-white rounded-2xl p-6 text-center text-xs text-slate-500">Sem fichas técnicas específicas para este dia.</div>`;
+        return;
+      }
+
+      container.innerHTML = day.monuments.map((m, idx) => `
+        <div class="bg-white rounded-2xl p-5 shadow-sm border border-sand-200 space-y-3">
+          <div class="flex items-start justify-between gap-2">
+            <div>
+              <span class="text-[10px] font-bold uppercase tracking-widest text-gold-600">${m.classification}</span>
+              <h3 class="font-editorial text-lg font-bold text-navy-900 mt-0.5">${m.name}</h3>
+              <p class="text-xs text-slate-500 flex items-center gap-1 mt-0.5">
+                <i data-lucide="map-pin" class="w-3.5 h-3.5 text-gold-500"></i> ${m.location}
+              </p>
+            </div>
+            <span class="bg-navy-900 text-gold-400 text-[11px] font-bold px-2.5 py-1 rounded-lg shrink-0">${m.schedule}</span>
+          </div>
+
+          <div>
+            <div class="text-[11px] font-bold uppercase text-slate-400 mb-1.5">Destaques Arquitetónicos & Históricos</div>
+            <ul class="space-y-1">
+              ${m.highlights.map(h => `
+                <li class="text-xs text-slate-700 flex items-center gap-2">
+                  <span class="w-1.5 h-1.5 rounded-full bg-gold-500 shrink-0"></span>
+                  <span>${h}</span>
+                </li>
+              `).join('')}
+            </ul>
+          </div>
+
+          <div class="bg-sand-100 rounded-xl p-3 border border-sand-200 text-xs text-navy-900">
+            <strong class="text-gold-600 block mb-0.5">★ Dica "Caminhos do Sul":</strong>
+            ${m.tip}
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // Secções Globais (Cofre de Bilhetes, Checklist, Diário & Contactos)
+    function renderGlobalSection(section) {
+      const container = document.getElementById('mobile-global-view');
+      const trip = appState.tripData;
+
+      if (section === 'wallet') {
+        container.innerHTML = `
+          <div class="bg-navy-900 text-white rounded-2xl p-4 shadow-md border border-gold-500/30">
+            <h2 class="font-editorial text-lg font-bold text-gold-400">Cofre de Bilhetes & Emergência</h2>
+            <p class="text-xs text-slate-300 mt-0.5">Acesso rápido offline nas bilheteiras e contactos em Espanha.</p>
+          </div>
+
+          <!-- Contactos de Emergência Espanha -->
+          <div class="bg-red-50 border border-red-200 rounded-2xl p-4">
+            <div class="text-xs font-bold uppercase text-red-800 mb-2 flex items-center gap-1.5">
+              <i data-lucide="phone-call" class="w-4 h-4"></i> Emergência Espanha (Marcação Direta)
+            </div>
+            <div class="grid grid-cols-3 gap-2 text-center">
+              <a href="tel:112" class="bg-white border border-red-200 rounded-xl py-2 px-1 shadow-sm">
+                <div class="text-base font-extrabold text-red-600">112</div>
+                <div class="text-[10px] font-semibold text-slate-600">Geral Europa</div>
+              </a>
+              <a href="tel:062" class="bg-white border border-red-200 rounded-xl py-2 px-1 shadow-sm">
+                <div class="text-base font-extrabold text-navy-900">062</div>
+                <div class="text-[10px] font-semibold text-slate-600">Guardia Civil</div>
+              </a>
+              <a href="tel:061" class="bg-white border border-red-200 rounded-xl py-2 px-1 shadow-sm">
+                <div class="text-base font-extrabold text-emerald-700">061</div>
+                <div class="text-[10px] font-semibold text-slate-600">Ambulância</div>
+              </a>
+            </div>
+          </div>
+
+          <!-- Lista de Bilhetes -->
+          <div class="space-y-3">
+            ${trip.tickets.map(t => `
+              <div onclick="openTicketModal(${t.id})" class="bg-white rounded-2xl p-4 shadow-sm border border-sand-200 flex items-center justify-between gap-3 cursor-pointer hover:border-gold-500 transition">
+                <div>
+                  <span class="text-[10px] font-bold uppercase text-gold-600">${t.day}</span>
+                  <h4 class="font-bold text-sm text-navy-900 mt-0.5">${t.title}</h4>
+                  <p class="text-xs text-slate-500 font-mono mt-1">Ref: ${t.code}</p>
+                </div>
+                <div class="w-11 h-11 rounded-xl bg-navy-900 text-gold-400 flex items-center justify-center shrink-0">
+                  <i data-lucide="qr-code" class="w-6 h-6"></i>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        `;
+      } else if (section === 'checklist') {
+        container.innerHTML = `
+          <div class="bg-navy-900 text-white rounded-2xl p-4 shadow-md border border-gold-500/30">
+            <h2 class="font-editorial text-lg font-bold text-gold-400">Checklist do Motociclista</h2>
+            <p class="text-xs text-slate-300 mt-0.5">Regra de Ouro: prepara-te para calor, chuva, vento e frio de altitude no mesmo dia.</p>
+          </div>
+
+          ${trip.checklist.map((cat, cIdx) => `
+            <div class="bg-white rounded-2xl p-4 shadow-sm border border-sand-200">
+              <h3 class="font-bold text-sm text-navy-900 mb-3 border-b border-slate-100 pb-2">${cat.category}</h3>
+              <div class="space-y-2.5">
+                ${cat.items.map((item, iIdx) => {
+                  const key = `${cIdx}-${iIdx}`;
+                  const checked = !!appState.checkedItems[key];
+                  return `
+                    <label class="flex items-center gap-3 cursor-pointer select-none">
+                      <input type="checkbox" ${checked ? 'checked' : ''} onchange="toggleCheckItem('${key}')" class="w-4 h-4 rounded text-gold-600 focus:ring-gold-500" />
+                      <span class="text-xs ${checked ? 'line-through text-slate-400' : 'text-slate-700 font-medium'}">${item}</span>
+                    </label>
+                  `;
+                }).join('')}
+              </div>
+            </div>
+          `).join('')}
+        `;
+      } else if (section === 'diary') {
+        const day = trip.days[appState.currentDayIdx];
+        const log = appState.diaryLogs[day.dayNumber] || { km: '', fuel: '', expense: '', notes: '' };
+        container.innerHTML = `
+          <div class="bg-navy-900 text-white rounded-2xl p-4 shadow-md border border-gold-500/30">
+            <h2 class="font-editorial text-lg font-bold text-gold-400">Diário de Bordo • Dia ${day.dayNumber}</h2>
+            <p class="text-xs text-slate-300 mt-0.5">${day.route} (Guardado offline no telemóvel)</p>
+          </div>
+
+          <div class="bg-white rounded-2xl p-4 shadow-sm border border-sand-200 space-y-3">
+            <div class="grid grid-cols-3 gap-2">
+              <div>
+                <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Km Reais</label>
+                <input type="number" value="${log.km}" onchange="updateDiary('${day.dayNumber}', 'km', this.value)" placeholder="Ex: 515" class="w-full text-xs px-3 py-2 rounded-xl border border-slate-300" />
+              </div>
+              <div>
+                <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Litros Comb.</label>
+                <input type="number" step="0.1" value="${log.fuel}" onchange="updateDiary('${day.dayNumber}', 'fuel', this.value)" placeholder="Ex: 18.5" class="w-full text-xs px-3 py-2 rounded-xl border border-slate-300" />
+              </div>
+              <div>
+                <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Despesas (€)</label>
+                <input type="number" step="0.5" value="${log.expense}" onchange="updateDiary('${day.dayNumber}', 'expense', this.value)" placeholder="Ex: 85" class="w-full text-xs px-3 py-2 rounded-xl border border-slate-300" />
+              </div>
+            </div>
+            <div>
+              <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Notas & Memórias da Etapa</label>
+              <textarea rows="4" onchange="updateDiary('${day.dayNumber}', 'notes', this.value)" placeholder="Regista restaurantes descobertos, estado das estradas ou melhores fotos..." class="w-full text-xs p-3 rounded-xl border border-slate-300">${log.notes}</textarea>
+            </div>
+          </div>
+        `;
+      }
+    }
+
+    function toggleCheckItem(key) {
+      appState.checkedItems[key] = !appState.checkedItems[key];
+      saveState();
+      renderGlobalSection('checklist');
+    }
+
+    function updateDiary(dayNum, field, val) {
+      if (!appState.diaryLogs[dayNum]) appState.diaryLogs[dayNum] = {};
+      appState.diaryLogs[dayNum][field] = val;
+      saveState();
+    }
+
+    function openTicketModal(id) {
+      const t = appState.tripData.tickets.find(item => item.id === id);
+      if (!t) return;
+      document.getElementById('modal-tag').textContent = t.day;
+      document.getElementById('modal-title').textContent = t.title;
+      document.getElementById('modal-body').innerHTML = `
+        <div class="bg-sand-100 p-6 rounded-2xl border border-sand-200 flex flex-col items-center text-center">
+          <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 mb-3">
+            <i data-lucide="qr-code" class="w-32 h-32 text-navy-900"></i>
+          </div>
+          <div class="font-mono font-extrabold text-base text-navy-900 tracking-wider">${t.code}</div>
+          <div class="text-[11px] text-emerald-700 font-bold mt-1">✓ Disponível Offline</div>
+        </div>
+        <div class="bg-amber-50 border border-amber-200 rounded-xl p-3 text-xs text-amber-900">
+          <strong>Nota de Acesso:</strong> ${t.note}
+        </div>
+      `;
+      document.getElementById('modal-overlay').classList.remove('hidden');
+      lucide.createIcons();
+    }
+
+    function closeModal() {
+      document.getElementById('modal-overlay').classList.add('hidden');
+    }
+
+    // =====================================================================
+    // FUNÇÕES DO PLANEADOR & IMPORTADOR PC (.PPTX e .KMZ/.KML)
+    // =====================================================================
+    function renderDesktopPlanner() {
+      const days = appState.tripData.days;
+      document.getElementById('desktop-stage-count').textContent = `${days.length} Etapas carregadas`;
+      const tbody = document.getElementById('desktop-stages-table');
+      tbody.innerHTML = days.map((d, idx) => `
+        <tr class="hover:bg-sand-50">
+          <td class="py-3 px-3 font-bold text-navy-900">Dia ${d.dayNumber}</td>
+          <td class="py-3 px-3 font-semibold text-slate-800">${d.route}</td>
+          <td class="py-3 px-3 text-xs text-slate-600">${d.distance} (${d.duration})</td>
+          <td class="py-3 px-3 text-xs text-slate-600">${d.timeline.length} pontos • ${d.monuments.length} fichas técnicas</td>
+          <td class="py-3 px-3 text-right">
+            <button onclick="selectDay(${idx}); switchMode('mobile');" class="text-xs font-bold text-gold-600 hover:text-gold-500">
+              Pré-visualizar no iPhone →
+            </button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    // Leitor real de PowerPoint (.pptx) usando JSZip + DOMParser XML
+    async function handlePptxUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const statusEl = document.getElementById('pptx-status');
+      statusEl.innerHTML = `<span class="text-amber-600 font-semibold">A processar slides de ${file.name}...</span>`;
+
+      try {
+        const zip = await JSZip.loadAsync(file);
+        const slideFiles = Object.keys(zip.files)
+          .filter(name => name.match(/^ppt\/slides\/slide\d+\.xml$/))
+          .sort((a, b) => {
+            const numA = parseInt(a.match(/\d+/)[0]);
+            const numB = parseInt(b.match(/\d+/)[0]);
+            return numA - numB;
+          });
+
+        const extractedSlides = [];
+        const parser = new DOMParser();
+
+        for (const slidePath of slideFiles) {
+          const xmlText = await zip.files[slidePath].async('string');
+          const xmlDoc = parser.parseFromString(xmlText, 'application/xml');
+          const textNodes = Array.from(xmlDoc.getElementsByTagName('a:t'));
+          const fullText = textNodes.map(n => n.textContent).join(' ').replace(/\s+/g, ' ').trim();
+          if (fullText) {
+            extractedSlides.push({
+              slide: slidePath.match(/\d+/)[0],
+              text: fullText
+            });
+          }
+        }
+
+        statusEl.innerHTML = `<span class="text-emerald-700 font-bold">✓ ${extractedSlides.length} slides lidos com sucesso!</span>`;
+        
+        const previewBox = document.getElementById('import-preview-box');
+        const previewTitle = document.getElementById('import-preview-title');
+        const previewContent = document.getElementById('import-preview-content');
+        
+        previewTitle.textContent = `Conteúdo Extraído do PowerPoint: ${file.name} (${extractedSlides.length} slides)`;
+        previewContent.innerHTML = extractedSlides.slice(0, 15).map(s => `
+          <div class="p-2.5 rounded-lg bg-navy-900/70 border border-slate-700">
+            <span class="text-gold-400 font-bold">Slide ${s.slide}:</span>
+            <span class="text-slate-300">${s.text.substring(0, 220)}${s.text.length > 220 ? '...' : ''}</span>
+          </div>
+        `).join('') + (extractedSlides.length > 15 ? `<div class="text-slate-400 italic pt-1">... e mais ${extractedSlides.length - 15} slides processados.</div>` : '');
+        
+        previewBox.classList.remove('hidden');
+        lucide.createIcons();
+      } catch (err) {
+        statusEl.innerHTML = `<span class="text-red-600 font-bold">Erro ao ler .pptx: ${err.message}</span>`;
+      }
+    }
+
+    // Leitor real de Google Maps (.kmz / .kml)
+    async function handleKmzUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const statusEl = document.getElementById('kmz-status');
+      statusEl.innerHTML = `<span class="text-amber-600 font-semibold">A extrair coordenadas de ${file.name}...</span>`;
+
+      try {
+        let kmlString = '';
+        if (file.name.toLowerCase().endsWith('.kmz')) {
+          const zip = await JSZip.loadAsync(file);
+          const kmlFile = Object.keys(zip.files).find(n => n.toLowerCase().endsWith('.kml'));
+          if (!kmlFile) throw new Error('Ficheiro KML não encontrado dentro do KMZ.');
+          kmlString = await zip.files[kmlFile].async('string');
+        } else {
+          kmlString = await file.text();
+        }
+
+        const parser = new DOMParser();
+        const xmlDoc = parser.parseFromString(kmlString, 'application/xml');
+        const placemarks = Array.from(xmlDoc.getElementsByTagName('Placemark'));
+        
+        const waypoints = placemarks.map(pm => {
+          const name = pm.getElementsByTagName('name')[0]?.textContent?.trim() || 'Ponto sem nome';
+          const desc = pm.getElementsByTagName('description')[0]?.textContent?.replace(/<[^>]*>?/gm, '').trim() || '';
+          const coordsRaw = pm.getElementsByTagName('coordinates')[0]?.textContent?.trim() || '';
+          const firstCoord = coordsRaw.split(/\s+/)[0]?.split(',');
+          const lng = firstCoord && firstCoord[0] ? parseFloat(firstCoord[0]) : null;
+          const lat = firstCoord && firstCoord[1] ? parseFloat(firstCoord[1]) : null;
+          return { name, desc, lat, lng };
+        }).filter(w => w.lat && w.lng);
+
+        statusEl.innerHTML = `<span class="text-emerald-700 font-bold">✓ ${waypoints.length} pontos GPS importados!</span>`;
+
+        const previewBox = document.getElementById('import-preview-box');
+        const previewTitle = document.getElementById('import-preview-title');
+        const previewContent = document.getElementById('import-preview-content');
+
+        previewTitle.textContent = `Pontos GPS Extraídos de ${file.name} (${waypoints.length} locais)`;
+        previewContent.innerHTML = waypoints.slice(0, 20).map(w => `
+          <div class="p-2.5 rounded-lg bg-navy-900/70 border border-slate-700 flex items-center justify-between gap-2">
+            <div>
+              <div class="font-bold text-gold-400">${w.name}</div>
+              <div class="text-[11px] text-slate-400">${w.lat.toFixed(5)}, ${w.lng.toFixed(5)} ${w.desc ? '• ' + w.desc.substring(0, 80) : ''}</div>
+            </div>
+            <button onclick="openGPS('google', ${w.lat}, ${w.lng}, '${w.name.replace(/'/g, '')}')" class="bg-emerald-600 text-white px-2.5 py-1 rounded text-[11px] font-bold shrink-0">Testar GPS</button>
+          </div>
+        `).join('');
+
+        previewBox.classList.remove('hidden');
+        lucide.createIcons();
+      } catch (err) {
+        statusEl.innerHTML = `<span class="text-red-600 font-bold">Erro ao ler mapa: ${err.message}</span>`;
+      }
+    }
+
+    function addNewTicket(event) {
+      event.preventDefault();
+      const title = document.getElementById('ticket-title').value.trim();
+      const day = document.getElementById('ticket-day').value.trim();
+      const code = document.getElementById('ticket-code').value.trim();
+      if (!title || !day || !code) return;
+
+      appState.tripData.tickets.push({
+        id: Date.now(),
+        title,
+        day,
+        code,
+        note: "Adicionado manualmente no Planeador PC."
+      });
+      saveState();
+      event.target.reset();
+      alert('Bilhete guardado no Cofre Offline! Já está disponível no separador "Bilhetes & ZBE" do modo Viagem.');
+    }
+
+    function exportTripJSON() {
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appState.tripData, null, 2));
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", "caminhos_do_sul_roteiro.json");
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+    }
+
+    function resetToDefaultTrip() {
+      if (confirm('Repor os dados originais de "Caminhos do Sul"?')) {
+        appState.tripData = DEFAULT_TRIP_DATA;
+        saveState();
+        renderDesktopPlanner();
+        renderMobileApp();
+      }
+    }
+
+    // Inicialização
+    window.addEventListener('DOMContentLoaded', () => {
+      renderMobileApp();
+      lucide.createIcons();
+    });
+  </script>
+</body>
+</html>

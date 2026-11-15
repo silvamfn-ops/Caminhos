@@ -1,0 +1,17 @@
+{
+  "name": "Caminhos do Sul — Moto-Turismo & Guia Cultural",
+  "short_name": "Caminhos do Sul",
+  "description": "Guia de viagem de mota, navegação e roteiros apeados culturais.",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#0B1120",
+  "theme_color": "#0B1120",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/854/854878.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
