@@ -60,33 +60,23 @@
     .font-editorial {
       font-family: 'Cinzel', serif;
     }
-    /* Hide scrollbar for Chrome, Safari and Opera */
     .no-scrollbar::-webkit-scrollbar {
       display: none;
     }
-    /* Hide scrollbar for IE, Edge and Firefox */
     .no-scrollbar {
-      -ms-overflow-style: none;  /* IE and Edge */
-      scrollbar-width: none;  /* Firefox */
+      -ms-overflow-style: none;
+      scrollbar-width: none;
     }
     .tab-active {
       background-color: #0B1120;
       color: #FBBF24;
       box-shadow: 0 4px 12px rgba(11, 17, 32, 0.25);
     }
-    .pulse-dot {
-      animation: pulse-ring 2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
-    }
-    @keyframes pulse-ring {
-      0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(217, 119, 6, 0.7); }
-      70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(217, 119, 6, 0); }
-      100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(217, 119, 6, 0); }
-    }
   </style>
 </head>
 <body class="bg-sand-50 min-h-screen flex flex-col">
 
-  <!-- TOP BAR: Seletor de Ambiente (Modo Mota/iPhone vs Modo Planeador PC) -->
+  <!-- TOP BAR: Seletor de Ambiente -->
   <header class="bg-navy-900 text-white sticky top-0 z-50 border-b border-gold-500/30 shadow-lg">
     <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between gap-2">
       <div class="flex items-center gap-3">
@@ -118,7 +108,7 @@
   <!-- ===================================================================== -->
   <main id="view-mobile" class="flex-1 max-w-2xl w-full mx-auto pb-28">
     
-    <!-- Seletor Horizontal de Dias (Etapas 01 a 07) -->
+    <!-- Seletor Horizontal de Dias -->
     <div class="bg-navy-800 text-white px-4 pt-3 pb-4 shadow-md">
       <div class="flex items-center justify-between mb-2">
         <span class="text-[11px] font-semibold uppercase tracking-wider text-gold-400">Selecionar Etapa</span>
@@ -126,17 +116,13 @@
           <i data-lucide="wifi-off" class="w-3 h-3"></i> Pronto Offline
         </span>
       </div>
-      <div id="day-selector" class="flex gap-2 overflow-x-auto no-scrollbar pb-1">
-        <!-- Injetado via JS -->
-      </div>
+      <div id="day-selector" class="flex gap-2 overflow-x-auto no-scrollbar pb-1"></div>
     </div>
 
     <!-- Banner Resumo da Etapa Atual -->
-    <section id="stage-hero" class="px-4 pt-4">
-      <!-- Injetado via JS -->
-    </section>
+    <section id="stage-hero" class="px-4 pt-4"></section>
 
-    <!-- Sub-Navegação da Etapa (Cockpit Mota | Visita a Pé | Fichas Técnicas) -->
+    <!-- Sub-Navegação da Etapa -->
     <div class="px-4 mt-4">
       <div class="grid grid-cols-3 gap-1.5 bg-sand-200/70 p-1 rounded-xl border border-sand-200">
         <button onclick="switchSubTab('cockpit')" id="subtab-cockpit" class="tab-active py-2.5 px-2 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 transition-all">
@@ -155,16 +141,12 @@
     </div>
 
     <!-- Conteúdo Dinâmico das Sub-Abas -->
-    <div id="mobile-content" class="px-4 mt-4 space-y-4">
-      <!-- Injetado via JS -->
-    </div>
+    <div id="mobile-content" class="px-4 mt-4 space-y-4"></div>
 
     <!-- Secções Globais (Bilhetes, Checklist, Diário) -->
-    <div id="mobile-global-view" class="px-4 mt-4 hidden space-y-4">
-      <!-- Injetado via JS -->
-    </div>
+    <div id="mobile-global-view" class="px-4 mt-4 hidden space-y-4"></div>
 
-    <!-- Barra de Navegação Inferior Fixa (iPhone Style) -->
+    <!-- Barra de Navegação Inferior Fixa -->
     <nav class="fixed bottom-0 inset-x-0 bg-navy-900/95 backdrop-blur-md border-t border-slate-800 text-slate-300 z-40">
       <div class="max-w-2xl mx-auto grid grid-cols-4 py-2 px-2">
         <button onclick="showMainMobileSection('route')" id="nav-route" class="flex flex-col items-center justify-center gap-1 py-1 text-gold-400">
@@ -188,18 +170,23 @@
   </main>
 
   <!-- ===================================================================== -->
-  <!-- AMBIENTE 2: PLANEADOR & IMPORTADOR (COMPUTADOR / DESKTOP)             -->
+  <!-- AMBIENTE 2: PLANEADOR & MOTOR DE IMPORTAÇÃO INTELIGENTE (.PPTX + .KMZ)-->
   <!-- ===================================================================== -->
   <main id="view-desktop" class="hidden flex-1 max-w-6xl w-full mx-auto px-4 py-6 space-y-6">
     
     <!-- Cabeçalho do Planeador -->
     <div class="bg-white rounded-2xl p-6 shadow-sm border border-sand-200 flex flex-col md:flex-row md:items-center justify-between gap-4">
       <div>
-        <span class="text-xs font-bold uppercase tracking-wider text-gold-600 bg-gold-400/20 px-2.5 py-1 rounded-full">Estúdio de Preparação</span>
-        <h2 class="text-2xl font-bold text-navy-900 mt-2">Importador de Roteiros & Sincronização</h2>
-        <p class="text-sm text-slate-600 mt-1">Importa o teu ficheiro <strong>PowerPoint (.pptx)</strong> e o traçado do <strong>Google Maps (.kmz / .kml)</strong> para atualizar automaticamente a aplicação para o iPhone e Android.</p>
+        <span class="text-xs font-bold uppercase tracking-wider text-gold-600 bg-gold-400/20 px-2.5 py-1 rounded-full">Estúdio de Importação v2.0</span>
+        <h2 class="text-2xl font-bold text-navy-900 mt-2">Importador Inteligente (.PPTX + .KMZ)</h2>
+        <p class="text-sm text-slate-600 mt-1">Carrega o teu PowerPoint e o ficheiro do Google Maps. O motor deteta automaticamente os dias, horários, fichas técnicas e cruza cada paragem com as coordenadas GPS exatas.</p>
       </div>
       <div class="flex flex-wrap gap-2">
+        <label class="inline-flex items-center gap-2 bg-emerald-700 hover:bg-emerald-600 text-white font-bold text-xs px-4 py-3 rounded-xl shadow cursor-pointer transition">
+          <i data-lucide="upload" class="w-4 h-4"></i>
+          <span>Carregar Viagem (.json)</span>
+          <input type="file" accept=".json" class="hidden" onchange="importTripJSON(event)" />
+        </label>
         <button onclick="exportTripJSON()" class="inline-flex items-center gap-2 bg-navy-900 hover:bg-navy-800 text-gold-400 font-bold text-xs px-4 py-3 rounded-xl shadow transition">
           <i data-lucide="download" class="w-4 h-4"></i>
           <span>Exportar Viagem (.json)</span>
@@ -211,137 +198,164 @@
       </div>
     </div>
 
-    <!-- Grelha de Importação (PPTX + KMZ/KML + Bilhetes) -->
+    <!-- Grelha de Importação (Passo 1: PPTX | Passo 2: KMZ | Passo 3: Fusão & Publicação) -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
       
-      <!-- Card 1: Importar PowerPoint (.pptx) -->
+      <!-- Passo 1: PowerPoint (.pptx) -->
       <div class="bg-white rounded-2xl p-5 shadow-sm border border-sand-200 flex flex-col justify-between">
         <div>
-          <div class="w-11 h-11 rounded-xl bg-orange-100 text-orange-600 flex items-center justify-center mb-4">
-            <i data-lucide="presentation" class="w-6 h-6"></i>
+          <div class="flex items-center justify-between mb-3">
+            <div class="w-11 h-11 rounded-xl bg-orange-100 text-orange-600 flex items-center justify-center">
+              <i data-lucide="presentation" class="w-6 h-6"></i>
+            </div>
+            <span id="badge-pptx-ready" class="hidden text-[11px] font-bold bg-emerald-100 text-emerald-800 px-2.5 py-0.5 rounded-full">✓ Carregado</span>
           </div>
-          <h3 class="font-bold text-base text-navy-900">1. Importar PowerPoint (.pptx)</h3>
+          <h3 class="font-bold text-base text-navy-900">1. Estrutura do PowerPoint (.pptx)</h3>
           <p class="text-xs text-slate-600 mt-1.5 leading-relaxed">
-            Lê diretamente os slides da tua apresentação: extrai títulos das etapas, horários, textos históricos e fichas técnicas dos monumentos.
+            Identifica padrões de slides (<code class="bg-slate-100 px-1 rounded">DIA 01</code>, horários <code class="bg-slate-100 px-1 rounded">08:30</code>, distâncias <code class="bg-slate-100 px-1 rounded">km</code>, <code class="bg-slate-100 px-1 rounded">FICHA TÉCNICA</code> e alertas <code class="bg-slate-100 px-1 rounded">ZBE</code>).
           </p>
         </div>
         <div class="mt-5">
           <label class="flex flex-col items-center justify-center border-2 border-dashed border-slate-300 hover:border-gold-500 rounded-xl p-4 cursor-pointer bg-sand-50/50 transition text-center">
             <i data-lucide="upload-cloud" class="w-6 h-6 text-slate-400 mb-1"></i>
             <span class="text-xs font-bold text-navy-900">Selecionar ficheiro .PPTX</span>
-            <span class="text-[10px] text-slate-500 mt-0.5">Processamento local no navegador</span>
+            <span class="text-[10px] text-slate-500 mt-0.5">Extração estruturada por etapas</span>
             <input type="file" accept=".pptx" class="hidden" onchange="handlePptxUpload(event)" />
           </label>
           <div id="pptx-status" class="mt-2 text-xs text-slate-500"></div>
         </div>
       </div>
 
-      <!-- Card 2: Importar Rota Google Maps (.kmz / .kml) -->
+      <!-- Passo 2: Google Maps (.kmz / .kml) -->
       <div class="bg-white rounded-2xl p-5 shadow-sm border border-sand-200 flex flex-col justify-between">
         <div>
-          <div class="w-11 h-11 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center mb-4">
-            <i data-lucide="map-pin" class="w-6 h-6"></i>
+          <div class="flex items-center justify-between mb-3">
+            <div class="w-11 h-11 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center">
+              <i data-lucide="map-pin" class="w-6 h-6"></i>
+            </div>
+            <span id="badge-kmz-ready" class="hidden text-[11px] font-bold bg-emerald-100 text-emerald-800 px-2.5 py-0.5 rounded-full">✓ Carregado</span>
           </div>
-          <h3 class="font-bold text-base text-navy-900">2. Importar Mapa (.kmz / .kml)</h3>
+          <h3 class="font-bold text-base text-navy-900">2. Coordenadas GPS (.kmz / .kml)</h3>
           <p class="text-xs text-slate-600 mt-1.5 leading-relaxed">
-            Extrai todos os marcadores (<em>Placemarks</em>), coordenadas GPS, paragens de combustível, restaurantes e pontos dos roteiros apeados.
+            Lê todos os marcadores (<em>Placemarks</em>) e pastas do Google My Maps para associar latitudes e longitudes reais a cada paragem do roteiro.
           </p>
         </div>
         <div class="mt-5">
           <label class="flex flex-col items-center justify-center border-2 border-dashed border-slate-300 hover:border-emerald-500 rounded-xl p-4 cursor-pointer bg-sand-50/50 transition text-center">
             <i data-lucide="globe" class="w-6 h-6 text-slate-400 mb-1"></i>
             <span class="text-xs font-bold text-navy-900">Selecionar .KMZ ou .KML</span>
-            <span class="text-[10px] text-slate-500 mt-0.5">Exportado do Google My Maps</span>
+            <span class="text-[10px] text-slate-500 mt-0.5">Cruzamento geográfico automático</span>
             <input type="file" accept=".kmz,.kml" class="hidden" onchange="handleKmzUpload(event)" />
           </label>
           <div id="kmz-status" class="mt-2 text-xs text-slate-500"></div>
         </div>
       </div>
 
-      <!-- Card 3: Anexar Bilhetes & Reservas -->
-      <div class="bg-white rounded-2xl p-5 shadow-sm border border-sand-200 flex flex-col justify-between">
+      <!-- Passo 3: Sincronizar e Aplicar na App -->
+      <div class="bg-navy-900 text-white rounded-2xl p-5 shadow-md border border-gold-500/40 flex flex-col justify-between">
         <div>
-          <div class="w-11 h-11 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center mb-4">
-            <i data-lucide="qr-code" class="w-6 h-6"></i>
+          <div class="w-11 h-11 rounded-xl bg-gold-500/20 text-gold-400 flex items-center justify-center mb-3">
+            <i data-lucide="wand-2" class="w-6 h-6"></i>
           </div>
-          <h3 class="font-bold text-base text-navy-900">3. Adicionar Reserva / Bilhete</h3>
-          <p class="text-xs text-slate-600 mt-1.5 leading-relaxed">
-            Adiciona códigos de reserva (Alhambra, Alcázar, Hotéis) ou links diretos para ficarem acessíveis num toque no telemóvel.
+          <h3 class="font-bold text-base text-gold-400">3. Fusão & Atualização da App</h3>
+          <p class="text-xs text-slate-300 mt-1.5 leading-relaxed">
+            Cruza os textos do PowerPoint com as coordenadas do KMZ por proximidade de nome e substitui o roteiro ativo na aplicação mobile.
           </p>
-        </div>
-        <form onsubmit="addNewTicket(event)" class="mt-4 space-y-2">
-          <input type="text" id="ticket-title" required placeholder="Ex: Alhambra - Palácios Nasridas" class="w-full text-xs px-3 py-2 rounded-lg border border-slate-300 focus:outline-none focus:border-gold-500" />
-          <div class="grid grid-cols-2 gap-2">
-            <input type="text" id="ticket-day" required placeholder="Dia (ex: Dia 02 • 15:30)" class="w-full text-xs px-3 py-2 rounded-lg border border-slate-300 focus:outline-none focus:border-gold-500" />
-            <input type="text" id="ticket-code" required placeholder="Código / Refª" class="w-full text-xs px-3 py-2 rounded-lg border border-slate-300 focus:outline-none focus:border-gold-500" />
+          <div id="staging-summary" class="mt-3 p-2.5 rounded-xl bg-navy-800 border border-slate-700 text-[11px] text-slate-300 space-y-1">
+            <div>• PPTX em memória: <strong id="staging-pptx-count" class="text-white">Nenhum</strong></div>
+            <div>• Pontos KMZ em memória: <strong id="staging-kmz-count" class="text-white">Nenhum</strong></div>
           </div>
-          <button type="submit" class="w-full bg-gold-500 hover:bg-gold-600 text-navy-900 font-bold text-xs py-2.5 rounded-lg transition">
+        </div>
+        <div class="mt-4 space-y-2">
+          <button onclick="applyStagedImport()" id="btn-apply-import" disabled class="w-full bg-gold-500 disabled:bg-slate-700 disabled:text-slate-400 hover:bg-gold-400 text-navy-900 font-extrabold text-xs py-3 rounded-xl shadow transition flex items-center justify-center gap-2">
+            <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+            <span>Gerar & Atualizar App Agora</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Área de Pré-Visualização e Ajuste antes de Publicar -->
+    <div id="staging-preview-panel" class="hidden bg-white rounded-2xl p-6 shadow-md border-2 border-gold-500/50 space-y-4">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 pb-3">
+        <div>
+          <span class="text-[10px] font-bold uppercase tracking-wider bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full">Pré-Visualização do Motor de Extração</span>
+          <h3 class="font-bold text-lg text-navy-900 mt-1">Revê os Dias e Pontos Detetados antes de Aplicar</h3>
+        </div>
+        <div class="flex items-center gap-2">
+          <input type="text" id="staged-trip-title" placeholder="Título da Viagem" class="text-xs font-bold px-3 py-2 rounded-lg border border-slate-300" />
+          <button onclick="applyStagedImport()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs px-4 py-2 rounded-lg shadow">
+            ✓ Confirmar e Gravar
+          </button>
+        </div>
+      </div>
+      <div id="staging-preview-body" class="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-96 overflow-y-auto pr-1"></div>
+    </div>
+
+    <!-- Secção Inferior: Adicionar Bilhetes + Tabela de Gestão das Etapas -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <!-- Formulário Rápido de Bilhetes -->
+      <div class="bg-white rounded-2xl p-5 shadow-sm border border-sand-200">
+        <h3 class="font-bold text-base text-navy-900 flex items-center gap-2">
+          <i data-lucide="qr-code" class="w-4 h-4 text-gold-600"></i>
+          <span>Adicionar Reserva / Bilhete</span>
+        </h3>
+        <p class="text-xs text-slate-500 mt-1">Guarda códigos de entrada ou hotéis no cofre offline.</p>
+        <form onsubmit="addNewTicket(event)" class="mt-4 space-y-2.5">
+          <input type="text" id="ticket-title" required placeholder="Ex: Alhambra - Palácios Nasridas" class="w-full text-xs px-3 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:border-gold-500" />
+          <input type="text" id="ticket-day" required placeholder="Dia e Hora (ex: Dia 02 • 15:30)" class="w-full text-xs px-3 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:border-gold-500" />
+          <input type="text" id="ticket-code" required placeholder="Código / Referência" class="w-full text-xs px-3 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:border-gold-500" />
+          <input type="text" id="ticket-note" placeholder="Nota (ex: Levar CC original)" class="w-full text-xs px-3 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:border-gold-500" />
+          <button type="submit" class="w-full bg-navy-900 hover:bg-navy-800 text-gold-400 font-bold text-xs py-2.5 rounded-xl transition">
             + Guardar no Cofre Offline
           </button>
         </form>
       </div>
-    </div>
 
-    <!-- Resultado da Extração / Editor Rápido de Etapas -->
-    <div id="import-preview-box" class="hidden bg-navy-900 text-white rounded-2xl p-5 shadow-lg border border-gold-500/40">
-      <div class="flex items-center justify-between mb-3">
-        <div class="flex items-center gap-2">
-          <i data-lucide="sparkles" class="w-5 h-5 text-gold-400"></i>
-          <h3 class="font-bold text-sm text-gold-400" id="import-preview-title">Dados Extraídos do Ficheiro</h3>
+      <!-- Tabela de Gestão das Etapas Ativas -->
+      <div class="lg:col-span-2 bg-white rounded-2xl p-5 shadow-sm border border-sand-200">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="font-bold text-base text-navy-900">Etapas Ativas na Aplicação</h3>
+          <span class="text-xs font-semibold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full" id="desktop-stage-count">7 Etapas</span>
         </div>
-        <button onclick="document.getElementById('import-preview-box').classList.add('hidden')" class="text-slate-400 hover:text-white text-xs">Fechar</button>
-      </div>
-      <div id="import-preview-content" class="text-xs text-slate-200 max-h-64 overflow-y-auto space-y-2 bg-navy-800 p-4 rounded-xl border border-slate-700"></div>
-    </div>
-
-    <!-- Tabela de Gestão das Etapas -->
-    <div class="bg-white rounded-2xl p-6 shadow-sm border border-sand-200">
-      <div class="flex items-center justify-between mb-4">
-        <h3 class="font-bold text-lg text-navy-900">Estrutura Atual do Roteiro (Sincronizada com Mobile)</h3>
-        <span class="text-xs text-slate-500" id="desktop-stage-count">7 Etapas carregadas</span>
-      </div>
-      <div class="overflow-x-auto">
-        <table class="w-full text-left border-collapse">
-          <thead>
-            <tr class="border-b border-slate-200 text-[11px] uppercase text-slate-500">
-              <th class="py-3 px-3">Dia</th>
-              <th class="py-3 px-3">Etapa</th>
-              <th class="py-3 px-3">Distância</th>
-              <th class="py-3 px-3">Paragens & Visitas</th>
-              <th class="py-3 px-3 text-right">Ação</th>
-            </tr>
-          </thead>
-          <tbody id="desktop-stages-table" class="divide-y divide-slate-100 text-sm">
-            <!-- Injetado via JS -->
-          </tbody>
-        </table>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="border-b border-slate-200 text-[11px] uppercase text-slate-500">
+                <th class="py-2.5 px-2">Dia</th>
+                <th class="py-2.5 px-2">Etapa</th>
+                <th class="py-2.5 px-2">Distância</th>
+                <th class="py-2.5 px-2">GPS & Fichas</th>
+                <th class="py-2.5 px-2 text-right">Ações</th>
+              </tr>
+            </thead>
+            <tbody id="desktop-stages-table" class="divide-y divide-slate-100 text-xs"></tbody>
+          </table>
+        </div>
       </div>
     </div>
   </main>
 
-  <!-- MODAL PARA DETALHE DE FICHA TÉCNICA / BILHETE -->
+  <!-- MODAL PARA DETALHE DE BILHETE OU EDIÇÃO RÁPIDA -->
   <div id="modal-overlay" class="fixed inset-0 bg-navy-900/80 backdrop-blur-sm z-50 hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
-    <div class="bg-white w-full max-w-lg rounded-t-3xl sm:rounded-2xl max-h-[88vh] flex flex-col overflow-hidden shadow-2xl animate-fade-in">
+    <div class="bg-white w-full max-w-lg rounded-t-3xl sm:rounded-2xl max-h-[88vh] flex flex-col overflow-hidden shadow-2xl">
       <div class="bg-navy-900 text-white px-5 py-4 flex items-center justify-between border-b border-gold-500/30">
         <div>
-          <span id="modal-tag" class="text-[10px] uppercase tracking-widest text-gold-400 font-bold">Ficha Técnica</span>
+          <span id="modal-tag" class="text-[10px] uppercase tracking-widest text-gold-400 font-bold">Detalhe</span>
           <h3 id="modal-title" class="font-editorial text-lg font-bold text-white mt-0.5">Título</h3>
         </div>
         <button onclick="closeModal()" class="w-8 h-8 rounded-full bg-navy-800 flex items-center justify-center text-slate-300 hover:text-white">
           <i data-lucide="x" class="w-5 h-5"></i>
         </button>
       </div>
-      <div id="modal-body" class="p-5 overflow-y-auto space-y-4 text-sm text-slate-700 leading-relaxed">
-        <!-- Injetado via JS -->
-      </div>
+      <div id="modal-body" class="p-5 overflow-y-auto space-y-4 text-sm text-slate-700 leading-relaxed"></div>
     </div>
   </div>
 
   <!-- ===================================================================== -->
-  <!-- DADOS E LÓGICA DA APLICAÇÃO                                           -->
+  <!-- DADOS E MOTOR DE IMPORTAÇÃO INTELIGENTE                               -->
   <!-- ===================================================================== -->
   <script>
-    // Dados completos extraídos do PDF "Caminhos do Sul"
     const DEFAULT_TRIP_DATA = {
       title: "CAMINHOS DO SUL",
       subtitle: "Andaluzia em Duas Rodas • 7 Dias • ~1.750 km",
@@ -684,7 +698,6 @@
       ]
     };
 
-    // Estado da Aplicação (persistido em LocalStorage para uso Offline)
     let appState = JSON.parse(localStorage.getItem('caminhos_do_sul_state')) || {
       tripData: DEFAULT_TRIP_DATA,
       currentDayIdx: 0,
@@ -694,11 +707,17 @@
       diaryLogs: {}
     };
 
+    // Área de Staging para a Importação Inteligente (PPTX + KMZ)
+    let stagingData = {
+      pptxDays: null,
+      pptxTitle: null,
+      kmzWaypoints: []
+    };
+
     function saveState() {
       localStorage.setItem('caminhos_do_sul_state', JSON.stringify(appState));
     }
 
-    // Alternar Modo Viagem (iPhone) vs Modo Planeador (PC)
     function switchMode(mode) {
       const mobileView = document.getElementById('view-mobile');
       const desktopView = document.getElementById('view-desktop');
@@ -721,9 +740,7 @@
       lucide.createIcons();
     }
 
-    // Links Externos de Navegação GPS (Google Maps, Waze, Apple Maps)
     function openGPS(app, lat, lng, label) {
-      const encodedLabel = encodeURIComponent(label);
       let url = '';
       if (app === 'google') {
         url = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}&travelmode=driving`;
@@ -737,7 +754,6 @@
       window.open(url, '_blank');
     }
 
-    // Selecionar Dia
     function selectDay(idx) {
       appState.currentDayIdx = idx;
       appState.mainSection = 'route';
@@ -745,27 +761,25 @@
       renderMobileApp();
     }
 
-    // Alternar Sub-Aba (Estrada | Roteiro a Pé | Monumentos)
     function switchSubTab(tab) {
       appState.currentSubTab = tab;
       saveState();
       renderMobileApp();
     }
 
-    // Alternar Secção Principal Inferior (Roteiro | Bilhetes | Checklist | Diário)
     function showMainMobileSection(section) {
       appState.mainSection = section;
       saveState();
       renderMobileApp();
     }
 
-    // Renderizar Interface Mobile (iPhone/Android)
     function renderMobileApp() {
       const trip = appState.tripData;
+      if (appState.currentDayIdx >= trip.days.length) appState.currentDayIdx = 0;
+
       document.getElementById('app-title').textContent = trip.title;
       document.getElementById('app-subtitle').textContent = trip.subtitle;
 
-      // Atualizar botões da barra inferior
       ['route', 'wallet', 'checklist', 'diary'].forEach(sec => {
         const el = document.getElementById(`nav-${sec}`);
         if (appState.mainSection === sec) {
@@ -797,10 +811,10 @@
       mobileContent.classList.remove('hidden');
       globalView.classList.add('hidden');
 
-      // Renderizar Seletor de Dias
       const daySelector = document.getElementById('day-selector');
       daySelector.innerHTML = trip.days.map((d, idx) => {
         const active = idx === appState.currentDayIdx;
+        const shortName = d.route.includes('→') ? d.route.split('→')[1].trim() : d.route;
         return `
           <button onclick="selectDay(${idx})" class="shrink-0 px-3.5 py-2 rounded-xl border text-left transition-all ${
             active 
@@ -808,33 +822,32 @@
               : 'bg-navy-900/60 text-slate-300 border-slate-700 hover:border-slate-500'
           }">
             <div class="text-[10px] uppercase tracking-wider opacity-80">Dia ${d.dayNumber}</div>
-            <div class="text-xs font-extrabold whitespace-nowrap">${d.route.split('→')[1]?.trim() || d.route}</div>
+            <div class="text-xs font-extrabold whitespace-nowrap max-w-[120px] truncate">${shortName}</div>
           </button>
         `;
       }).join('');
 
       const day = trip.days[appState.currentDayIdx];
-      const finalStop = day.timeline[day.timeline.length - 1];
+      const stopWithCoords = [...day.timeline].reverse().find(s => s.lat && s.lng);
 
-      // Renderizar Hero Card da Etapa
       stageHero.innerHTML = `
         <div class="bg-navy-900 text-white rounded-2xl p-4 shadow-lg border border-gold-500/30 relative overflow-hidden">
           <div class="flex items-start justify-between gap-2">
             <div>
               <span class="inline-block text-[10px] font-bold uppercase tracking-widest bg-gold-500/20 text-gold-400 px-2.5 py-0.5 rounded-full border border-gold-500/30">
-                Etapa ${day.dayNumber} • ${day.roadType}
+                Etapa ${day.dayNumber} • ${day.roadType || 'Roteiro Moto'}
               </span>
               <h2 class="font-editorial text-xl font-bold text-white mt-1.5">${day.route}</h2>
-              <p class="text-xs text-slate-300 mt-0.5">${day.via}</p>
+              <p class="text-xs text-slate-300 mt-0.5">${day.via || ''}</p>
             </div>
             <div class="text-right shrink-0 bg-navy-800 px-3 py-2 rounded-xl border border-slate-700">
-              <div class="text-sm font-extrabold text-gold-400">${day.distance}</div>
-              <div class="text-[11px] text-slate-300">${day.duration}</div>
+              <div class="text-sm font-extrabold text-gold-400">${day.distance || '—'}</div>
+              <div class="text-[11px] text-slate-300">${day.duration || ''}</div>
             </div>
           </div>
 
           <p class="text-xs text-slate-300 mt-3 leading-relaxed border-t border-slate-800 pt-2.5">
-            ${day.summary}
+            ${day.summary || ''}
           </p>
 
           ${day.zbeWarning ? `
@@ -847,20 +860,19 @@
             </div>
           ` : ''}
 
-          <!-- Botões Grandes de Navegação Rápida (Cockpit Mota) -->
-          ${finalStop && finalStop.lat ? `
+          ${stopWithCoords ? `
             <div class="mt-3 pt-3 border-t border-slate-800">
-              <div class="text-[10px] uppercase tracking-wider text-slate-400 font-bold mb-2">Iniciar Navegação da Etapa Completa:</div>
+              <div class="text-[10px] uppercase tracking-wider text-slate-400 font-bold mb-2">Iniciar Navegação para o Destino da Etapa:</div>
               <div class="grid grid-cols-3 gap-2">
-                <button onclick="openGPS('google', ${finalStop.lat}, ${finalStop.lng}, '${day.route}')" class="bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white font-bold text-xs py-2.5 px-2 rounded-xl flex items-center justify-center gap-1.5 shadow transition">
+                <button onclick="openGPS('google', ${stopWithCoords.lat}, ${stopWithCoords.lng}, '${day.route.replace(/'/g, '')}')" class="bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white font-bold text-xs py-2.5 px-2 rounded-xl flex items-center justify-center gap-1.5 shadow transition">
                   <i data-lucide="navigation" class="w-4 h-4"></i>
                   <span>Google Maps</span>
                 </button>
-                <button onclick="openGPS('waze', ${finalStop.lat}, ${finalStop.lng}, '${day.route}')" class="bg-sky-600 hover:bg-sky-500 active:scale-95 text-white font-bold text-xs py-2.5 px-2 rounded-xl flex items-center justify-center gap-1.5 shadow transition">
+                <button onclick="openGPS('waze', ${stopWithCoords.lat}, ${stopWithCoords.lng}, '${day.route.replace(/'/g, '')}')" class="bg-sky-600 hover:bg-sky-500 active:scale-95 text-white font-bold text-xs py-2.5 px-2 rounded-xl flex items-center justify-center gap-1.5 shadow transition">
                   <i data-lucide="compass" class="w-4 h-4"></i>
                   <span>Waze</span>
                 </button>
-                <button onclick="openGPS('apple', ${finalStop.lat}, ${finalStop.lng}, '${day.route}')" class="bg-slate-700 hover:bg-slate-600 active:scale-95 text-white font-bold text-xs py-2.5 px-2 rounded-xl flex items-center justify-center gap-1.5 shadow transition">
+                <button onclick="openGPS('apple', ${stopWithCoords.lat}, ${stopWithCoords.lng}, '${day.route.replace(/'/g, '')}')" class="bg-slate-700 hover:bg-slate-600 active:scale-95 text-white font-bold text-xs py-2.5 px-2 rounded-xl flex items-center justify-center gap-1.5 shadow transition">
                   <i data-lucide="map-pin" class="w-4 h-4"></i>
                   <span>Apple Mapas</span>
                 </button>
@@ -870,7 +882,6 @@
         </div>
       `;
 
-      // Atualizar estilo das Sub-Abas
       ['cockpit', 'walking', 'monuments'].forEach(t => {
         const btn = document.getElementById(`subtab-${t}`);
         if (appState.currentSubTab === t) {
@@ -880,7 +891,6 @@
         }
       });
 
-      // Renderizar Conteúdo da Sub-Aba Ativa
       if (appState.currentSubTab === 'cockpit') {
         renderCockpitTimeline(day);
       } else if (appState.currentSubTab === 'walking') {
@@ -907,17 +917,18 @@
       return map[type] || map.ride;
     }
 
-    // Sub-Aba 1: Timeline Horária & Navegação por Paragem
     function renderCockpitTimeline(day) {
       const container = document.getElementById('mobile-content');
       container.innerHTML = `
-        <div class="bg-amber-50 border border-amber-200 rounded-xl p-3 flex items-center gap-2.5 text-xs text-amber-900">
-          <i data-lucide="fuel" class="w-4 h-4 text-amber-600 shrink-0"></i>
-          <span><strong>Gestão de Autonomia:</strong> ${day.fuelRule}</span>
-        </div>
+        ${day.fuelRule ? `
+          <div class="bg-amber-50 border border-amber-200 rounded-xl p-3 flex items-center gap-2.5 text-xs text-amber-900">
+            <i data-lucide="fuel" class="w-4 h-4 text-amber-600 shrink-0"></i>
+            <span><strong>Gestão de Autonomia:</strong> ${day.fuelRule}</span>
+          </div>
+        ` : ''}
 
         <div class="space-y-3">
-          ${day.timeline.map((item, index) => {
+          ${day.timeline.map(item => {
             const badge = getTypeBadge(item.type);
             return `
               <div class="bg-white rounded-2xl p-4 shadow-sm border border-sand-200 relative">
@@ -928,25 +939,32 @@
                       <i data-lucide="${badge.icon}" class="w-3 h-3"></i> ${badge.label}
                     </span>
                   </div>
-                  <span class="text-xs font-bold text-slate-400">${item.km}</span>
+                  <span class="text-xs font-bold text-slate-400">${item.km || ''}</span>
                 </div>
 
                 <h4 class="font-bold text-base text-navy-900 mt-2">${item.title}</h4>
                 <p class="text-xs text-slate-600 mt-1 leading-relaxed">${item.desc}</p>
 
-                ${item.lat ? `
+                ${item.lat && item.lng ? `
                   <div class="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between gap-2">
-                    <span class="text-[11px] text-slate-400 font-mono">${item.lat.toFixed(4)}, ${item.lng.toFixed(4)}</span>
+                    <span class="text-[11px] text-emerald-700 font-mono font-semibold flex items-center gap-1">
+                      <i data-lucide="map-pin" class="w-3 h-3"></i> ${item.lat.toFixed(4)}, ${item.lng.toFixed(4)}
+                    </span>
                     <div class="flex gap-1.5">
-                      <button onclick="openGPS('google', ${item.lat}, ${item.lng}, '${item.title}')" class="bg-navy-900 hover:bg-navy-800 text-gold-400 text-xs font-bold px-3 py-1.5 rounded-lg flex items-center gap-1 transition">
+                      <button onclick="openGPS('google', ${item.lat}, ${item.lng}, '${item.title.replace(/'/g, '')}')" class="bg-navy-900 hover:bg-navy-800 text-gold-400 text-xs font-bold px-3 py-1.5 rounded-lg flex items-center gap-1 transition">
                         <i data-lucide="navigation" class="w-3.5 h-3.5"></i> Ir para aqui
                       </button>
-                      <button onclick="openGPS('waze', ${item.lat}, ${item.lng}, '${item.title}')" class="bg-sky-100 hover:bg-sky-200 text-sky-800 text-xs font-bold px-2.5 py-1.5 rounded-lg transition">
+                      <button onclick="openGPS('waze', ${item.lat}, ${item.lng}, '${item.title.replace(/'/g, '')}')" class="bg-sky-100 hover:bg-sky-200 text-sky-800 text-xs font-bold px-2.5 py-1.5 rounded-lg transition">
                         Waze
                       </button>
                     </div>
                   </div>
-                ` : ''}
+                ` : `
+                  <div class="mt-2 pt-2 border-t border-slate-100 flex items-center justify-between">
+                    <span class="text-[11px] text-slate-400 italic">Sem coordenadas GPS associadas</span>
+                    <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.title)}" target="_blank" class="text-[11px] font-bold text-gold-600 hover:underline">Pesquisar no Maps →</a>
+                  </div>
+                `}
               </div>
             `;
           }).join('')}
@@ -954,10 +972,14 @@
       `;
     }
 
-    // Sub-Aba 2: Roteiro Apeado nas Localidades
     function renderWalkingGuide(day) {
       const walk = day.walkingRoute;
       const container = document.getElementById('mobile-content');
+      if (!walk || !walk.stops || walk.stops.length === 0) {
+        container.innerHTML = `<div class="bg-white rounded-2xl p-6 text-center text-xs text-slate-500">Sem percurso apeado definido para esta etapa.</div>`;
+        return;
+      }
+
       container.innerHTML = `
         <div class="bg-white rounded-2xl p-4 shadow-sm border border-sand-200">
           <div class="flex items-center justify-between">
@@ -966,22 +988,23 @@
               <h3 class="font-editorial text-lg font-bold text-navy-900 mt-1">${walk.city}</h3>
             </div>
             <div class="text-right text-xs text-slate-500">
-              <i data-lucide="clock" class="w-3.5 h-3.5 inline mr-0.5"></i> ${walk.estimatedTime}
+              <i data-lucide="clock" class="w-3.5 h-3.5 inline mr-0.5"></i> ${walk.estimatedTime || ''}
             </div>
           </div>
 
-          <div class="mt-3 bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs text-slate-700 flex items-start gap-2">
-            <i data-lucide="parking-circle" class="w-4 h-4 text-navy-900 shrink-0 mt-0.5"></i>
-            <div><strong>Estacionamento Motas:</strong> ${walk.parkingNote}</div>
-          </div>
+          ${walk.parkingNote ? `
+            <div class="mt-3 bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs text-slate-700 flex items-start gap-2">
+              <i data-lucide="parking-circle" class="w-4 h-4 text-navy-900 shrink-0 mt-0.5"></i>
+              <div><strong>Estacionamento Motas:</strong> ${walk.parkingNote}</div>
+            </div>
+          ` : ''}
 
-          <!-- Mapa Esquemático Interativo do Percurso Pedonal -->
           <div class="mt-4 bg-sand-100 rounded-xl p-4 border border-sand-200 relative overflow-hidden">
             <div class="text-[11px] font-bold uppercase text-slate-500 mb-3 flex items-center justify-between">
               <span>Sequência do Percurso Pedonal</span>
               <span class="text-gold-600">Toca num ponto para navegar a pé</span>
             </div>
-            <div class="relative pl-6 space-y-4 before:content-[''] before:absolute before:left-[11px] before:top-2 before:bottom-2 before:w-0.5 before:bg-dashed before:border-l-2 before:border-dashed before:border-gold-600">
+            <div class="relative pl-6 space-y-4 before:content-[''] before:absolute before:left-[11px] before:top-2 before:bottom-2 before:w-0.5 before:border-l-2 before:border-dashed before:border-gold-600">
               ${walk.stops.map(stop => `
                 <div class="relative bg-white p-3.5 rounded-xl shadow-sm border border-sand-200">
                   <div class="absolute -left-6 top-3.5 w-6 h-6 rounded-full bg-navy-900 text-gold-400 font-extrabold text-xs flex items-center justify-center shadow">
@@ -989,9 +1012,13 @@
                   </div>
                   <div class="flex items-start justify-between gap-2">
                     <h4 class="font-bold text-sm text-navy-900">${stop.name}</h4>
-                    <button onclick="openGPS('walk', ${stop.lat}, ${stop.lng}, '${stop.name}')" class="shrink-0 bg-teal-600 hover:bg-teal-700 text-white text-[11px] font-bold px-2.5 py-1 rounded-lg flex items-center gap-1">
-                      <i data-lucide="footprints" class="w-3 h-3"></i> Guiar a Pé
-                    </button>
+                    ${stop.lat && stop.lng ? `
+                      <button onclick="openGPS('walk', ${stop.lat}, ${stop.lng}, '${stop.name.replace(/'/g, '')}')" class="shrink-0 bg-teal-600 hover:bg-teal-700 text-white text-[11px] font-bold px-2.5 py-1 rounded-lg flex items-center gap-1">
+                        <i data-lucide="footprints" class="w-3 h-3"></i> Guiar a Pé
+                      </button>
+                    ` : `
+                      <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(stop.name)}" target="_blank" class="shrink-0 bg-slate-200 text-slate-800 text-[11px] font-bold px-2.5 py-1 rounded-lg">Maps</a>
+                    `}
                   </div>
                   <p class="text-xs text-slate-600 mt-1 leading-relaxed">${stop.desc}</p>
                 </div>
@@ -1002,7 +1029,6 @@
       `;
     }
 
-    // Sub-Aba 3: Fichas Técnicas dos Monumentos
     function renderMonumentsList(day) {
       const container = document.getElementById('mobile-content');
       if (!day.monuments || day.monuments.length === 0) {
@@ -1010,40 +1036,43 @@
         return;
       }
 
-      container.innerHTML = day.monuments.map((m, idx) => `
+      container.innerHTML = day.monuments.map(m => `
         <div class="bg-white rounded-2xl p-5 shadow-sm border border-sand-200 space-y-3">
           <div class="flex items-start justify-between gap-2">
             <div>
-              <span class="text-[10px] font-bold uppercase tracking-widest text-gold-600">${m.classification}</span>
+              <span class="text-[10px] font-bold uppercase tracking-widest text-gold-600">${m.classification || 'Ficha Técnica'}</span>
               <h3 class="font-editorial text-lg font-bold text-navy-900 mt-0.5">${m.name}</h3>
               <p class="text-xs text-slate-500 flex items-center gap-1 mt-0.5">
-                <i data-lucide="map-pin" class="w-3.5 h-3.5 text-gold-500"></i> ${m.location}
+                <i data-lucide="map-pin" class="w-3.5 h-3.5 text-gold-500"></i> ${m.location || ''}
               </p>
             </div>
-            <span class="bg-navy-900 text-gold-400 text-[11px] font-bold px-2.5 py-1 rounded-lg shrink-0">${m.schedule}</span>
+            ${m.schedule ? `<span class="bg-navy-900 text-gold-400 text-[11px] font-bold px-2.5 py-1 rounded-lg shrink-0">${m.schedule}</span>` : ''}
           </div>
 
-          <div>
-            <div class="text-[11px] font-bold uppercase text-slate-400 mb-1.5">Destaques Arquitetónicos & Históricos</div>
-            <ul class="space-y-1">
-              ${m.highlights.map(h => `
-                <li class="text-xs text-slate-700 flex items-center gap-2">
-                  <span class="w-1.5 h-1.5 rounded-full bg-gold-500 shrink-0"></span>
-                  <span>${h}</span>
-                </li>
-              `).join('')}
-            </ul>
-          </div>
+          ${m.highlights && m.highlights.length > 0 ? `
+            <div>
+              <div class="text-[11px] font-bold uppercase text-slate-400 mb-1.5">Destaques & Notas Históricas</div>
+              <ul class="space-y-1">
+                ${m.highlights.map(h => `
+                  <li class="text-xs text-slate-700 flex items-start gap-2">
+                    <span class="w-1.5 h-1.5 rounded-full bg-gold-500 shrink-0 mt-1.5"></span>
+                    <span>${h}</span>
+                  </li>
+                `).join('')}
+              </ul>
+            </div>
+          ` : ''}
 
-          <div class="bg-sand-100 rounded-xl p-3 border border-sand-200 text-xs text-navy-900">
-            <strong class="text-gold-600 block mb-0.5">★ Dica "Caminhos do Sul":</strong>
-            ${m.tip}
-          </div>
+          ${m.tip ? `
+            <div class="bg-sand-100 rounded-xl p-3 border border-sand-200 text-xs text-navy-900">
+              <strong class="text-gold-600 block mb-0.5">★ Dica de Viagem:</strong>
+              ${m.tip}
+            </div>
+          ` : ''}
         </div>
       `).join('');
     }
 
-    // Secções Globais (Cofre de Bilhetes, Checklist, Diário & Contactos)
     function renderGlobalSection(section) {
       const container = document.getElementById('mobile-global-view');
       const trip = appState.tripData;
@@ -1055,7 +1084,6 @@
             <p class="text-xs text-slate-300 mt-0.5">Acesso rápido offline nas bilheteiras e contactos em Espanha.</p>
           </div>
 
-          <!-- Contactos de Emergência Espanha -->
           <div class="bg-red-50 border border-red-200 rounded-2xl p-4">
             <div class="text-xs font-bold uppercase text-red-800 mb-2 flex items-center gap-1.5">
               <i data-lucide="phone-call" class="w-4 h-4"></i> Emergência Espanha (Marcação Direta)
@@ -1076,7 +1104,6 @@
             </div>
           </div>
 
-          <!-- Lista de Bilhetes -->
           <div class="space-y-3">
             ${trip.tickets.map(t => `
               <div onclick="openTicketModal(${t.id})" class="bg-white rounded-2xl p-4 shadow-sm border border-sand-200 flex items-center justify-between gap-3 cursor-pointer hover:border-gold-500 transition">
@@ -1176,7 +1203,7 @@
           <div class="text-[11px] text-emerald-700 font-bold mt-1">✓ Disponível Offline</div>
         </div>
         <div class="bg-amber-50 border border-amber-200 rounded-xl p-3 text-xs text-amber-900">
-          <strong>Nota de Acesso:</strong> ${t.note}
+          <strong>Nota de Acesso:</strong> ${t.note || 'Apresentar na entrada.'}
         </div>
       `;
       document.getElementById('modal-overlay').classList.remove('hidden');
@@ -1188,87 +1215,279 @@
     }
 
     // =====================================================================
-    // FUNÇÕES DO PLANEADOR & IMPORTADOR PC (.PPTX e .KMZ/.KML)
+    // MOTOR DE IMPORTAÇÃO INTELIGENTE (.PPTX + .KMZ -> ESTRUTURA DA APP)
     // =====================================================================
     function renderDesktopPlanner() {
       const days = appState.tripData.days;
-      document.getElementById('desktop-stage-count').textContent = `${days.length} Etapas carregadas`;
+      document.getElementById('desktop-stage-count').textContent = `${days.length} Etapas ativas`;
       const tbody = document.getElementById('desktop-stages-table');
-      tbody.innerHTML = days.map((d, idx) => `
-        <tr class="hover:bg-sand-50">
-          <td class="py-3 px-3 font-bold text-navy-900">Dia ${d.dayNumber}</td>
-          <td class="py-3 px-3 font-semibold text-slate-800">${d.route}</td>
-          <td class="py-3 px-3 text-xs text-slate-600">${d.distance} (${d.duration})</td>
-          <td class="py-3 px-3 text-xs text-slate-600">${d.timeline.length} pontos • ${d.monuments.length} fichas técnicas</td>
-          <td class="py-3 px-3 text-right">
-            <button onclick="selectDay(${idx}); switchMode('mobile');" class="text-xs font-bold text-gold-600 hover:text-gold-500">
-              Pré-visualizar no iPhone →
-            </button>
-          </td>
-        </tr>
-      `).join('');
+      tbody.innerHTML = days.map((d, idx) => {
+        const gpsCount = d.timeline.filter(t => t.lat && t.lng).length;
+        return `
+          <tr class="hover:bg-sand-50">
+            <td class="py-3 px-2 font-bold text-navy-900">Dia ${d.dayNumber}</td>
+            <td class="py-3 px-2 font-semibold text-slate-800">${d.route}</td>
+            <td class="py-3 px-2 text-slate-600">${d.distance || '—'}</td>
+            <td class="py-3 px-2 text-slate-600">
+              <span class="text-emerald-700 font-semibold">${gpsCount}/${d.timeline.length} GPS</span> • ${d.monuments.length} fichas
+            </td>
+            <td class="py-3 px-2 text-right">
+              <button onclick="selectDay(${idx}); switchMode('mobile');" class="font-bold text-gold-600 hover:text-gold-500">
+                Abrir no iPhone →
+              </button>
+            </td>
+          </tr>
+        `;
+      }).join('');
     }
 
-    // Leitor real de PowerPoint (.pptx) usando JSZip + DOMParser XML
+    // Normalizar strings para comparação fuzzy entre nomes do PPTX e Placemarks do KMZ
+    function normalizeText(str) {
+      return (str || '')
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[̀-ͯ]/g, "")
+        .replace(/[^a-z0-9\s]/g, " ")
+        .replace(/\s+/g, " ")
+        .trim();
+    }
+
+    // Encontrar a melhor coordenada GPS no KMZ para um determinado título de paragem
+    function findBestCoordMatch(title, desc, waypoints) {
+      if (!waypoints || waypoints.length === 0) return null;
+      const stopWords = ['saida', 'partida', 'chegada', 'almoco', 'jantar', 'pausa', 'visita', 'para', 'em', 'de', 'da', 'do', 'a', 'o', 'e', 'no', 'na', 'hotel', 'check', 'in'];
+      const tokens = normalizeText(title + ' ' + (desc || ''))
+        .split(' ')
+        .filter(w => w.length > 2 && !stopWords.includes(w));
+
+      if (tokens.length === 0) return null;
+
+      let bestMatch = null;
+      let highestScore = 0;
+
+      for (const wp of waypoints) {
+        const wpNorm = normalizeText(wp.name + ' ' + wp.desc);
+        let score = 0;
+        for (const tok of tokens) {
+          if (wpNorm.includes(tok)) {
+            score += tok.length;
+          }
+        }
+        if (score > highestScore && score >= 4) {
+          highestScore = score;
+          bestMatch = wp;
+        }
+      }
+      return bestMatch;
+    }
+
+    // Classificar automaticamente o tipo de paragem pelo texto
+    function inferStopType(title) {
+      const t = normalizeText(title);
+      if (t.includes('combustivel') || t.includes('abastec') || t.includes('gasolina')) return 'fuel';
+      if (t.includes('almoco') || t.includes('jantar') || t.includes('restaurante') || t.includes('tapas')) return 'food';
+      if (t.includes('cafe') || t.includes('pausa')) return 'coffee';
+      if (t.includes('hotel') || t.includes('check in') || t.includes('alojamento') || t.includes('chegada')) return 'hotel';
+      if (t.includes('miradouro') || t.includes('foto')) return 'photo';
+      if (t.includes('bilhete') || t.includes('entrada')) return 'ticket';
+      if (t.includes('passeio') || t.includes('caminhada') || t.includes('a pe')) return 'walk';
+      if (t.includes('saida') || t.includes('partida') || t.includes('rota') || t.includes('curvas')) return 'ride';
+      return 'visit';
+    }
+
+    // Parser Estruturado de Slides PPTX
     async function handlePptxUpload(event) {
       const file = event.target.files[0];
       if (!file) return;
       const statusEl = document.getElementById('pptx-status');
-      statusEl.innerHTML = `<span class="text-amber-600 font-semibold">A processar slides de ${file.name}...</span>`;
+      statusEl.innerHTML = `<span class="text-amber-600 font-semibold">A analisar estrutura de ${file.name}...</span>`;
 
       try {
         const zip = await JSZip.loadAsync(file);
         const slideFiles = Object.keys(zip.files)
           .filter(name => name.match(/^ppt\/slides\/slide\d+\.xml$/))
-          .sort((a, b) => {
-            const numA = parseInt(a.match(/\d+/)[0]);
-            const numB = parseInt(b.match(/\d+/)[0]);
-            return numA - numB;
-          });
+          .sort((a, b) => parseInt(a.match(/\d+/)[0]) - parseInt(b.match(/\d+/)[0]));
 
-        const extractedSlides = [];
         const parser = new DOMParser();
+        const slidesData = [];
 
         for (const slidePath of slideFiles) {
           const xmlText = await zip.files[slidePath].async('string');
           const xmlDoc = parser.parseFromString(xmlText, 'application/xml');
-          const textNodes = Array.from(xmlDoc.getElementsByTagName('a:t'));
-          const fullText = textNodes.map(n => n.textContent).join(' ').replace(/\s+/g, ' ').trim();
-          if (fullText) {
-            extractedSlides.push({
-              slide: slidePath.match(/\d+/)[0],
-              text: fullText
+          // Extrair parágrafos (<a:p>) para preservar quebras de linha lógicas
+          const paragraphs = Array.from(xmlDoc.getElementsByTagName('a:p')).map(p => {
+            return Array.from(p.getElementsByTagName('a:t')).map(t => t.textContent).join('').trim();
+          }).filter(line => line.length > 0);
+
+          slidesData.push({
+            num: parseInt(slidePath.match(/\d+/)[0]),
+            lines: paragraphs,
+            fullText: paragraphs.join('
+')
+          });
+        }
+
+        // Agrupar slides por DIA (ex: "DIA 01", "DIA 1", "ETAPA 01")
+        const parsedDays = [];
+        let currentDay = null;
+        let detectedTitle = file.name.replace(/\.pptx$/i, '').replace(/[_-]/g, ' ').toUpperCase();
+
+        if (slidesData.length > 0 && slidesData[0].lines.length > 0) {
+          const firstCandidate = slidesData[0].lines.find(l => l.length > 4 && l.length < 45);
+          if (firstCandidate) detectedTitle = firstCandidate.toUpperCase();
+        }
+
+        for (const slide of slidesData) {
+          const textUpper = slide.fullText.toUpperCase();
+          const dayMatch = textUpper.match(/(?:DIA|ETAPA)\s*0?(\d{1,2})/);
+
+          // Ignorar índice geral nas primeiras páginas se listar todos os dias juntos
+          const isIndexSlide = (textUpper.includes('ÍNDICE') || textUpper.includes('INDICE')) && slide.num <= 6;
+          if (isIndexSlide) continue;
+
+          if (dayMatch) {
+            const dNum = dayMatch[1].padStart(2, '0');
+            if (!currentDay || currentDay.dayNumber !== dNum) {
+              // Procurar título da rota (ex: "LISBOA → CÓRDOBA" ou "LISBOA - CÓRDOBA")
+              const routeLine = slide.lines.find(l => l.includes('→') || l.includes('->') || (l.includes(' - ') && l.length < 50)) || `Etapa ${dNum}`;
+              const distMatch = slide.fullText.match(/(\d{2,4}\s*km)/i);
+              const durMatch = slide.fullText.match(/(\d{1,2}h\d{0,2}(?:\s*[-–]\s*\d{1,2}h\d{0,2})?)/i);
+
+              currentDay = {
+                dayNumber: dNum,
+                route: routeLine.replace('->', '→'),
+                via: slide.lines.find(l => l.includes('|') && l.length < 80) || routeLine,
+                distance: distMatch ? distMatch[1] : '—',
+                duration: durMatch ? `≈ ${durMatch[1]}` : '',
+                roadType: textUpper.includes('MONTANHA') ? 'Estradas de Montanha' : 'Estradas Panorâmicas',
+                difficulty: 'Moderada',
+                summary: '',
+                zbeWarning: null,
+                fuelRule: 'Verificar autonomia antes de entrar em zonas de serra.',
+                timeline: [],
+                walkingRoute: {
+                  city: `Percurso a Pé • Dia ${dNum}`,
+                  estimatedTime: '1h30 – 2h30',
+                  parkingNote: 'Estacionar em zona autorizada próxima do centro histórico.',
+                  stops: []
+                },
+                monuments: []
+              };
+              parsedDays.push(currentDay);
+            }
+          }
+
+          if (!currentDay) continue;
+
+          // Detetar Alertas ZBE
+          if (textUpper.includes('ZBE') || textUpper.includes('BAIXAS EMISSÕES') || textUpper.includes('ACESSO CONDICIONADO')) {
+            const zbeSentences = slide.lines.filter(l => l.length > 25).slice(0, 3).join(' ');
+            if (zbeSentences) currentDay.zbeWarning = zbeSentences;
+          }
+
+          // Detetar Ficha Técnica de Monumento
+          if (textUpper.includes('FICHA TÉCNICA') || textUpper.includes('FICHA TECNICA')) {
+            const titleCandidates = slide.lines.filter(l => 
+              !l.toUpperCase().includes('FICHA') && 
+              !l.toUpperCase().includes('ESTRADA, CULTURA') &&
+              !l.toUpperCase().includes('CAMINHOS DO SUL') &&
+              l.length > 3 && l.length < 65
+            );
+            const monName = titleCandidates[0] || `Monumento Dia ${currentDay.dayNumber}`;
+            const highlights = slide.lines
+              .filter(l => l.startsWith('✓') || l.startsWith('•') || l.startsWith('-'))
+              .map(l => l.replace(/^[✓•\-]\s*/, '').trim());
+            const tipIdx = slide.lines.findIndex(l => l.toUpperCase().includes('DICA'));
+            const tipText = tipIdx !== -1 && slide.lines[tipIdx + 1] ? slide.lines[tipIdx + 1] : '';
+
+            currentDay.monuments.push({
+              name: monName,
+              location: currentDay.route.split('→').pop().trim(),
+              classification: 'Património & Cultura',
+              schedule: '',
+              highlights: highlights.length > 0 ? highlights.slice(0, 5) : slide.lines.slice(1, 5),
+              tip: tipText
             });
+            continue;
+          }
+
+          // Extrair Horários para a Timeline (ex: "08:00", "14:30")
+          for (let i = 0; i < slide.lines.length; i++) {
+            const line = slide.lines[i];
+            const timeMatch = line.match(/^(\d{1,2}:\d{2})(?:\s*[-–]\s*\d{1,2}:\d{2})?$/);
+            if (timeMatch && slide.lines[i + 1]) {
+              const timeStr = timeMatch[1];
+              const stopTitle = slide.lines[i + 1];
+              const stopDesc = slide.lines[i + 2] && !slide.lines[i + 2].match(/^\d{1,2}:\d{2}/) ? slide.lines[i + 2] : '';
+              
+              // Evitar duplicados no mesmo dia
+              if (!currentDay.timeline.some(t => t.time === timeStr && t.title === stopTitle)) {
+                currentDay.timeline.push({
+                  time: timeStr,
+                  title: stopTitle,
+                  desc: stopDesc,
+                  km: '',
+                  type: inferStopType(stopTitle),
+                  lat: null,
+                  lng: null
+                });
+              }
+            }
+          }
+
+          // Extrair Resumo narrativo se ainda estiver vazio
+          if (!currentDay.summary) {
+            const longParagraph = slide.lines.find(l => l.length > 120 && !l.toUpperCase().includes('ESTRADA, CULTURA'));
+            if (longParagraph) currentDay.summary = longParagraph;
           }
         }
 
-        statusEl.innerHTML = `<span class="text-emerald-700 font-bold">✓ ${extractedSlides.length} slides lidos com sucesso!</span>`;
-        
-        const previewBox = document.getElementById('import-preview-box');
-        const previewTitle = document.getElementById('import-preview-title');
-        const previewContent = document.getElementById('import-preview-content');
-        
-        previewTitle.textContent = `Conteúdo Extraído do PowerPoint: ${file.name} (${extractedSlides.length} slides)`;
-        previewContent.innerHTML = extractedSlides.slice(0, 15).map(s => `
-          <div class="p-2.5 rounded-lg bg-navy-900/70 border border-slate-700">
-            <span class="text-gold-400 font-bold">Slide ${s.slide}:</span>
-            <span class="text-slate-300">${s.text.substring(0, 220)}${s.text.length > 220 ? '...' : ''}</span>
-          </div>
-        `).join('') + (extractedSlides.length > 15 ? `<div class="text-slate-400 italic pt-1">... e mais ${extractedSlides.length - 15} slides processados.</div>` : '');
-        
-        previewBox.classList.remove('hidden');
-        lucide.createIcons();
+        // Fallback caso o PPTX não use etiquetas "DIA 01"
+        if (parsedDays.length === 0) {
+          slidesData.forEach((s, idx) => {
+            parsedDays.push({
+              dayNumber: String(idx + 1).padStart(2, '0'),
+              route: s.lines[0] || `Slide ${s.num}`,
+              via: '',
+              distance: '—',
+              duration: '',
+              roadType: 'Importado PPTX',
+              difficulty: 'Moderada',
+              summary: s.lines.slice(1, 4).join(' '),
+              zbeWarning: null,
+              fuelRule: '',
+              timeline: [{
+                time: "09:00",
+                title: s.lines[0] || `Ponto ${s.num}`,
+                desc: s.lines.slice(1).join(' '),
+                km: '',
+                type: 'visit',
+                lat: null,
+                lng: null
+              }],
+              walkingRoute: { city: s.lines[0] || `Local ${s.num}`, estimatedTime: '', parkingNote: '', stops: [] },
+              monuments: []
+            });
+          });
+        }
+
+        stagingData.pptxDays = parsedDays;
+        stagingData.pptxTitle = detectedTitle;
+
+        statusEl.innerHTML = `<span class="text-emerald-700 font-bold">✓ ${parsedDays.length} etapas e ${slidesData.length} slides estruturados!</span>`;
+        document.getElementById('badge-pptx-ready').classList.remove('hidden');
+        updateStagingUI();
       } catch (err) {
         statusEl.innerHTML = `<span class="text-red-600 font-bold">Erro ao ler .pptx: ${err.message}</span>`;
       }
     }
 
-    // Leitor real de Google Maps (.kmz / .kml)
+    // Parser de KMZ / KML
     async function handleKmzUpload(event) {
       const file = event.target.files[0];
       if (!file) return;
       const statusEl = document.getElementById('kmz-status');
-      statusEl.innerHTML = `<span class="text-amber-600 font-semibold">A extrair coordenadas de ${file.name}...</span>`;
+      statusEl.innerHTML = `<span class="text-amber-600 font-semibold">A extrair pontos GPS de ${file.name}...</span>`;
 
       try {
         let kmlString = '';
@@ -1286,37 +1505,174 @@
         const placemarks = Array.from(xmlDoc.getElementsByTagName('Placemark'));
         
         const waypoints = placemarks.map(pm => {
-          const name = pm.getElementsByTagName('name')[0]?.textContent?.trim() || 'Ponto sem nome';
+          const name = pm.getElementsByTagName('name')[0]?.textContent?.trim() || 'Ponto GPS';
           const desc = pm.getElementsByTagName('description')[0]?.textContent?.replace(/<[^>]*>?/gm, '').trim() || '';
           const coordsRaw = pm.getElementsByTagName('coordinates')[0]?.textContent?.trim() || '';
-          const firstCoord = coordsRaw.split(/\s+/)[0]?.split(',');
-          const lng = firstCoord && firstCoord[0] ? parseFloat(firstCoord[0]) : null;
-          const lat = firstCoord && firstCoord[1] ? parseFloat(firstCoord[1]) : null;
-          return { name, desc, lat, lng };
+          const coordPairs = coordsRaw.split(/\s+/).filter(Boolean);
+          // Se for uma linha (LineString) com muitos pontos, pegar o ponto final; se for marcador, pegar o único ponto
+          const targetPair = (coordPairs.length > 1 ? coordPairs[coordPairs.length - 1] : coordPairs[0])?.split(',');
+          const lng = targetPair && targetPair[0] ? parseFloat(targetPair[0]) : null;
+          const lat = targetPair && targetPair[1] ? parseFloat(targetPair[1]) : null;
+          return { name, desc, lat, lng, isRouteLine: coordPairs.length > 2 };
         }).filter(w => w.lat && w.lng);
 
-        statusEl.innerHTML = `<span class="text-emerald-700 font-bold">✓ ${waypoints.length} pontos GPS importados!</span>`;
-
-        const previewBox = document.getElementById('import-preview-box');
-        const previewTitle = document.getElementById('import-preview-title');
-        const previewContent = document.getElementById('import-preview-content');
-
-        previewTitle.textContent = `Pontos GPS Extraídos de ${file.name} (${waypoints.length} locais)`;
-        previewContent.innerHTML = waypoints.slice(0, 20).map(w => `
-          <div class="p-2.5 rounded-lg bg-navy-900/70 border border-slate-700 flex items-center justify-between gap-2">
-            <div>
-              <div class="font-bold text-gold-400">${w.name}</div>
-              <div class="text-[11px] text-slate-400">${w.lat.toFixed(5)}, ${w.lng.toFixed(5)} ${w.desc ? '• ' + w.desc.substring(0, 80) : ''}</div>
-            </div>
-            <button onclick="openGPS('google', ${w.lat}, ${w.lng}, '${w.name.replace(/'/g, '')}')" class="bg-emerald-600 text-white px-2.5 py-1 rounded text-[11px] font-bold shrink-0">Testar GPS</button>
-          </div>
-        `).join('');
-
-        previewBox.classList.remove('hidden');
-        lucide.createIcons();
+        stagingData.kmzWaypoints = waypoints;
+        statusEl.innerHTML = `<span class="text-emerald-700 font-bold">✓ ${waypoints.length} coordenadas GPS prontas para cruzar!</span>`;
+        document.getElementById('badge-kmz-ready').classList.remove('hidden');
+        updateStagingUI();
       } catch (err) {
         statusEl.innerHTML = `<span class="text-red-600 font-bold">Erro ao ler mapa: ${err.message}</span>`;
       }
+    }
+
+    // Atualizar Painel de Pré-visualização e Fusão
+    function updateStagingUI() {
+      const hasPptx = stagingData.pptxDays && stagingData.pptxDays.length > 0;
+      const hasKmz = stagingData.kmzWaypoints && stagingData.kmzWaypoints.length > 0;
+
+      document.getElementById('staging-pptx-count').textContent = hasPptx ? `${stagingData.pptxDays.length} Dias detetados` : 'Nenhum';
+      document.getElementById('staging-kmz-count').textContent = hasKmz ? `${stagingData.kmzWaypoints.length} Marcadores GPS` : 'Nenhum';
+
+      const applyBtn = document.getElementById('btn-apply-import');
+      applyBtn.disabled = !(hasPptx || hasKmz);
+
+      // Construir versão pré-fundida para visualização
+      const previewDays = buildMergedDays();
+      const panel = document.getElementById('staging-preview-panel');
+      const body = document.getElementById('staging-preview-body');
+      const titleInput = document.getElementById('staged-trip-title');
+
+      if (stagingData.pptxTitle && !titleInput.value) {
+        titleInput.value = stagingData.pptxTitle;
+      } else if (!titleInput.value) {
+        titleInput.value = "NOVO ROTEIRO MOTO";
+      }
+
+      panel.classList.remove('hidden');
+      body.innerHTML = previewDays.map(d => {
+        const matchedCount = d.timeline.filter(t => t.lat && t.lng).length;
+        return `
+          <div class="p-4 rounded-xl bg-sand-50 border border-sand-200 space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="font-extrabold text-xs bg-navy-900 text-gold-400 px-2 py-0.5 rounded">DIA ${d.dayNumber}</span>
+              <span class="text-[11px] font-bold ${matchedCount > 0 ? 'text-emerald-700' : 'text-slate-400'}">
+                ${matchedCount}/${d.timeline.length} pontos com GPS cruzado
+              </span>
+            </div>
+            <div class="font-bold text-sm text-navy-900">${d.route}</div>
+            <div class="text-[11px] text-slate-600 space-y-1 max-h-32 overflow-y-auto">
+              ${d.timeline.map(t => `
+                <div class="flex items-center justify-between gap-2 bg-white px-2 py-1 rounded border border-slate-100">
+                  <span class="truncate"><strong>${t.time}</strong> • ${t.title}</span>
+                  ${t.lat ? `<span class="text-[10px] text-emerald-600 font-mono shrink-0">✓ GPS</span>` : `<span class="text-[10px] text-slate-300 shrink-0">—</span>`}
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      lucide.createIcons();
+    }
+
+    // Cruzar PPTX + KMZ
+    function buildMergedDays() {
+      const waypoints = stagingData.kmzWaypoints || [];
+      
+      // Caso 1: Temos PPTX (com ou sem KMZ)
+      if (stagingData.pptxDays && stagingData.pptxDays.length > 0) {
+        const cloned = JSON.parse(JSON.stringify(stagingData.pptxDays));
+        for (const day of cloned) {
+          for (const item of day.timeline) {
+            const match = findBestCoordMatch(item.title, item.desc, waypoints);
+            if (match) {
+              item.lat = match.lat;
+              item.lng = match.lng;
+            }
+          }
+          // Se não houver timeline no dia, tentar associar o destino da rota
+          if (day.timeline.length === 0) {
+            const destName = day.route.split('→').pop().trim();
+            const destMatch = findBestCoordMatch(destName, '', waypoints);
+            day.timeline.push({
+              time: "09:00",
+              title: day.route,
+              desc: day.summary || `Etapa ${day.dayNumber}`,
+              km: day.distance,
+              type: "ride",
+              lat: destMatch ? destMatch.lat : null,
+              lng: destMatch ? destMatch.lng : null
+            });
+          }
+          // Popular paragens apeadas com os pontos de visita do dia
+          day.walkingRoute.stops = day.timeline
+            .filter(t => t.type === 'visit' || t.type === 'walk' || t.type === 'photo')
+            .map((t, i) => ({
+              num: i + 1,
+              name: t.title,
+              desc: t.desc || `Paragem prevista às ${t.time}`,
+              lat: t.lat,
+              lng: t.lng
+            }));
+        }
+        return cloned;
+      }
+
+      // Caso 2: Apenas KMZ carregado -> Criar etapas a partir dos marcadores GPS
+      if (waypoints.length > 0) {
+        const pointMarkers = waypoints.filter(w => !w.isRouteLine);
+        const list = pointMarkers.length > 0 ? pointMarkers : waypoints;
+        return [{
+          dayNumber: "01",
+          route: `${list[0].name} → ${list[list.length - 1].name}`,
+          via: `${list.length} pontos importados do Google Maps`,
+          distance: "—",
+          duration: "",
+          roadType: "Importado KMZ",
+          difficulty: "Moderada",
+          summary: "Roteiro gerado diretamente a partir dos marcadores GPS do ficheiro KMZ/KML.",
+          zbeWarning: null,
+          fuelRule: "Verificar postos de abastecimento ao longo do traçado.",
+          timeline: list.map((wp, idx) => ({
+            time: `${String(9 + Math.floor(idx * 1.5)).padStart(2, '0')}:00`,
+            title: wp.name,
+            desc: wp.desc || "Ponto importado do mapa.",
+            km: "",
+            type: inferStopType(wp.name),
+            lat: wp.lat,
+            lng: wp.lng
+          })),
+          walkingRoute: {
+            city: list[list.length - 1].name,
+            estimatedTime: "",
+            parkingNote: "",
+            stops: list.map((wp, i) => ({ num: i + 1, name: wp.name, desc: wp.desc, lat: wp.lat, lng: wp.lng }))
+          },
+          monuments: []
+        }];
+      }
+
+      return [];
+    }
+
+    // Aplicar definitivamente na Aplicação e Sincronizar
+    function applyStagedImport() {
+      const mergedDays = buildMergedDays();
+      if (mergedDays.length === 0) return;
+
+      const customTitle = document.getElementById('staged-trip-title').value.trim() || "ROTEIRO IMPORTADO";
+      appState.tripData = {
+        ...appState.tripData,
+        title: customTitle.toUpperCase(),
+        subtitle: `Roteiro Personalizado • ${mergedDays.length} Etapa(s)`,
+        days: mergedDays
+      };
+      appState.currentDayIdx = 0;
+      saveState();
+
+      document.getElementById('staging-preview-panel').classList.add('hidden');
+      renderDesktopPlanner();
+      alert(`Viagem "${appState.tripData.title}" atualizada com sucesso (${mergedDays.length} etapas)! Podes agora alternar para "Viagem (iPhone)" ou exportar o ficheiro .json para partilhar com o grupo.`);
     }
 
     function addNewTicket(event) {
@@ -1324,6 +1680,7 @@
       const title = document.getElementById('ticket-title').value.trim();
       const day = document.getElementById('ticket-day').value.trim();
       const code = document.getElementById('ticket-code').value.trim();
+      const note = document.getElementById('ticket-note').value.trim();
       if (!title || !day || !code) return;
 
       appState.tripData.tickets.push({
@@ -1331,33 +1688,65 @@
         title,
         day,
         code,
-        note: "Adicionado manualmente no Planeador PC."
+        note: note || "Adicionado no Planeador PC."
       });
       saveState();
       event.target.reset();
-      alert('Bilhete guardado no Cofre Offline! Já está disponível no separador "Bilhetes & ZBE" do modo Viagem.');
+      alert('Bilhete guardado no Cofre Offline!');
     }
 
     function exportTripJSON() {
       const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appState.tripData, null, 2));
       const downloadAnchor = document.createElement('a');
       downloadAnchor.setAttribute("href", dataStr);
-      downloadAnchor.setAttribute("download", "caminhos_do_sul_roteiro.json");
+      const slug = normalizeText(appState.tripData.title).replace(/\s+/g, '_') || 'roteiro_moto';
+      downloadAnchor.setAttribute("download", `${slug}.json`);
       document.body.appendChild(downloadAnchor);
       downloadAnchor.click();
       downloadAnchor.remove();
     }
 
+    function importTripJSON(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const data = JSON.parse(e.target.result);
+          if (data && Array.isArray(data.days)) {
+            appState.tripData = data;
+            appState.currentDayIdx = 0;
+            saveState();
+            renderDesktopPlanner();
+            renderMobileApp();
+            alert(`Viagem "${data.title}" carregada com sucesso!`);
+          } else {
+            alert('Ficheiro JSON inválido.');
+          }
+        } catch (err) {
+          alert('Erro ao ler ficheiro JSON: ' + err.message);
+        }
+      };
+      reader.readAsText(file);
+    }
+
     function resetToDefaultTrip() {
       if (confirm('Repor os dados originais de "Caminhos do Sul"?')) {
         appState.tripData = DEFAULT_TRIP_DATA;
+        appState.currentDayIdx = 0;
         saveState();
         renderDesktopPlanner();
         renderMobileApp();
       }
     }
 
-    // Inicialização
+    // Registo do Service Worker para Offline PWA
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').catch(() => {});
+      });
+    }
+
     window.addEventListener('DOMContentLoaded', () => {
       renderMobileApp();
       lucide.createIcons();
