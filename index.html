@@ -123,7 +123,7 @@
     <section id="stage-hero" class="px-4 pt-4"></section>
 
     <!-- Sub-Navegação da Etapa -->
-    <div class="px-4 mt-4">
+    <div id="route-subtabs" class="px-4 mt-4">
       <div class="grid grid-cols-3 gap-1.5 bg-sand-200/70 p-1 rounded-xl border border-sand-200">
         <button onclick="switchSubTab('cockpit')" id="subtab-cockpit" class="tab-active py-2.5 px-2 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 transition-all">
           <i data-lucide="navigation" class="w-4 h-4"></i>
@@ -737,7 +737,7 @@
         btnMobile.className = "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all text-slate-300 hover:text-white";
         renderDesktopPlanner();
       }
-      lucide.createIcons();
+      if (window.lucide) { lucide.createIcons(); }
     }
 
     function openGPS(app, lat, lng, label) {
@@ -791,7 +791,7 @@
         }
       });
 
-      const routeSubTabs = document.querySelector('#view-mobile > div:nth-child(3)');
+      const routeSubTabs = document.getElementById('route-subtabs');
       const stageHero = document.getElementById('stage-hero');
       const mobileContent = document.getElementById('mobile-content');
       const globalView = document.getElementById('mobile-global-view');
@@ -802,7 +802,7 @@
         mobileContent.classList.add('hidden');
         globalView.classList.remove('hidden');
         renderGlobalSection(appState.mainSection);
-        lucide.createIcons();
+        if (window.lucide) { lucide.createIcons(); }
         return;
       }
 
@@ -899,7 +899,7 @@
         renderMonumentsList(day);
       }
 
-      lucide.createIcons();
+      if (window.lucide) { lucide.createIcons(); }
     }
 
     function getTypeBadge(type) {
@@ -1207,7 +1207,7 @@
         </div>
       `;
       document.getElementById('modal-overlay').classList.remove('hidden');
-      lucide.createIcons();
+      if (window.lucide) { lucide.createIcons(); }
     }
 
     function closeModal() {
@@ -1572,7 +1572,7 @@
         `;
       }).join('');
 
-      lucide.createIcons();
+      if (window.lucide) { lucide.createIcons(); }
     }
 
     // Cruzar PPTX + KMZ
@@ -1749,7 +1749,7 @@
 
     window.addEventListener('DOMContentLoaded', () => {
       renderMobileApp();
-      lucide.createIcons();
+      if (window.lucide) { lucide.createIcons(); }
     });
   </script>
 </body>
