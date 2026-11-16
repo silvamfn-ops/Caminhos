@@ -145,7 +145,7 @@
   <main id="view-desktop" class="hidden flex-1 max-w-6xl w-full mx-auto px-4 py-6 space-y-6">
     <div class="bg-white rounded-2xl p-6 shadow-sm border border-sand-200 flex flex-col md:flex-row md:items-center justify-between gap-4">
       <div>
-        <span class="text-xs font-bold uppercase tracking-wider text-gold-600 bg-gold-400/20 px-2.5 py-1 rounded-full">Estúdio de Importação v2.2</span>
+        <span class="text-xs font-bold uppercase tracking-wider text-gold-600 bg-gold-400/20 px-2.5 py-1 rounded-full">Estúdio de Importação v2.4 • Etiquetas [APP:]</span>
         <h2 class="text-2xl font-bold text-navy-900 mt-2">Importador Inteligente (.PPTX + .KMZ)</h2>
         <p class="text-sm text-slate-600 mt-1">Carrega o teu PowerPoint e o ficheiro do Google Maps. O motor deteta automaticamente os dias, horários, fichas técnicas e cruza cada paragem com as coordenadas GPS.</p>
       </div>
@@ -178,8 +178,11 @@
           </div>
           <h3 class="font-bold text-base text-navy-900">1. Estrutura do PowerPoint (.pptx)</h3>
           <p class="text-xs text-slate-600 mt-1.5 leading-relaxed">
-            Identifica padrões de slides (<code class="bg-slate-100 px-1 rounded">DIA 01</code>, horários <code class="bg-slate-100 px-1 rounded">08:30</code>, distâncias <code class="bg-slate-100 px-1 rounded">km</code>, <code class="bg-slate-100 px-1 rounded">FICHA TÉCNICA</code> e alertas <code class="bg-slate-100 px-1 rounded">ZBE</code>).
+            Lê etiquetas <code class="bg-amber-100 text-amber-900 font-bold px-1 rounded">[APP: ...]</code> nas <strong>Notas do Apresentador</strong> ou no slide para importação exata sem erros.
           </p>
+          <button onclick="openTagGuideModal()" class="mt-2 inline-flex items-center gap-1 text-[11px] font-bold text-gold-600 hover:text-gold-500 underline">
+            <i data-lucide="code" class="w-3.5 h-3.5"></i> Ver códigos [APP: ...] prontos a copiar
+          </button>
         </div>
         <div class="mt-5">
           <label class="flex flex-col items-center justify-center border-2 border-dashed border-slate-300 hover:border-gold-500 rounded-xl p-4 cursor-pointer bg-sand-50/50 transition text-center">
@@ -1287,25 +1290,123 @@
       return line.replace(/^[\u2713\u2022\-\*]\s*/, '').trim();
     }
 
+    function openTagGuideModal() {
+      document.getElementById('modal-tag').textContent = 'Guia de Importação 100% Exata';
+      document.getElementById('modal-title').textContent = 'Códigos [APP: ...] para PowerPoint';
+      document.getElementById('modal-body').innerHTML = `
+        <p class="text-xs text-slate-600">
+          Coloca estes códigos nas <strong>Notas do Apresentador</strong> (em baixo de cada slide, invisíveis na apresentação) ou numa caixa discreta no slide. O motor obedece prioritariamente a estas etiquetas:
+        </p>
+
+        <div class="space-y-2.5 text-xs">
+          <div class="bg-sand-100 p-3 rounded-xl border border-sand-200">
+            <div class="font-bold text-navy-900">1. Ignorar Slide (Capa, Índice, Mapas Gerais)</div>
+            <code class="block bg-navy-900 text-gold-400 p-2 rounded-lg mt-1 font-mono select-all">[APP: IGNORAR]</code>
+          </div>
+
+          <div class="bg-sand-100 p-3 rounded-xl border border-sand-200">
+            <div class="font-bold text-navy-900">2. Iniciar Novo Dia / Etapa</div>
+            <code class="block bg-navy-900 text-gold-400 p-2 rounded-lg mt-1 font-mono select-all">[APP: DIA 01 | Lisboa → Córdoba | 511 km | ≈ 6h45]</code>
+            <p class="text-[11px] text-slate-500 mt-1">Podes escrever logo abaixo no mesmo bloco o resumo do dia.</p>
+          </div>
+
+          <div class="bg-sand-100 p-3 rounded-xl border border-sand-200">
+            <div class="font-bold text-navy-900">3. Slide de Horários / Cronograma</div>
+            <code class="block bg-navy-900 text-gold-400 p-2 rounded-lg mt-1 font-mono whitespace-pre-wrap select-all">[APP: HORARIO]
+08:00 | Saída de Lisboa | Pela EN4 rumo a Espanha | 0 km
+10:00 | Combustível Estremoz | Atestar antes da fronteira | 180 km
+14:00 | Almoço em Zafra | Plaza Grande | 322 km</code>
+            <p class="text-[11px] text-slate-500 mt-1">Se não listares as linhas após <code>[APP: HORARIO]</code>, o motor extrai automaticamente as horas visíveis no slide.</p>
+          </div>
+
+          <div class="bg-sand-100 p-3 rounded-xl border border-sand-200">
+            <div class="font-bold text-navy-900">4. Roteiro a Pé, Monumento ou Alerta ZBE</div>
+            <code class="block bg-navy-900 text-gold-400 p-2 rounded-lg mt-1 font-mono whitespace-pre-wrap select-all">[APP: APE]
+[APP: MONUMENTO]
+[APP: ZBE]</code>
+          </div>
+        </div>
+      `;
+      document.getElementById('modal-overlay').classList.remove('hidden');
+      refreshIcons();
+    }
+
+    function parsePipeHours(lines, targetDay) {
+      let added = 0;
+      for (const rawLine of lines) {
+        const line = rawLine.trim();
+        const m = line.match(/^(\d{1,2}:\d{2})(?:\s*[-–]\s*\d{1,2}:\d{2})?\s*\|\s*([^|]+)(?:\|\s*([^|]*))?(?:\|\s*([^|]*))?$/);
+        if (m) {
+          const timeStr = m[1].trim();
+          const stopTitle = m[2].trim();
+          const stopDesc = (m[3] || '').trim();
+          const stopKm = (m[4] || '').trim();
+          if (stopTitle && !targetDay.timeline.some(t => t.time === timeStr && t.title === stopTitle)) {
+            targetDay.timeline.push({
+              time: timeStr,
+              title: stopTitle,
+              desc: stopDesc,
+              km: stopKm,
+              type: inferStopType(stopTitle),
+              lat: null,
+              lng: null
+            });
+            added++;
+          }
+        }
+      }
+      return added;
+    }
+
+    function parseSlideLinesForHours(lines, targetDay) {
+      for (let i = 0; i < lines.length; i++) {
+        const line = lines[i].trim();
+        if (/^\d{1,2}:\d{2}.*\|/.test(line)) {
+          parsePipeHours([line], targetDay);
+          continue;
+        }
+        const inlineMatch = line.match(/^(\d{1,2}:\d{2})(?:\s*[-–]\s*\d{1,2}:\d{2})?(?:\s*[•\-–]\s*(.+))?$/);
+        if (inlineMatch) {
+          const timeStr = inlineMatch[1];
+          let stopTitle = inlineMatch[2] ? inlineMatch[2].trim() : (lines[i + 1] || '').trim();
+          let stopDesc = '';
+
+          if (inlineMatch[2]) {
+            stopDesc = lines[i + 1] && !/^\d{1,2}:\d{2}/.test(lines[i + 1]) ? lines[i + 1].trim() : '';
+          } else {
+            stopDesc = lines[i + 2] && !/^\d{1,2}:\d{2}/.test(lines[i + 2]) ? lines[i + 2].trim() : '';
+          }
+
+          if (stopTitle && !stopTitle.startsWith('[APP:') && !targetDay.timeline.some(t => t.time === timeStr && t.title === stopTitle)) {
+            targetDay.timeline.push({
+              time: timeStr,
+              title: stopTitle,
+              desc: stopDesc,
+              km: '',
+              type: inferStopType(stopTitle),
+              lat: null,
+              lng: null
+            });
+          }
+        }
+      }
+    }
+
     function detectDayHeader(lines, fullText) {
       const textUpper = fullText.toUpperCase();
-      // Ignorar slides de resumo geral que mencionam múltiplos dias (ex: Dia 01, Dia 02, Dia 03 no mesmo slide)
       const allDayMentions = [...textUpper.matchAll(/\b(?:DIA|ETAPA|JORNADA)\s*0?(\d{1,2})\b/g)].map(m => parseInt(m[1], 10));
       const uniqueDays = [...new Set(allDayMentions)];
       if (uniqueDays.length > 1) return null;
 
-      // Ignorar slides globais (Índice, Capa, Checklist, Orçamento, Emergência)
       const globalKeywords = ['ÍNDICE', 'INDICE', 'CHECKLIST', 'EQUIPAMENTO', 'ORÇAMENTO', 'ORCAMENTO', 'EMERGÊNCIA', 'EMERGENCIA', 'PREPARAÇÃO', 'PREPARACAO', 'VISÃO GERAL', 'VISAO GERAL', 'MAPA GERAL'];
       if (globalKeywords.some(kw => textUpper.includes(kw)) && uniqueDays.length === 0) {
         return null;
       }
 
-      // Procurar marcador de dia prioritariamente nas primeiras 4 linhas do slide (título/cabeçalho)
       const topLines = lines.slice(0, 4).join(' ').toUpperCase();
       let m = topLines.match(/\b(?:DIA|ETAPA|JORNADA)\s*0?(\d{1,2})\b/) || topLines.match(/\b0?(\d{1,2})[º°.]?\s*(?:DIA|ETAPA|JORNADA)\b/);
       if (m) return m[1].padStart(2, '0');
 
-      // Caso o marcador esteja noutra linha mas seja único no slide e não seja uma referência ("como no Dia 01")
       if (uniqueDays.length === 1) {
         const refMatch = textUpper.match(/(?:COMO NO|VER|IGUAL AO|REGRESSO DO)\s+DIA\s*0?\d{1,2}/);
         if (!refMatch) {
@@ -1320,7 +1421,7 @@
       const file = event.target.files[0];
       if (!file) return;
       const statusEl = document.getElementById('pptx-status');
-      statusEl.innerHTML = `<span class="text-amber-600 font-semibold">A analisar estrutura de ${file.name}...</span>`;
+      statusEl.innerHTML = `<span class="text-amber-600 font-semibold">A ler slides e notas de ${file.name}...</span>`;
 
       try {
         if (!window.JSZip) throw new Error('Biblioteca JSZip ainda a carregar. Tenta novamente em 2 segundos.');
@@ -1333,36 +1434,168 @@
         const slidesData = [];
 
         for (const slidePath of slideFiles) {
+          const slideNum = parseInt(slidePath.match(/\d+/)[0], 10);
           const xmlText = await zip.files[slidePath].async('string');
           const xmlDoc = parser.parseFromString(xmlText, 'application/xml');
-          const paragraphs = Array.from(xmlDoc.getElementsByTagName('a:p')).map(p => {
+          const slideLines = Array.from(xmlDoc.getElementsByTagName('a:p')).map(p => {
             return Array.from(p.getElementsByTagName('a:t')).map(t => t.textContent).join('').trim();
           }).filter(line => line.length > 0);
 
+          let notesLines = [];
+          const relPath = `ppt/slides/_rels/slide${slideNum}.xml.rels`;
+          let targetNotePath = `ppt/notesSlides/notesSlide${slideNum}.xml`;
+          if (zip.files[relPath]) {
+            const relXml = await zip.files[relPath].async('string');
+            const noteTargetMatch = relXml.match(/Target="\.\.\/notesSlides\/(notesSlide\d+\.xml)"/);
+            if (noteTargetMatch) {
+              targetNotePath = `ppt/notesSlides/${noteTargetMatch[1]}`;
+            }
+          }
+          if (zip.files[targetNotePath]) {
+            const noteXmlText = await zip.files[targetNotePath].async('string');
+            const noteXmlDoc = parser.parseFromString(noteXmlText, 'application/xml');
+            notesLines = Array.from(noteXmlDoc.getElementsByTagName('a:p')).map(p => {
+              return Array.from(p.getElementsByTagName('a:t')).map(t => t.textContent).join('').trim();
+            }).filter(line => line.length > 0 && !/^\d+$/.test(line));
+          }
+
+          const combinedLines = [...notesLines, ...slideLines];
           slidesData.push({
-            num: parseInt(slidePath.match(/\d+/)[0], 10),
-            lines: paragraphs,
-            fullText: paragraphs.join('\n')
+            num: slideNum,
+            slideLines,
+            notesLines,
+            lines: combinedLines,
+            fullText: combinedLines.join('\n')
           });
         }
 
         const parsedDays = [];
         let currentDay = null;
+        let taggedSlidesCount = 0;
         let detectedTitle = file.name.replace(/\.pptx$/i, '').replace(/[_-]/g, ' ').toUpperCase();
 
-        if (slidesData.length > 0 && slidesData[0].lines.length > 0) {
-          const firstCandidate = slidesData[0].lines.find(l => l.length > 4 && l.length < 45 && !/\d{4}/.test(l));
+        if (slidesData.length > 0 && slidesData[0].slideLines.length > 0) {
+          const firstCandidate = slidesData[0].slideLines.find(l => l.length > 4 && l.length < 45 && !/\d{4}/.test(l) && !l.startsWith('[APP:'));
           if (firstCandidate) detectedTitle = firstCandidate.toUpperCase();
         }
 
-        for (const slide of slidesData) {
-          const textUpper = slide.fullText.toUpperCase();
-          const detectedDayNum = detectDayHeader(slide.lines, slide.fullText);
+        const appTagRegex = new RegExp('\\[APP:\\s*([^\\]]+)\\]', 'i');
 
-          // Se detetou um novo número de dia (diferente do dia atualmente aberto), cria nova etapa
+        for (const slide of slidesData) {
+          const appTagLine = slide.lines.find(l => appTagRegex.test(l));
+          const appTagMatch = appTagLine ? appTagLine.match(appTagRegex) : null;
+
+          if (appTagMatch) {
+            taggedSlidesCount++;
+            const tagPayload = appTagMatch[1].trim();
+            const tagParts = tagPayload.split('|').map(p => p.trim());
+            const tagCommand = tagParts[0].toUpperCase();
+
+            if (tagCommand === 'IGNORAR' || tagCommand === 'IGNORE') {
+              continue;
+            }
+
+            const explicitDayMatch = tagCommand.match(/^(?:DIA|ETAPA)\s*0?(\d{1,2})$/);
+            if (explicitDayMatch) {
+              const dNum = explicitDayMatch[1].padStart(2, '0');
+              const routeVal = (tagParts[1] || `Etapa ${dNum}`).replace('->', '→');
+              const distVal = tagParts[2] || '—';
+              const durVal = tagParts[3] || '';
+
+              const noteExtra = slide.notesLines.filter(l => !l.includes('[APP:') && l.length > 15).join(' ');
+              const slideSummary = slide.slideLines.find(l => l.length > 80 && !l.includes('[APP:')) || '';
+
+              currentDay = {
+                dayNumber: dNum,
+                route: routeVal,
+                via: routeVal,
+                distance: distVal,
+                duration: durVal,
+                roadType: 'Estradas Panorâmicas',
+                difficulty: 'Moderada',
+                summary: noteExtra || slideSummary,
+                zbeWarning: null,
+                fuelRule: 'Verificar autonomia antes de entrar em zonas de serra.',
+                timeline: [],
+                walkingRoute: {
+                  city: `Percurso a Pé • Dia ${dNum}`,
+                  estimatedTime: '1h30 – 2h30',
+                  parkingNote: 'Estacionar em zona autorizada próxima do centro histórico.',
+                  stops: []
+                },
+                monuments: [],
+                sourceSlides: [slide.num]
+              };
+              parsedDays.push(currentDay);
+
+              parsePipeHours(slide.notesLines, currentDay);
+              parseSlideLinesForHours(slide.slideLines, currentDay);
+              continue;
+            }
+
+            if (!currentDay) continue;
+            currentDay.sourceSlides.push(slide.num);
+
+            if (tagCommand === 'HORARIO' || tagCommand === 'HORÁRIO' || tagCommand === 'CRONOGRAMA') {
+              const addedFromNotes = parsePipeHours(slide.notesLines, currentDay);
+              if (addedFromNotes === 0) {
+                parseSlideLinesForHours(slide.slideLines, currentDay);
+              }
+              continue;
+            }
+
+            if (tagCommand === 'ZBE' || tagCommand === 'ALERTA') {
+              const alertLines = slide.lines.filter(l => !l.includes('[APP:') && l.length > 10);
+              currentDay.zbeWarning = alertLines.join(' ');
+              continue;
+            }
+
+            if (tagCommand === 'APE' || tagCommand === 'A PE' || tagCommand === 'A PÉ' || tagCommand === 'WALK') {
+              const walkLines = slide.lines.filter(l => !l.includes('[APP:') && l.length > 4);
+              if (walkLines.length > 0) {
+                currentDay.walkingRoute.city = walkLines[0];
+                walkLines.slice(1).forEach(wl => {
+                  const parts = wl.split('|').map(x => x.trim());
+                  currentDay.walkingRoute.stops.push({
+                    num: currentDay.walkingRoute.stops.length + 1,
+                    name: parts[0],
+                    desc: parts[1] || '',
+                    lat: null,
+                    lng: null
+                  });
+                });
+              }
+              continue;
+            }
+
+            if (tagCommand === 'MONUMENTO' || tagCommand === 'FICHA') {
+              const cleanSlideLines = slide.slideLines.filter(l => !l.includes('[APP:') && !l.toUpperCase().includes('FICHA TÉCNICA') && l.length > 3);
+              const monName = tagParts[1] || cleanSlideLines[0] || `Monumento Dia ${currentDay.dayNumber}`;
+              const highlights = cleanSlideLines
+                .filter(l => l.startsWith('✓') || l.startsWith('•') || l.startsWith('-'))
+                .map(cleanBulletPrefix);
+              const tipIdx = cleanSlideLines.findIndex(l => l.toUpperCase().includes('DICA'));
+              const tipText = tipIdx !== -1 && cleanSlideLines[tipIdx + 1] ? cleanSlideLines[tipIdx + 1] : '';
+
+              currentDay.monuments.push({
+                name: monName,
+                location: currentDay.route.split('→').pop().trim(),
+                classification: 'Património & Cultura',
+                schedule: tagParts[2] || '',
+                highlights: highlights.length > 0 ? highlights.slice(0, 6) : cleanSlideLines.slice(1, 5),
+                tip: tipText
+              });
+              continue;
+            }
+          }
+
+          // Modo automático de compatibilidade para slides sem etiqueta
+          const textUpper = slide.fullText.toUpperCase();
+          const detectedDayNum = detectDayHeader(slide.slideLines, slide.fullText);
+
           if (detectedDayNum && (!currentDay || currentDay.dayNumber !== detectedDayNum)) {
-            const routeLine = slide.lines.find(l => l.includes('→') || l.includes('->') || (l.includes(' - ') && l.length < 55 && !/^\d{1,2}:\d{2}/.test(l)))
-              || slide.lines.find(l => l.length > 4 && l.length < 50 && !/^(?:DIA|ETAPA)/i.test(l))
+            const routeLine = slide.slideLines.find(l => l.includes('→') || l.includes('->') || (l.includes(' - ') && l.length < 55 && !/^\d{1,2}:\d{2}/.test(l)))
+              || slide.slideLines.find(l => l.length > 4 && l.length < 50 && !/^(?:DIA|ETAPA)/i.test(l))
               || `Etapa ${detectedDayNum}`;
             const distMatch = slide.fullText.match(/(\d{2,4}\s*km)/i);
             const durMatch = slide.fullText.match(/(\d{1,2}h\d{0,2}(?:\s*[-–]\s*\d{1,2}h\d{0,2})?)/i);
@@ -1370,7 +1603,7 @@
             currentDay = {
               dayNumber: detectedDayNum,
               route: routeLine.replace('->', '→'),
-              via: slide.lines.find(l => (l.includes('|') || l.includes('•')) && l.length < 90) || routeLine,
+              via: slide.slideLines.find(l => (l.includes('|') || l.includes('•')) && l.length < 90) || routeLine,
               distance: distMatch ? distMatch[1] : '—',
               duration: durMatch ? `≈ ${durMatch[1]}` : '',
               roadType: textUpper.includes('MONTANHA') || textUpper.includes('SERRA') ? 'Estradas de Montanha' : 'Estradas Panorâmicas',
@@ -1391,28 +1624,25 @@
             parsedDays.push(currentDay);
           } else if (currentDay) {
             currentDay.sourceSlides.push(slide.num);
-            // Atualizar distância/rota se o slide de abertura do dia não tinha mas este slide tem
             if (currentDay.distance === '—') {
               const distMatch = slide.fullText.match(/(\d{2,4}\s*km)/i);
               if (distMatch) currentDay.distance = distMatch[1];
             }
             if (!currentDay.route.includes('→')) {
-              const betterRoute = slide.lines.find(l => l.includes('→') || l.includes('->'));
+              const betterRoute = slide.slideLines.find(l => l.includes('→') || l.includes('->'));
               if (betterRoute) currentDay.route = betterRoute.replace('->', '→');
             }
           }
 
           if (!currentDay) continue;
 
-          // Detetar Alertas ZBE
           if (textUpper.includes('ZBE') || textUpper.includes('BAIXAS EMISSÕES') || textUpper.includes('ACESSO CONDICIONADO')) {
-            const zbeSentences = slide.lines.filter(l => l.length > 25 && !l.toUpperCase().includes('CAMINHOS DO SUL')).slice(0, 3).join(' ');
+            const zbeSentences = slide.slideLines.filter(l => l.length > 25 && !l.toUpperCase().includes('CAMINHOS DO SUL')).slice(0, 3).join(' ');
             if (zbeSentences && !currentDay.zbeWarning) currentDay.zbeWarning = zbeSentences;
           }
 
-          // Detetar Ficha Técnica de Monumento
           if (textUpper.includes('FICHA TÉCNICA') || textUpper.includes('FICHA TECNICA') || textUpper.includes('PATRIMÓNIO MUNDIAL')) {
-            const titleCandidates = slide.lines.filter(l => 
+            const titleCandidates = slide.slideLines.filter(l => 
               !l.toUpperCase().includes('FICHA') && 
               !l.toUpperCase().includes('ESTRADA, CULTURA') &&
               !l.toUpperCase().includes('CAMINHOS DO SUL') &&
@@ -1420,11 +1650,11 @@
               l.length > 3 && l.length < 65
             );
             const monName = titleCandidates[0] || `Monumento Dia ${currentDay.dayNumber}`;
-            const highlights = slide.lines
+            const highlights = slide.slideLines
               .filter(l => l.startsWith('✓') || l.startsWith('•') || l.startsWith('-'))
               .map(cleanBulletPrefix);
-            const tipIdx = slide.lines.findIndex(l => l.toUpperCase().includes('DICA'));
-            const tipText = tipIdx !== -1 && slide.lines[tipIdx + 1] ? slide.lines[tipIdx + 1] : '';
+            const tipIdx = slide.slideLines.findIndex(l => l.toUpperCase().includes('DICA'));
+            const tipText = tipIdx !== -1 && slide.slideLines[tipIdx + 1] ? slide.slideLines[tipIdx + 1] : '';
 
             if (!currentDay.monuments.some(m => m.name === monName)) {
               currentDay.monuments.push({
@@ -1432,52 +1662,24 @@
                 location: currentDay.route.split('→').pop().trim(),
                 classification: 'Património & Cultura',
                 schedule: '',
-                highlights: highlights.length > 0 ? highlights.slice(0, 5) : slide.lines.slice(1, 5),
+                highlights: highlights.length > 0 ? highlights.slice(0, 5) : slide.slideLines.slice(1, 5),
                 tip: tipText
               });
             }
             continue;
           }
 
-          // Extrair Horários para a Timeline (ex: "08:00", "08:00 - 09:30", "08:00 | Saída")
-          for (let i = 0; i < slide.lines.length; i++) {
-            const line = slide.lines[i];
-            const inlineMatch = line.match(/^(\d{1,2}:\d{2})(?:\s*[-–]\s*\d{1,2}:\d{2})?\s*(?:[|•\-–]\s*(.+))?$/);
-            if (inlineMatch) {
-              const timeStr = inlineMatch[1];
-              let stopTitle = inlineMatch[2] ? inlineMatch[2].trim() : (slide.lines[i + 1] || '');
-              let stopDesc = '';
+          parsePipeHours(slide.notesLines, currentDay);
+          parseSlideLinesForHours(slide.slideLines, currentDay);
 
-              if (inlineMatch[2]) {
-                stopDesc = slide.lines[i + 1] && !/^\d{1,2}:\d{2}/.test(slide.lines[i + 1]) ? slide.lines[i + 1] : '';
-              } else {
-                stopDesc = slide.lines[i + 2] && !/^\d{1,2}:\d{2}/.test(slide.lines[i + 2]) ? slide.lines[i + 2] : '';
-              }
-
-              if (stopTitle && !currentDay.timeline.some(t => t.time === timeStr && t.title === stopTitle)) {
-                currentDay.timeline.push({
-                  time: timeStr,
-                  title: stopTitle,
-                  desc: stopDesc,
-                  km: '',
-                  type: inferStopType(stopTitle),
-                  lat: null,
-                  lng: null
-                });
-              }
-            }
-          }
-
-          // Extrair Resumo narrativo se ainda estiver vazio
           if (!currentDay.summary) {
-            const longParagraph = slide.lines.find(l => l.length > 100 && !l.toUpperCase().includes('ESTRADA, CULTURA'));
+            const longParagraph = slide.slideLines.find(l => l.length > 100 && !l.toUpperCase().includes('ESTRADA, CULTURA'));
             if (longParagraph) currentDay.summary = longParagraph;
           }
         }
 
-        // Fallback seguro: se nenhum padrão "DIA XX" foi encontrado, cria apenas 1 dia único com os horários detetados (nunca 1 dia por slide!)
         if (parsedDays.length === 0) {
-          const singleDay = {
+          parsedDays.push({
             dayNumber: "01",
             route: detectedTitle,
             via: `${slidesData.length} slides importados`,
@@ -1485,37 +1687,21 @@
             duration: "",
             roadType: "Roteiro Importado",
             difficulty: "Moderada",
-            summary: "Roteiro consolidado a partir da apresentação PowerPoint.",
+            summary: "Roteiro consolidado. Adiciona etiquetas [APP: DIA 01 | ...] nos slides para separar por dias.",
             zbeWarning: null,
             fuelRule: "",
             timeline: [],
             walkingRoute: { city: detectedTitle, estimatedTime: "", parkingNote: "", stops: [] },
             monuments: [],
             sourceSlides: slidesData.map(s => s.num)
-          };
-          slidesData.forEach(s => {
-            s.lines.forEach((line, i) => {
-              const tm = line.match(/^(\d{1,2}:\d{2})/);
-              if (tm && s.lines[i + 1]) {
-                singleDay.timeline.push({
-                  time: tm[1],
-                  title: s.lines[i + 1],
-                  desc: s.lines[i + 2] || '',
-                  km: '',
-                  type: inferStopType(s.lines[i + 1]),
-                  lat: null,
-                  lng: null
-                });
-              }
-            });
           });
-          parsedDays.push(singleDay);
         }
 
         stagingData.pptxDays = parsedDays;
         stagingData.pptxTitle = detectedTitle;
 
-        statusEl.innerHTML = `<span class="text-emerald-700 font-bold">✓ ${parsedDays.length} etapa(s) estruturada(s) a partir de ${slidesData.length} slides!</span>`;
+        const tagInfo = taggedSlidesCount > 0 ? ` (${taggedSlidesCount} slides com código [APP:])` : '';
+        statusEl.innerHTML = `<span class="text-emerald-700 font-bold">✓ ${parsedDays.length} etapa(s) estruturada(s)${tagInfo}!</span>`;
         document.getElementById('badge-pptx-ready').classList.remove('hidden');
         updateStagingUI();
       } catch (err) {

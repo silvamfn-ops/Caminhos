@@ -1,3 +1,3 @@
-# Caminhos do Sul — Aplicação Web de Moto-Turismo & Guia Cultural (v2.3)
+# Caminhos do Sul — Aplicação Web de Moto-Turismo & Guia Cultural (v2.4)
 
-Inclui motor de extração estrutural de PowerPoint (`.pptx`) com deteção precisa de dias, agrupamento sequencial de slides e editor visual de fusão/remoção antes da publicação.
+Suporta etiquetas estruturais `[APP: ...]` nas Notas do Apresentador ou nos slides do PowerPoint para importação determinística de dias, horários, percursos a pé, monumentos e alertas ZBE.
