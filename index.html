@@ -22,32 +22,22 @@
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
   <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            navy: {
-              900: '#0B1120',
-              800: '#131C31',
-              700: '#1E293B',
+    if (window.tailwind) {
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              navy: { 900: '#0B1120', 800: '#131C31', 700: '#1E293B' },
+              gold: { 400: '#FBBF24', 500: '#D97706', 600: '#B45309' },
+              sand: { 50: '#FAF8F5', 100: '#F3EFEA', 200: '#E5DEC9' }
             },
-            gold: {
-              400: '#FBBF24',
-              500: '#D97706',
-              600: '#B45309',
-            },
-            sand: {
-              50: '#FAF8F5',
-              100: '#F3EFEA',
-              200: '#E5DEC9',
+            fontFamily: {
+              display: ['Cinzel', 'serif'],
+              sans: ['Plus Jakarta Sans', 'sans-serif']
             }
-          },
-          fontFamily: {
-            display: ['Cinzel', 'serif'],
-            sans: ['Plus Jakarta Sans', 'sans-serif'],
           }
         }
-      }
+      };
     }
   </script>
   <style>
@@ -57,16 +47,9 @@
       color: #0F172A;
       -webkit-tap-highlight-color: transparent;
     }
-    .font-editorial {
-      font-family: 'Cinzel', serif;
-    }
-    .no-scrollbar::-webkit-scrollbar {
-      display: none;
-    }
-    .no-scrollbar {
-      -ms-overflow-style: none;
-      scrollbar-width: none;
-    }
+    .font-editorial { font-family: 'Cinzel', serif; }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     .tab-active {
       background-color: #0B1120;
       color: #FBBF24;
@@ -76,7 +59,7 @@
 </head>
 <body class="bg-sand-50 min-h-screen flex flex-col">
 
-  <!-- TOP BAR: Seletor de Ambiente -->
+  <!-- TOP BAR -->
   <header class="bg-navy-900 text-white sticky top-0 z-50 border-b border-gold-500/30 shadow-lg">
     <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between gap-2">
       <div class="flex items-center gap-3">
@@ -89,7 +72,6 @@
         </div>
       </div>
 
-      <!-- Switch Mode -->
       <div class="flex items-center bg-navy-800 p-1 rounded-xl border border-slate-700">
         <button onclick="switchMode('mobile')" id="btn-mode-mobile" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all bg-gold-500 text-navy-900 shadow">
           <i data-lucide="smartphone" class="w-3.5 h-3.5"></i>
@@ -103,12 +85,8 @@
     </div>
   </header>
 
-  <!-- ===================================================================== -->
-  <!-- AMBIENTE 1: MODO VIAGEM (IPHONE / ANDROID / COCKPIT & VISITAS A PÉ)    -->
-  <!-- ===================================================================== -->
+  <!-- AMBIENTE 1: MODO VIAGEM (IPHONE / ANDROID) -->
   <main id="view-mobile" class="flex-1 max-w-2xl w-full mx-auto pb-28">
-    
-    <!-- Seletor Horizontal de Dias -->
     <div class="bg-navy-800 text-white px-4 pt-3 pb-4 shadow-md">
       <div class="flex items-center justify-between mb-2">
         <span class="text-[11px] font-semibold uppercase tracking-wider text-gold-400">Selecionar Etapa</span>
@@ -119,10 +97,8 @@
       <div id="day-selector" class="flex gap-2 overflow-x-auto no-scrollbar pb-1"></div>
     </div>
 
-    <!-- Banner Resumo da Etapa Atual -->
     <section id="stage-hero" class="px-4 pt-4"></section>
 
-    <!-- Sub-Navegação da Etapa -->
     <div id="route-subtabs" class="px-4 mt-4">
       <div class="grid grid-cols-3 gap-1.5 bg-sand-200/70 p-1 rounded-xl border border-sand-200">
         <button onclick="switchSubTab('cockpit')" id="subtab-cockpit" class="tab-active py-2.5 px-2 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 transition-all">
@@ -140,13 +116,9 @@
       </div>
     </div>
 
-    <!-- Conteúdo Dinâmico das Sub-Abas -->
     <div id="mobile-content" class="px-4 mt-4 space-y-4"></div>
-
-    <!-- Secções Globais (Bilhetes, Checklist, Diário) -->
     <div id="mobile-global-view" class="px-4 mt-4 hidden space-y-4"></div>
 
-    <!-- Barra de Navegação Inferior Fixa -->
     <nav class="fixed bottom-0 inset-x-0 bg-navy-900/95 backdrop-blur-md border-t border-slate-800 text-slate-300 z-40">
       <div class="max-w-2xl mx-auto grid grid-cols-4 py-2 px-2">
         <button onclick="showMainMobileSection('route')" id="nav-route" class="flex flex-col items-center justify-center gap-1 py-1 text-gold-400">
@@ -169,17 +141,13 @@
     </nav>
   </main>
 
-  <!-- ===================================================================== -->
-  <!-- AMBIENTE 2: PLANEADOR & MOTOR DE IMPORTAÇÃO INTELIGENTE (.PPTX + .KMZ)-->
-  <!-- ===================================================================== -->
+  <!-- AMBIENTE 2: PLANEADOR & IMPORTADOR PC -->
   <main id="view-desktop" class="hidden flex-1 max-w-6xl w-full mx-auto px-4 py-6 space-y-6">
-    
-    <!-- Cabeçalho do Planeador -->
     <div class="bg-white rounded-2xl p-6 shadow-sm border border-sand-200 flex flex-col md:flex-row md:items-center justify-between gap-4">
       <div>
-        <span class="text-xs font-bold uppercase tracking-wider text-gold-600 bg-gold-400/20 px-2.5 py-1 rounded-full">Estúdio de Importação v2.0</span>
+        <span class="text-xs font-bold uppercase tracking-wider text-gold-600 bg-gold-400/20 px-2.5 py-1 rounded-full">Estúdio de Importação v2.2</span>
         <h2 class="text-2xl font-bold text-navy-900 mt-2">Importador Inteligente (.PPTX + .KMZ)</h2>
-        <p class="text-sm text-slate-600 mt-1">Carrega o teu PowerPoint e o ficheiro do Google Maps. O motor deteta automaticamente os dias, horários, fichas técnicas e cruza cada paragem com as coordenadas GPS exatas.</p>
+        <p class="text-sm text-slate-600 mt-1">Carrega o teu PowerPoint e o ficheiro do Google Maps. O motor deteta automaticamente os dias, horários, fichas técnicas e cruza cada paragem com as coordenadas GPS.</p>
       </div>
       <div class="flex flex-wrap gap-2">
         <label class="inline-flex items-center gap-2 bg-emerald-700 hover:bg-emerald-600 text-white font-bold text-xs px-4 py-3 rounded-xl shadow cursor-pointer transition">
@@ -198,10 +166,8 @@
       </div>
     </div>
 
-    <!-- Grelha de Importação (Passo 1: PPTX | Passo 2: KMZ | Passo 3: Fusão & Publicação) -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
-      
-      <!-- Passo 1: PowerPoint (.pptx) -->
+      <!-- Passo 1: PowerPoint -->
       <div class="bg-white rounded-2xl p-5 shadow-sm border border-sand-200 flex flex-col justify-between">
         <div>
           <div class="flex items-center justify-between mb-3">
@@ -226,7 +192,7 @@
         </div>
       </div>
 
-      <!-- Passo 2: Google Maps (.kmz / .kml) -->
+      <!-- Passo 2: KMZ / KML -->
       <div class="bg-white rounded-2xl p-5 shadow-sm border border-sand-200 flex flex-col justify-between">
         <div>
           <div class="flex items-center justify-between mb-3">
@@ -251,7 +217,7 @@
         </div>
       </div>
 
-      <!-- Passo 3: Sincronizar e Aplicar na App -->
+      <!-- Passo 3: Fusão -->
       <div class="bg-navy-900 text-white rounded-2xl p-5 shadow-md border border-gold-500/40 flex flex-col justify-between">
         <div>
           <div class="w-11 h-11 rounded-xl bg-gold-500/20 text-gold-400 flex items-center justify-center mb-3">
@@ -275,7 +241,7 @@
       </div>
     </div>
 
-    <!-- Área de Pré-Visualização e Ajuste antes de Publicar -->
+    <!-- Pré-Visualização -->
     <div id="staging-preview-panel" class="hidden bg-white rounded-2xl p-6 shadow-md border-2 border-gold-500/50 space-y-4">
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 pb-3">
         <div>
@@ -292,9 +258,8 @@
       <div id="staging-preview-body" class="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-96 overflow-y-auto pr-1"></div>
     </div>
 
-    <!-- Secção Inferior: Adicionar Bilhetes + Tabela de Gestão das Etapas -->
+    <!-- Bilhetes + Tabela -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      <!-- Formulário Rápido de Bilhetes -->
       <div class="bg-white rounded-2xl p-5 shadow-sm border border-sand-200">
         <h3 class="font-bold text-base text-navy-900 flex items-center gap-2">
           <i data-lucide="qr-code" class="w-4 h-4 text-gold-600"></i>
@@ -312,7 +277,6 @@
         </form>
       </div>
 
-      <!-- Tabela de Gestão das Etapas Ativas -->
       <div class="lg:col-span-2 bg-white rounded-2xl p-5 shadow-sm border border-sand-200">
         <div class="flex items-center justify-between mb-4">
           <h3 class="font-bold text-base text-navy-900">Etapas Ativas na Aplicação</h3>
@@ -336,7 +300,7 @@
     </div>
   </main>
 
-  <!-- MODAL PARA DETALHE DE BILHETE OU EDIÇÃO RÁPIDA -->
+  <!-- MODAL -->
   <div id="modal-overlay" class="fixed inset-0 bg-navy-900/80 backdrop-blur-sm z-50 hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
     <div class="bg-white w-full max-w-lg rounded-t-3xl sm:rounded-2xl max-h-[88vh] flex flex-col overflow-hidden shadow-2xl">
       <div class="bg-navy-900 text-white px-5 py-4 flex items-center justify-between border-b border-gold-500/30">
@@ -352,9 +316,7 @@
     </div>
   </div>
 
-  <!-- ===================================================================== -->
-  <!-- DADOS E MOTOR DE IMPORTAÇÃO INTELIGENTE                               -->
-  <!-- ===================================================================== -->
+  <!-- SCRIPT PRINCIPAL -->
   <script>
     const DEFAULT_TRIP_DATA = {
       title: "CAMINHOS DO SUL",
@@ -698,16 +660,31 @@
       ]
     };
 
-    let appState = JSON.parse(localStorage.getItem('caminhos_do_sul_state')) || {
-      tripData: DEFAULT_TRIP_DATA,
-      currentDayIdx: 0,
-      currentSubTab: 'cockpit',
-      mainSection: 'route',
-      checkedItems: {},
-      diaryLogs: {}
-    };
+    function loadInitialState() {
+      const defaultState = {
+        tripData: DEFAULT_TRIP_DATA,
+        currentDayIdx: 0,
+        currentSubTab: 'cockpit',
+        mainSection: 'route',
+        checkedItems: {},
+        diaryLogs: {}
+      };
+      try {
+        const raw = localStorage.getItem('caminhos_do_sul_state_v2');
+        if (!raw) return defaultState;
+        const parsed = JSON.parse(raw);
+        if (!parsed || !parsed.tripData || !Array.isArray(parsed.tripData.days) || parsed.tripData.days.length === 0) {
+          return defaultState;
+        }
+        return Object.assign({}, defaultState, parsed);
+      } catch (e) {
+        localStorage.removeItem('caminhos_do_sul_state_v2');
+        return defaultState;
+      }
+    }
 
-    // Área de Staging para a Importação Inteligente (PPTX + KMZ)
+    let appState = loadInitialState();
+
     let stagingData = {
       pptxDays: null,
       pptxTitle: null,
@@ -715,7 +692,19 @@
     };
 
     function saveState() {
-      localStorage.setItem('caminhos_do_sul_state', JSON.stringify(appState));
+      try {
+        localStorage.setItem('caminhos_do_sul_state_v2', JSON.stringify(appState));
+      } catch (e) {}
+    }
+
+    function refreshIcons() {
+      if (window.lucide && typeof window.lucide.createIcons === 'function') {
+        window.lucide.createIcons();
+      }
+    }
+
+    function escapeAttr(str) {
+      return String(str || '').replace(/"/g, '&quot;').replace(/'/g, '');
     }
 
     function switchMode(mode) {
@@ -737,7 +726,7 @@
         btnMobile.className = "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all text-slate-300 hover:text-white";
         renderDesktopPlanner();
       }
-      if (window.lucide) { lucide.createIcons(); }
+      refreshIcons();
     }
 
     function openGPS(app, lat, lng, label) {
@@ -782,6 +771,7 @@
 
       ['route', 'wallet', 'checklist', 'diary'].forEach(sec => {
         const el = document.getElementById(`nav-${sec}`);
+        if (!el) return;
         if (appState.mainSection === sec) {
           el.classList.add('text-gold-400');
           el.classList.remove('text-slate-300');
@@ -802,7 +792,7 @@
         mobileContent.classList.add('hidden');
         globalView.classList.remove('hidden');
         renderGlobalSection(appState.mainSection);
-        if (window.lucide) { lucide.createIcons(); }
+        refreshIcons();
         return;
       }
 
@@ -864,15 +854,15 @@
             <div class="mt-3 pt-3 border-t border-slate-800">
               <div class="text-[10px] uppercase tracking-wider text-slate-400 font-bold mb-2">Iniciar Navegação para o Destino da Etapa:</div>
               <div class="grid grid-cols-3 gap-2">
-                <button onclick="openGPS('google', ${stopWithCoords.lat}, ${stopWithCoords.lng}, '${day.route.replace(/'/g, '')}')" class="bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white font-bold text-xs py-2.5 px-2 rounded-xl flex items-center justify-center gap-1.5 shadow transition">
+                <button onclick="openGPS('google', ${stopWithCoords.lat}, ${stopWithCoords.lng}, '${escapeAttr(day.route)}')" class="bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white font-bold text-xs py-2.5 px-2 rounded-xl flex items-center justify-center gap-1.5 shadow transition">
                   <i data-lucide="navigation" class="w-4 h-4"></i>
                   <span>Google Maps</span>
                 </button>
-                <button onclick="openGPS('waze', ${stopWithCoords.lat}, ${stopWithCoords.lng}, '${day.route.replace(/'/g, '')}')" class="bg-sky-600 hover:bg-sky-500 active:scale-95 text-white font-bold text-xs py-2.5 px-2 rounded-xl flex items-center justify-center gap-1.5 shadow transition">
+                <button onclick="openGPS('waze', ${stopWithCoords.lat}, ${stopWithCoords.lng}, '${escapeAttr(day.route)}')" class="bg-sky-600 hover:bg-sky-500 active:scale-95 text-white font-bold text-xs py-2.5 px-2 rounded-xl flex items-center justify-center gap-1.5 shadow transition">
                   <i data-lucide="compass" class="w-4 h-4"></i>
                   <span>Waze</span>
                 </button>
-                <button onclick="openGPS('apple', ${stopWithCoords.lat}, ${stopWithCoords.lng}, '${day.route.replace(/'/g, '')}')" class="bg-slate-700 hover:bg-slate-600 active:scale-95 text-white font-bold text-xs py-2.5 px-2 rounded-xl flex items-center justify-center gap-1.5 shadow transition">
+                <button onclick="openGPS('apple', ${stopWithCoords.lat}, ${stopWithCoords.lng}, '${escapeAttr(day.route)}')" class="bg-slate-700 hover:bg-slate-600 active:scale-95 text-white font-bold text-xs py-2.5 px-2 rounded-xl flex items-center justify-center gap-1.5 shadow transition">
                   <i data-lucide="map-pin" class="w-4 h-4"></i>
                   <span>Apple Mapas</span>
                 </button>
@@ -899,7 +889,7 @@
         renderMonumentsList(day);
       }
 
-      if (window.lucide) { lucide.createIcons(); }
+      refreshIcons();
     }
 
     function getTypeBadge(type) {
@@ -951,10 +941,10 @@
                       <i data-lucide="map-pin" class="w-3 h-3"></i> ${item.lat.toFixed(4)}, ${item.lng.toFixed(4)}
                     </span>
                     <div class="flex gap-1.5">
-                      <button onclick="openGPS('google', ${item.lat}, ${item.lng}, '${item.title.replace(/'/g, '')}')" class="bg-navy-900 hover:bg-navy-800 text-gold-400 text-xs font-bold px-3 py-1.5 rounded-lg flex items-center gap-1 transition">
+                      <button onclick="openGPS('google', ${item.lat}, ${item.lng}, '${escapeAttr(item.title)}')" class="bg-navy-900 hover:bg-navy-800 text-gold-400 text-xs font-bold px-3 py-1.5 rounded-lg flex items-center gap-1 transition">
                         <i data-lucide="navigation" class="w-3.5 h-3.5"></i> Ir para aqui
                       </button>
-                      <button onclick="openGPS('waze', ${item.lat}, ${item.lng}, '${item.title.replace(/'/g, '')}')" class="bg-sky-100 hover:bg-sky-200 text-sky-800 text-xs font-bold px-2.5 py-1.5 rounded-lg transition">
+                      <button onclick="openGPS('waze', ${item.lat}, ${item.lng}, '${escapeAttr(item.title)}')" class="bg-sky-100 hover:bg-sky-200 text-sky-800 text-xs font-bold px-2.5 py-1.5 rounded-lg transition">
                         Waze
                       </button>
                     </div>
@@ -1013,7 +1003,7 @@
                   <div class="flex items-start justify-between gap-2">
                     <h4 class="font-bold text-sm text-navy-900">${stop.name}</h4>
                     ${stop.lat && stop.lng ? `
-                      <button onclick="openGPS('walk', ${stop.lat}, ${stop.lng}, '${stop.name.replace(/'/g, '')}')" class="shrink-0 bg-teal-600 hover:bg-teal-700 text-white text-[11px] font-bold px-2.5 py-1 rounded-lg flex items-center gap-1">
+                      <button onclick="openGPS('walk', ${stop.lat}, ${stop.lng}, '${escapeAttr(stop.name)}')" class="shrink-0 bg-teal-600 hover:bg-teal-700 text-white text-[11px] font-bold px-2.5 py-1 rounded-lg flex items-center gap-1">
                         <i data-lucide="footprints" class="w-3 h-3"></i> Guiar a Pé
                       </button>
                     ` : `
@@ -1207,7 +1197,7 @@
         </div>
       `;
       document.getElementById('modal-overlay').classList.remove('hidden');
-      if (window.lucide) { lucide.createIcons(); }
+      refreshIcons();
     }
 
     function closeModal() {
@@ -1215,7 +1205,7 @@
     }
 
     // =====================================================================
-    // MOTOR DE IMPORTAÇÃO INTELIGENTE (.PPTX + .KMZ -> ESTRUTURA DA APP)
+    // MOTOR DE IMPORTAÇÃO INTELIGENTE (.PPTX + .KMZ)
     // =====================================================================
     function renderDesktopPlanner() {
       const days = appState.tripData.days;
@@ -1241,18 +1231,16 @@
       }).join('');
     }
 
-    // Normalizar strings para comparação fuzzy entre nomes do PPTX e Placemarks do KMZ
     function normalizeText(str) {
       return (str || '')
         .toLowerCase()
         .normalize("NFD")
-        .replace(/[̀-ͯ]/g, "")
+        .replace(/[\u0300-\u036f]/g, "")
         .replace(/[^a-z0-9\s]/g, " ")
         .replace(/\s+/g, " ")
         .trim();
     }
 
-    // Encontrar a melhor coordenada GPS no KMZ para um determinado título de paragem
     function findBestCoordMatch(title, desc, waypoints) {
       if (!waypoints || waypoints.length === 0) return null;
       const stopWords = ['saida', 'partida', 'chegada', 'almoco', 'jantar', 'pausa', 'visita', 'para', 'em', 'de', 'da', 'do', 'a', 'o', 'e', 'no', 'na', 'hotel', 'check', 'in'];
@@ -1281,7 +1269,6 @@
       return bestMatch;
     }
 
-    // Classificar automaticamente o tipo de paragem pelo texto
     function inferStopType(title) {
       const t = normalizeText(title);
       if (t.includes('combustivel') || t.includes('abastec') || t.includes('gasolina')) return 'fuel';
@@ -1295,7 +1282,10 @@
       return 'visit';
     }
 
-    // Parser Estruturado de Slides PPTX
+    function cleanBulletPrefix(line) {
+      return line.replace(/^[\u2713\u2022\-\*]\s*/, '').trim();
+    }
+
     async function handlePptxUpload(event) {
       const file = event.target.files[0];
       if (!file) return;
@@ -1303,10 +1293,11 @@
       statusEl.innerHTML = `<span class="text-amber-600 font-semibold">A analisar estrutura de ${file.name}...</span>`;
 
       try {
+        if (!window.JSZip) throw new Error('Biblioteca JSZip ainda a carregar. Tenta novamente em 2 segundos.');
         const zip = await JSZip.loadAsync(file);
         const slideFiles = Object.keys(zip.files)
-          .filter(name => name.match(/^ppt\/slides\/slide\d+\.xml$/))
-          .sort((a, b) => parseInt(a.match(/\d+/)[0]) - parseInt(b.match(/\d+/)[0]));
+          .filter(name => /^ppt\/slides\/slide\d+\.xml$/.test(name))
+          .sort((a, b) => parseInt(a.match(/\d+/)[0], 10) - parseInt(b.match(/\d+/)[0], 10));
 
         const parser = new DOMParser();
         const slidesData = [];
@@ -1314,20 +1305,17 @@
         for (const slidePath of slideFiles) {
           const xmlText = await zip.files[slidePath].async('string');
           const xmlDoc = parser.parseFromString(xmlText, 'application/xml');
-          // Extrair parágrafos (<a:p>) para preservar quebras de linha lógicas
           const paragraphs = Array.from(xmlDoc.getElementsByTagName('a:p')).map(p => {
             return Array.from(p.getElementsByTagName('a:t')).map(t => t.textContent).join('').trim();
           }).filter(line => line.length > 0);
 
           slidesData.push({
-            num: parseInt(slidePath.match(/\d+/)[0]),
+            num: parseInt(slidePath.match(/\d+/)[0], 10),
             lines: paragraphs,
-            fullText: paragraphs.join('
-')
+            fullText: paragraphs.join('\n')
           });
         }
 
-        // Agrupar slides por DIA (ex: "DIA 01", "DIA 1", "ETAPA 01")
         const parsedDays = [];
         let currentDay = null;
         let detectedTitle = file.name.replace(/\.pptx$/i, '').replace(/[_-]/g, ' ').toUpperCase();
@@ -1339,16 +1327,14 @@
 
         for (const slide of slidesData) {
           const textUpper = slide.fullText.toUpperCase();
-          const dayMatch = textUpper.match(/(?:DIA|ETAPA)\s*0?(\d{1,2})/);
+          const dayMatch = textUpper.match(/\b(?:DIA|ETAPA)\s*0?(\d{1,2})\b/);
 
-          // Ignorar índice geral nas primeiras páginas se listar todos os dias juntos
           const isIndexSlide = (textUpper.includes('ÍNDICE') || textUpper.includes('INDICE')) && slide.num <= 6;
           if (isIndexSlide) continue;
 
           if (dayMatch) {
             const dNum = dayMatch[1].padStart(2, '0');
             if (!currentDay || currentDay.dayNumber !== dNum) {
-              // Procurar título da rota (ex: "LISBOA → CÓRDOBA" ou "LISBOA - CÓRDOBA")
               const routeLine = slide.lines.find(l => l.includes('→') || l.includes('->') || (l.includes(' - ') && l.length < 50)) || `Etapa ${dNum}`;
               const distMatch = slide.fullText.match(/(\d{2,4}\s*km)/i);
               const durMatch = slide.fullText.match(/(\d{1,2}h\d{0,2}(?:\s*[-–]\s*\d{1,2}h\d{0,2})?)/i);
@@ -1379,13 +1365,11 @@
 
           if (!currentDay) continue;
 
-          // Detetar Alertas ZBE
           if (textUpper.includes('ZBE') || textUpper.includes('BAIXAS EMISSÕES') || textUpper.includes('ACESSO CONDICIONADO')) {
             const zbeSentences = slide.lines.filter(l => l.length > 25).slice(0, 3).join(' ');
             if (zbeSentences) currentDay.zbeWarning = zbeSentences;
           }
 
-          // Detetar Ficha Técnica de Monumento
           if (textUpper.includes('FICHA TÉCNICA') || textUpper.includes('FICHA TECNICA')) {
             const titleCandidates = slide.lines.filter(l => 
               !l.toUpperCase().includes('FICHA') && 
@@ -1396,7 +1380,7 @@
             const monName = titleCandidates[0] || `Monumento Dia ${currentDay.dayNumber}`;
             const highlights = slide.lines
               .filter(l => l.startsWith('✓') || l.startsWith('•') || l.startsWith('-'))
-              .map(l => l.replace(/^[✓•\-]\s*/, '').trim());
+              .map(cleanBulletPrefix);
             const tipIdx = slide.lines.findIndex(l => l.toUpperCase().includes('DICA'));
             const tipText = tipIdx !== -1 && slide.lines[tipIdx + 1] ? slide.lines[tipIdx + 1] : '';
 
@@ -1411,16 +1395,14 @@
             continue;
           }
 
-          // Extrair Horários para a Timeline (ex: "08:00", "14:30")
           for (let i = 0; i < slide.lines.length; i++) {
             const line = slide.lines[i];
             const timeMatch = line.match(/^(\d{1,2}:\d{2})(?:\s*[-–]\s*\d{1,2}:\d{2})?$/);
             if (timeMatch && slide.lines[i + 1]) {
               const timeStr = timeMatch[1];
               const stopTitle = slide.lines[i + 1];
-              const stopDesc = slide.lines[i + 2] && !slide.lines[i + 2].match(/^\d{1,2}:\d{2}/) ? slide.lines[i + 2] : '';
+              const stopDesc = slide.lines[i + 2] && !/^\d{1,2}:\d{2}/.test(slide.lines[i + 2]) ? slide.lines[i + 2] : '';
               
-              // Evitar duplicados no mesmo dia
               if (!currentDay.timeline.some(t => t.time === timeStr && t.title === stopTitle)) {
                 currentDay.timeline.push({
                   time: timeStr,
@@ -1435,14 +1417,12 @@
             }
           }
 
-          // Extrair Resumo narrativo se ainda estiver vazio
           if (!currentDay.summary) {
             const longParagraph = slide.lines.find(l => l.length > 120 && !l.toUpperCase().includes('ESTRADA, CULTURA'));
             if (longParagraph) currentDay.summary = longParagraph;
           }
         }
 
-        // Fallback caso o PPTX não use etiquetas "DIA 01"
         if (parsedDays.length === 0) {
           slidesData.forEach((s, idx) => {
             parsedDays.push({
@@ -1482,7 +1462,6 @@
       }
     }
 
-    // Parser de KMZ / KML
     async function handleKmzUpload(event) {
       const file = event.target.files[0];
       if (!file) return;
@@ -1492,6 +1471,7 @@
       try {
         let kmlString = '';
         if (file.name.toLowerCase().endsWith('.kmz')) {
+          if (!window.JSZip) throw new Error('Biblioteca JSZip ainda a carregar. Tenta novamente em 2 segundos.');
           const zip = await JSZip.loadAsync(file);
           const kmlFile = Object.keys(zip.files).find(n => n.toLowerCase().endsWith('.kml'));
           if (!kmlFile) throw new Error('Ficheiro KML não encontrado dentro do KMZ.');
@@ -1509,7 +1489,6 @@
           const desc = pm.getElementsByTagName('description')[0]?.textContent?.replace(/<[^>]*>?/gm, '').trim() || '';
           const coordsRaw = pm.getElementsByTagName('coordinates')[0]?.textContent?.trim() || '';
           const coordPairs = coordsRaw.split(/\s+/).filter(Boolean);
-          // Se for uma linha (LineString) com muitos pontos, pegar o ponto final; se for marcador, pegar o único ponto
           const targetPair = (coordPairs.length > 1 ? coordPairs[coordPairs.length - 1] : coordPairs[0])?.split(',');
           const lng = targetPair && targetPair[0] ? parseFloat(targetPair[0]) : null;
           const lat = targetPair && targetPair[1] ? parseFloat(targetPair[1]) : null;
@@ -1525,7 +1504,6 @@
       }
     }
 
-    // Atualizar Painel de Pré-visualização e Fusão
     function updateStagingUI() {
       const hasPptx = stagingData.pptxDays && stagingData.pptxDays.length > 0;
       const hasKmz = stagingData.kmzWaypoints && stagingData.kmzWaypoints.length > 0;
@@ -1536,7 +1514,6 @@
       const applyBtn = document.getElementById('btn-apply-import');
       applyBtn.disabled = !(hasPptx || hasKmz);
 
-      // Construir versão pré-fundida para visualização
       const previewDays = buildMergedDays();
       const panel = document.getElementById('staging-preview-panel');
       const body = document.getElementById('staging-preview-body');
@@ -1572,14 +1549,12 @@
         `;
       }).join('');
 
-      if (window.lucide) { lucide.createIcons(); }
+      refreshIcons();
     }
 
-    // Cruzar PPTX + KMZ
     function buildMergedDays() {
       const waypoints = stagingData.kmzWaypoints || [];
       
-      // Caso 1: Temos PPTX (com ou sem KMZ)
       if (stagingData.pptxDays && stagingData.pptxDays.length > 0) {
         const cloned = JSON.parse(JSON.stringify(stagingData.pptxDays));
         for (const day of cloned) {
@@ -1590,7 +1565,6 @@
               item.lng = match.lng;
             }
           }
-          // Se não houver timeline no dia, tentar associar o destino da rota
           if (day.timeline.length === 0) {
             const destName = day.route.split('→').pop().trim();
             const destMatch = findBestCoordMatch(destName, '', waypoints);
@@ -1604,7 +1578,6 @@
               lng: destMatch ? destMatch.lng : null
             });
           }
-          // Popular paragens apeadas com os pontos de visita do dia
           day.walkingRoute.stops = day.timeline
             .filter(t => t.type === 'visit' || t.type === 'walk' || t.type === 'photo')
             .map((t, i) => ({
@@ -1618,7 +1591,6 @@
         return cloned;
       }
 
-      // Caso 2: Apenas KMZ carregado -> Criar etapas a partir dos marcadores GPS
       if (waypoints.length > 0) {
         const pointMarkers = waypoints.filter(w => !w.isRouteLine);
         const list = pointMarkers.length > 0 ? pointMarkers : waypoints;
@@ -1655,7 +1627,6 @@
       return [];
     }
 
-    // Aplicar definitivamente na Aplicação e Sincronizar
     function applyStagedImport() {
       const mergedDays = buildMergedDays();
       if (mergedDays.length === 0) return;
@@ -1672,7 +1643,7 @@
 
       document.getElementById('staging-preview-panel').classList.add('hidden');
       renderDesktopPlanner();
-      alert(`Viagem "${appState.tripData.title}" atualizada com sucesso (${mergedDays.length} etapas)! Podes agora alternar para "Viagem (iPhone)" ou exportar o ficheiro .json para partilhar com o grupo.`);
+      alert(`Viagem "${appState.tripData.title}" atualizada com sucesso (${mergedDays.length} etapas)!`);
     }
 
     function addNewTicket(event) {
@@ -1740,7 +1711,6 @@
       }
     }
 
-    // Registo do Service Worker para Offline PWA
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('./sw.js').catch(() => {});
@@ -1749,7 +1719,7 @@
 
     window.addEventListener('DOMContentLoaded', () => {
       renderMobileApp();
-      if (window.lucide) { lucide.createIcons(); }
+      refreshIcons();
     });
   </script>
 </body>
