@@ -241,21 +241,22 @@
       </div>
     </div>
 
-    <!-- Pré-Visualização -->
+    <!-- Pré-Visualização & Ajuste Estrutural -->
     <div id="staging-preview-panel" class="hidden bg-white rounded-2xl p-6 shadow-md border-2 border-gold-500/50 space-y-4">
-      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 pb-3">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 pb-3">
         <div>
-          <span class="text-[10px] font-bold uppercase tracking-wider bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full">Pré-Visualização do Motor de Extração</span>
-          <h3 class="font-bold text-lg text-navy-900 mt-1">Revê os Dias e Pontos Detetados antes de Aplicar</h3>
+          <span class="text-[10px] font-bold uppercase tracking-wider bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full">Revisão Estrutural antes de Gravar</span>
+          <h3 class="font-bold text-lg text-navy-900 mt-1">Ajusta as Etapas Detetadas (<span id="staged-days-total">0</span> Dias)</h3>
+          <p class="text-xs text-slate-500">Se algum slide extra foi considerado um dia, usa <strong>"Fundir no anterior"</strong> ou <strong>"Remover"</strong> antes de confirmar.</p>
         </div>
-        <div class="flex items-center gap-2">
+        <div class="flex items-center gap-2 shrink-0">
           <input type="text" id="staged-trip-title" placeholder="Título da Viagem" class="text-xs font-bold px-3 py-2 rounded-lg border border-slate-300" />
-          <button onclick="applyStagedImport()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs px-4 py-2 rounded-lg shadow">
+          <button onclick="applyStagedImport()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs px-4 py-2.5 rounded-lg shadow">
             ✓ Confirmar e Gravar
           </button>
         </div>
       </div>
-      <div id="staging-preview-body" class="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-96 overflow-y-auto pr-1"></div>
+      <div id="staging-preview-body" class="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-[32rem] overflow-y-auto pr-1"></div>
     </div>
 
     <!-- Bilhetes + Tabela -->
@@ -1286,6 +1287,35 @@
       return line.replace(/^[\u2713\u2022\-\*]\s*/, '').trim();
     }
 
+    function detectDayHeader(lines, fullText) {
+      const textUpper = fullText.toUpperCase();
+      // Ignorar slides de resumo geral que mencionam múltiplos dias (ex: Dia 01, Dia 02, Dia 03 no mesmo slide)
+      const allDayMentions = [...textUpper.matchAll(/\b(?:DIA|ETAPA|JORNADA)\s*0?(\d{1,2})\b/g)].map(m => parseInt(m[1], 10));
+      const uniqueDays = [...new Set(allDayMentions)];
+      if (uniqueDays.length > 1) return null;
+
+      // Ignorar slides globais (Índice, Capa, Checklist, Orçamento, Emergência)
+      const globalKeywords = ['ÍNDICE', 'INDICE', 'CHECKLIST', 'EQUIPAMENTO', 'ORÇAMENTO', 'ORCAMENTO', 'EMERGÊNCIA', 'EMERGENCIA', 'PREPARAÇÃO', 'PREPARACAO', 'VISÃO GERAL', 'VISAO GERAL', 'MAPA GERAL'];
+      if (globalKeywords.some(kw => textUpper.includes(kw)) && uniqueDays.length === 0) {
+        return null;
+      }
+
+      // Procurar marcador de dia prioritariamente nas primeiras 4 linhas do slide (título/cabeçalho)
+      const topLines = lines.slice(0, 4).join(' ').toUpperCase();
+      let m = topLines.match(/\b(?:DIA|ETAPA|JORNADA)\s*0?(\d{1,2})\b/) || topLines.match(/\b0?(\d{1,2})[º°.]?\s*(?:DIA|ETAPA|JORNADA)\b/);
+      if (m) return m[1].padStart(2, '0');
+
+      // Caso o marcador esteja noutra linha mas seja único no slide e não seja uma referência ("como no Dia 01")
+      if (uniqueDays.length === 1) {
+        const refMatch = textUpper.match(/(?:COMO NO|VER|IGUAL AO|REGRESSO DO)\s+DIA\s*0?\d{1,2}/);
+        if (!refMatch) {
+          return String(uniqueDays[0]).padStart(2, '0');
+        }
+      }
+
+      return null;
+    }
+
     async function handlePptxUpload(event) {
       const file = event.target.files[0];
       if (!file) return;
@@ -1321,60 +1351,72 @@
         let detectedTitle = file.name.replace(/\.pptx$/i, '').replace(/[_-]/g, ' ').toUpperCase();
 
         if (slidesData.length > 0 && slidesData[0].lines.length > 0) {
-          const firstCandidate = slidesData[0].lines.find(l => l.length > 4 && l.length < 45);
+          const firstCandidate = slidesData[0].lines.find(l => l.length > 4 && l.length < 45 && !/\d{4}/.test(l));
           if (firstCandidate) detectedTitle = firstCandidate.toUpperCase();
         }
 
         for (const slide of slidesData) {
           const textUpper = slide.fullText.toUpperCase();
-          const dayMatch = textUpper.match(/\b(?:DIA|ETAPA)\s*0?(\d{1,2})\b/);
+          const detectedDayNum = detectDayHeader(slide.lines, slide.fullText);
 
-          const isIndexSlide = (textUpper.includes('ÍNDICE') || textUpper.includes('INDICE')) && slide.num <= 6;
-          if (isIndexSlide) continue;
+          // Se detetou um novo número de dia (diferente do dia atualmente aberto), cria nova etapa
+          if (detectedDayNum && (!currentDay || currentDay.dayNumber !== detectedDayNum)) {
+            const routeLine = slide.lines.find(l => l.includes('→') || l.includes('->') || (l.includes(' - ') && l.length < 55 && !/^\d{1,2}:\d{2}/.test(l)))
+              || slide.lines.find(l => l.length > 4 && l.length < 50 && !/^(?:DIA|ETAPA)/i.test(l))
+              || `Etapa ${detectedDayNum}`;
+            const distMatch = slide.fullText.match(/(\d{2,4}\s*km)/i);
+            const durMatch = slide.fullText.match(/(\d{1,2}h\d{0,2}(?:\s*[-–]\s*\d{1,2}h\d{0,2})?)/i);
 
-          if (dayMatch) {
-            const dNum = dayMatch[1].padStart(2, '0');
-            if (!currentDay || currentDay.dayNumber !== dNum) {
-              const routeLine = slide.lines.find(l => l.includes('→') || l.includes('->') || (l.includes(' - ') && l.length < 50)) || `Etapa ${dNum}`;
+            currentDay = {
+              dayNumber: detectedDayNum,
+              route: routeLine.replace('->', '→'),
+              via: slide.lines.find(l => (l.includes('|') || l.includes('•')) && l.length < 90) || routeLine,
+              distance: distMatch ? distMatch[1] : '—',
+              duration: durMatch ? `≈ ${durMatch[1]}` : '',
+              roadType: textUpper.includes('MONTANHA') || textUpper.includes('SERRA') ? 'Estradas de Montanha' : 'Estradas Panorâmicas',
+              difficulty: 'Moderada',
+              summary: '',
+              zbeWarning: null,
+              fuelRule: 'Verificar autonomia antes de entrar em zonas de serra.',
+              timeline: [],
+              walkingRoute: {
+                city: `Percurso a Pé • Dia ${detectedDayNum}`,
+                estimatedTime: '1h30 – 2h30',
+                parkingNote: 'Estacionar em zona autorizada próxima do centro histórico.',
+                stops: []
+              },
+              monuments: [],
+              sourceSlides: [slide.num]
+            };
+            parsedDays.push(currentDay);
+          } else if (currentDay) {
+            currentDay.sourceSlides.push(slide.num);
+            // Atualizar distância/rota se o slide de abertura do dia não tinha mas este slide tem
+            if (currentDay.distance === '—') {
               const distMatch = slide.fullText.match(/(\d{2,4}\s*km)/i);
-              const durMatch = slide.fullText.match(/(\d{1,2}h\d{0,2}(?:\s*[-–]\s*\d{1,2}h\d{0,2})?)/i);
-
-              currentDay = {
-                dayNumber: dNum,
-                route: routeLine.replace('->', '→'),
-                via: slide.lines.find(l => l.includes('|') && l.length < 80) || routeLine,
-                distance: distMatch ? distMatch[1] : '—',
-                duration: durMatch ? `≈ ${durMatch[1]}` : '',
-                roadType: textUpper.includes('MONTANHA') ? 'Estradas de Montanha' : 'Estradas Panorâmicas',
-                difficulty: 'Moderada',
-                summary: '',
-                zbeWarning: null,
-                fuelRule: 'Verificar autonomia antes de entrar em zonas de serra.',
-                timeline: [],
-                walkingRoute: {
-                  city: `Percurso a Pé • Dia ${dNum}`,
-                  estimatedTime: '1h30 – 2h30',
-                  parkingNote: 'Estacionar em zona autorizada próxima do centro histórico.',
-                  stops: []
-                },
-                monuments: []
-              };
-              parsedDays.push(currentDay);
+              if (distMatch) currentDay.distance = distMatch[1];
+            }
+            if (!currentDay.route.includes('→')) {
+              const betterRoute = slide.lines.find(l => l.includes('→') || l.includes('->'));
+              if (betterRoute) currentDay.route = betterRoute.replace('->', '→');
             }
           }
 
           if (!currentDay) continue;
 
+          // Detetar Alertas ZBE
           if (textUpper.includes('ZBE') || textUpper.includes('BAIXAS EMISSÕES') || textUpper.includes('ACESSO CONDICIONADO')) {
-            const zbeSentences = slide.lines.filter(l => l.length > 25).slice(0, 3).join(' ');
-            if (zbeSentences) currentDay.zbeWarning = zbeSentences;
+            const zbeSentences = slide.lines.filter(l => l.length > 25 && !l.toUpperCase().includes('CAMINHOS DO SUL')).slice(0, 3).join(' ');
+            if (zbeSentences && !currentDay.zbeWarning) currentDay.zbeWarning = zbeSentences;
           }
 
-          if (textUpper.includes('FICHA TÉCNICA') || textUpper.includes('FICHA TECNICA')) {
+          // Detetar Ficha Técnica de Monumento
+          if (textUpper.includes('FICHA TÉCNICA') || textUpper.includes('FICHA TECNICA') || textUpper.includes('PATRIMÓNIO MUNDIAL')) {
             const titleCandidates = slide.lines.filter(l => 
               !l.toUpperCase().includes('FICHA') && 
               !l.toUpperCase().includes('ESTRADA, CULTURA') &&
               !l.toUpperCase().includes('CAMINHOS DO SUL') &&
+              !/^DIA\s*\d+/i.test(l) &&
               l.length > 3 && l.length < 65
             );
             const monName = titleCandidates[0] || `Monumento Dia ${currentDay.dayNumber}`;
@@ -1384,26 +1426,35 @@
             const tipIdx = slide.lines.findIndex(l => l.toUpperCase().includes('DICA'));
             const tipText = tipIdx !== -1 && slide.lines[tipIdx + 1] ? slide.lines[tipIdx + 1] : '';
 
-            currentDay.monuments.push({
-              name: monName,
-              location: currentDay.route.split('→').pop().trim(),
-              classification: 'Património & Cultura',
-              schedule: '',
-              highlights: highlights.length > 0 ? highlights.slice(0, 5) : slide.lines.slice(1, 5),
-              tip: tipText
-            });
+            if (!currentDay.monuments.some(m => m.name === monName)) {
+              currentDay.monuments.push({
+                name: monName,
+                location: currentDay.route.split('→').pop().trim(),
+                classification: 'Património & Cultura',
+                schedule: '',
+                highlights: highlights.length > 0 ? highlights.slice(0, 5) : slide.lines.slice(1, 5),
+                tip: tipText
+              });
+            }
             continue;
           }
 
+          // Extrair Horários para a Timeline (ex: "08:00", "08:00 - 09:30", "08:00 | Saída")
           for (let i = 0; i < slide.lines.length; i++) {
             const line = slide.lines[i];
-            const timeMatch = line.match(/^(\d{1,2}:\d{2})(?:\s*[-–]\s*\d{1,2}:\d{2})?$/);
-            if (timeMatch && slide.lines[i + 1]) {
-              const timeStr = timeMatch[1];
-              const stopTitle = slide.lines[i + 1];
-              const stopDesc = slide.lines[i + 2] && !/^\d{1,2}:\d{2}/.test(slide.lines[i + 2]) ? slide.lines[i + 2] : '';
-              
-              if (!currentDay.timeline.some(t => t.time === timeStr && t.title === stopTitle)) {
+            const inlineMatch = line.match(/^(\d{1,2}:\d{2})(?:\s*[-–]\s*\d{1,2}:\d{2})?\s*(?:[|•\-–]\s*(.+))?$/);
+            if (inlineMatch) {
+              const timeStr = inlineMatch[1];
+              let stopTitle = inlineMatch[2] ? inlineMatch[2].trim() : (slide.lines[i + 1] || '');
+              let stopDesc = '';
+
+              if (inlineMatch[2]) {
+                stopDesc = slide.lines[i + 1] && !/^\d{1,2}:\d{2}/.test(slide.lines[i + 1]) ? slide.lines[i + 1] : '';
+              } else {
+                stopDesc = slide.lines[i + 2] && !/^\d{1,2}:\d{2}/.test(slide.lines[i + 2]) ? slide.lines[i + 2] : '';
+              }
+
+              if (stopTitle && !currentDay.timeline.some(t => t.time === timeStr && t.title === stopTitle)) {
                 currentDay.timeline.push({
                   time: timeStr,
                   title: stopTitle,
@@ -1417,44 +1468,54 @@
             }
           }
 
+          // Extrair Resumo narrativo se ainda estiver vazio
           if (!currentDay.summary) {
-            const longParagraph = slide.lines.find(l => l.length > 120 && !l.toUpperCase().includes('ESTRADA, CULTURA'));
+            const longParagraph = slide.lines.find(l => l.length > 100 && !l.toUpperCase().includes('ESTRADA, CULTURA'));
             if (longParagraph) currentDay.summary = longParagraph;
           }
         }
 
+        // Fallback seguro: se nenhum padrão "DIA XX" foi encontrado, cria apenas 1 dia único com os horários detetados (nunca 1 dia por slide!)
         if (parsedDays.length === 0) {
-          slidesData.forEach((s, idx) => {
-            parsedDays.push({
-              dayNumber: String(idx + 1).padStart(2, '0'),
-              route: s.lines[0] || `Slide ${s.num}`,
-              via: '',
-              distance: '—',
-              duration: '',
-              roadType: 'Importado PPTX',
-              difficulty: 'Moderada',
-              summary: s.lines.slice(1, 4).join(' '),
-              zbeWarning: null,
-              fuelRule: '',
-              timeline: [{
-                time: "09:00",
-                title: s.lines[0] || `Ponto ${s.num}`,
-                desc: s.lines.slice(1).join(' '),
-                km: '',
-                type: 'visit',
-                lat: null,
-                lng: null
-              }],
-              walkingRoute: { city: s.lines[0] || `Local ${s.num}`, estimatedTime: '', parkingNote: '', stops: [] },
-              monuments: []
+          const singleDay = {
+            dayNumber: "01",
+            route: detectedTitle,
+            via: `${slidesData.length} slides importados`,
+            distance: "—",
+            duration: "",
+            roadType: "Roteiro Importado",
+            difficulty: "Moderada",
+            summary: "Roteiro consolidado a partir da apresentação PowerPoint.",
+            zbeWarning: null,
+            fuelRule: "",
+            timeline: [],
+            walkingRoute: { city: detectedTitle, estimatedTime: "", parkingNote: "", stops: [] },
+            monuments: [],
+            sourceSlides: slidesData.map(s => s.num)
+          };
+          slidesData.forEach(s => {
+            s.lines.forEach((line, i) => {
+              const tm = line.match(/^(\d{1,2}:\d{2})/);
+              if (tm && s.lines[i + 1]) {
+                singleDay.timeline.push({
+                  time: tm[1],
+                  title: s.lines[i + 1],
+                  desc: s.lines[i + 2] || '',
+                  km: '',
+                  type: inferStopType(s.lines[i + 1]),
+                  lat: null,
+                  lng: null
+                });
+              }
             });
           });
+          parsedDays.push(singleDay);
         }
 
         stagingData.pptxDays = parsedDays;
         stagingData.pptxTitle = detectedTitle;
 
-        statusEl.innerHTML = `<span class="text-emerald-700 font-bold">✓ ${parsedDays.length} etapas e ${slidesData.length} slides estruturados!</span>`;
+        statusEl.innerHTML = `<span class="text-emerald-700 font-bold">✓ ${parsedDays.length} etapa(s) estruturada(s) a partir de ${slidesData.length} slides!</span>`;
         document.getElementById('badge-pptx-ready').classList.remove('hidden');
         updateStagingUI();
       } catch (err) {
@@ -1504,6 +1565,33 @@
       }
     }
 
+    // Funções de ajuste manual na pré-visualização antes de gravar
+    function mergeStagedDayWithPrev(idx) {
+      if (!stagingData.pptxDays || idx <= 0) return;
+      const prev = stagingData.pptxDays[idx - 1];
+      const curr = stagingData.pptxDays[idx];
+      prev.timeline = prev.timeline.concat(curr.timeline);
+      prev.monuments = prev.monuments.concat(curr.monuments);
+      if (curr.zbeWarning && !prev.zbeWarning) prev.zbeWarning = curr.zbeWarning;
+      if (curr.sourceSlides) prev.sourceSlides = (prev.sourceSlides || []).concat(curr.sourceSlides);
+      stagingData.pptxDays.splice(idx, 1);
+      // Renumerar dias sequencialmente
+      stagingData.pptxDays.forEach((d, i) => { d.dayNumber = String(i + 1).padStart(2, '0'); });
+      updateStagingUI();
+    }
+
+    function removeStagedDay(idx) {
+      if (!stagingData.pptxDays) return;
+      stagingData.pptxDays.splice(idx, 1);
+      stagingData.pptxDays.forEach((d, i) => { d.dayNumber = String(i + 1).padStart(2, '0'); });
+      updateStagingUI();
+    }
+
+    function renameStagedDay(idx, newRoute) {
+      if (!stagingData.pptxDays || !stagingData.pptxDays[idx]) return;
+      stagingData.pptxDays[idx].route = newRoute.trim() || stagingData.pptxDays[idx].route;
+    }
+
     function updateStagingUI() {
       const hasPptx = stagingData.pptxDays && stagingData.pptxDays.length > 0;
       const hasKmz = stagingData.kmzWaypoints && stagingData.kmzWaypoints.length > 0;
@@ -1515,6 +1603,8 @@
       applyBtn.disabled = !(hasPptx || hasKmz);
 
       const previewDays = buildMergedDays();
+      document.getElementById('staged-days-total').textContent = previewDays.length;
+
       const panel = document.getElementById('staging-preview-panel');
       const body = document.getElementById('staging-preview-body');
       const titleInput = document.getElementById('staged-trip-title');
@@ -1526,18 +1616,40 @@
       }
 
       panel.classList.remove('hidden');
-      body.innerHTML = previewDays.map(d => {
+      body.innerHTML = previewDays.map((d, idx) => {
         const matchedCount = d.timeline.filter(t => t.lat && t.lng).length;
+        const slidesInfo = d.sourceSlides ? `Slides ${d.sourceSlides[0]}–${d.sourceSlides[d.sourceSlides.length - 1]}` : '';
         return `
-          <div class="p-4 rounded-xl bg-sand-50 border border-sand-200 space-y-2">
-            <div class="flex items-center justify-between">
-              <span class="font-extrabold text-xs bg-navy-900 text-gold-400 px-2 py-0.5 rounded">DIA ${d.dayNumber}</span>
-              <span class="text-[11px] font-bold ${matchedCount > 0 ? 'text-emerald-700' : 'text-slate-400'}">
-                ${matchedCount}/${d.timeline.length} pontos com GPS cruzado
+          <div class="p-4 rounded-xl bg-sand-50 border border-sand-200 space-y-2.5">
+            <div class="flex items-center justify-between gap-2">
+              <div class="flex items-center gap-1.5">
+                <span class="font-extrabold text-xs bg-navy-900 text-gold-400 px-2 py-0.5 rounded">DIA ${d.dayNumber}</span>
+                ${slidesInfo ? `<span class="text-[10px] text-slate-500 bg-white px-1.5 py-0.5 rounded border border-slate-200">${slidesInfo}</span>` : ''}
+              </div>
+              <div class="flex items-center gap-1">
+                ${hasPptx && idx > 0 ? `
+                  <button onclick="mergeStagedDayWithPrev(${idx})" title="Juntar este bloco ao Dia anterior" class="text-[10px] font-bold bg-amber-100 hover:bg-amber-200 text-amber-900 px-2 py-1 rounded transition">
+                    ↑ Fundir no anterior
+                  </button>
+                ` : ''}
+                ${hasPptx && previewDays.length > 1 ? `
+                  <button onclick="removeStagedDay(${idx})" title="Remover este bloco" class="text-[10px] font-bold bg-red-100 hover:bg-red-200 text-red-800 px-2 py-1 rounded transition">
+                    ✕
+                  </button>
+                ` : ''}
+              </div>
+            </div>
+
+            <input type="text" value="${escapeAttr(d.route)}" onchange="renameStagedDay(${idx}, this.value)" class="w-full font-bold text-xs text-navy-900 bg-white px-2.5 py-1.5 rounded-lg border border-slate-300 focus:border-gold-500 focus:outline-none" />
+
+            <div class="flex items-center justify-between text-[11px]">
+              <span class="text-slate-500">${d.timeline.length} paragens • ${d.monuments.length} fichas</span>
+              <span class="font-bold ${matchedCount > 0 ? 'text-emerald-700' : 'text-slate-400'}">
+                ${matchedCount}/${d.timeline.length} com GPS cruzado
               </span>
             </div>
-            <div class="font-bold text-sm text-navy-900">${d.route}</div>
-            <div class="text-[11px] text-slate-600 space-y-1 max-h-32 overflow-y-auto">
+
+            <div class="text-[11px] text-slate-600 space-y-1 max-h-28 overflow-y-auto">
               ${d.timeline.map(t => `
                 <div class="flex items-center justify-between gap-2 bg-white px-2 py-1 rounded border border-slate-100">
                   <span class="truncate"><strong>${t.time}</strong> • ${t.title}</span>

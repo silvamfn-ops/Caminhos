@@ -1,3 +1,3 @@
-# Caminhos do Sul — Aplicação Web de Moto-Turismo & Guia Cultural (v2.2)
+# Caminhos do Sul — Aplicação Web de Moto-Turismo & Guia Cultural (v2.3)
 
-Aplicação PWA (Progressive Web App) com **Motor de Importação Inteligente (`.pptx` + `.kmz`/`.kml`)**, planeador para computador e interface mobile otimizada para iPhone e Android.
+Inclui motor de extração estrutural de PowerPoint (`.pptx`) com deteção precisa de dias, agrupamento sequencial de slides e editor visual de fusão/remoção antes da publicação.
