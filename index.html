@@ -62,13 +62,19 @@
   <!-- TOP BAR -->
   <header class="bg-navy-900 text-white sticky top-0 z-50 border-b border-gold-500/30 shadow-lg">
     <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between gap-2">
-      <div class="flex items-center gap-3">
+      <div class="flex items-center gap-3 min-w-0">
         <div class="w-10 h-10 rounded-full bg-gradient-to-br from-gold-400 to-gold-600 flex items-center justify-center text-navy-900 shadow-md shrink-0">
           <i data-lucide="compass" class="w-6 h-6 stroke-[2.2]"></i>
         </div>
-        <div>
-          <h1 class="font-editorial text-base sm:text-lg font-bold tracking-wider text-gold-400 leading-tight" id="app-title">CAMINHOS DO SUL</h1>
-          <p class="text-[11px] text-slate-300 tracking-wide uppercase" id="app-subtitle">Andaluzia em Duas Rodas • 7 Dias • ~1.750 km</p>
+        <div class="min-w-0">
+          <div class="flex items-center gap-2">
+            <h1 class="font-editorial text-sm sm:text-lg font-bold tracking-wider text-gold-400 leading-tight truncate" id="app-title">CAMINHOS DO SUL</h1>
+            <button onclick="openTripsLibraryModal()" title="Trocar ou Gerir Viagens" class="inline-flex items-center gap-1 bg-navy-800 hover:bg-navy-700 text-gold-400 border border-gold-500/40 px-2 py-0.5 rounded-lg text-[10px] font-bold shrink-0 transition">
+              <i data-lucide="folder-kanban" class="w-3 h-3"></i>
+              <span id="trips-count-badge">1 Viagem</span>
+            </button>
+          </div>
+          <p class="text-[11px] text-slate-300 tracking-wide uppercase truncate" id="app-subtitle">Andaluzia em Duas Rodas • 7 Dias • ~1.750 km</p>
         </div>
       </div>
 
@@ -143,25 +149,50 @@
 
   <!-- AMBIENTE 2: PLANEADOR & IMPORTADOR PC -->
   <main id="view-desktop" class="hidden flex-1 max-w-6xl w-full mx-auto px-4 py-6 space-y-6">
+    <!-- GESTOR DE MÚLTIPLAS VIAGENS (BIBLIOTECA) -->
+    <div class="bg-navy-900 text-white rounded-2xl p-6 shadow-md border border-gold-500/30 space-y-4">
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <span class="text-[11px] font-bold uppercase tracking-wider text-gold-400 bg-gold-500/20 px-2.5 py-1 rounded-full border border-gold-500/30">Garagem & Biblioteca de Expedições • v3.0</span>
+          <h2 class="font-editorial text-xl sm:text-2xl font-bold text-white mt-2">As Minhas Viagens Guardadas</h2>
+          <p class="text-xs text-slate-300 mt-1">Gere várias expedições em simultâneo. Cada viagem mantém os seus próprios dias, bilhetes, checklist e diário de bordo offline.</p>
+        </div>
+        <div class="flex flex-wrap gap-2">
+          <button onclick="createBlankTrip()" class="inline-flex items-center gap-1.5 bg-gold-500 hover:bg-gold-400 text-navy-900 font-extrabold text-xs px-3.5 py-2.5 rounded-xl shadow transition">
+            <i data-lucide="plus-circle" class="w-4 h-4"></i>
+            <span>Nova Viagem Vazia</span>
+          </button>
+          <label class="inline-flex items-center gap-1.5 bg-emerald-700 hover:bg-emerald-600 text-white font-bold text-xs px-3.5 py-2.5 rounded-xl shadow cursor-pointer transition">
+            <i data-lucide="upload" class="w-4 h-4"></i>
+            <span>Importar (.json)</span>
+            <input type="file" accept=".json" class="hidden" onchange="importTripJSON(event)" />
+          </label>
+          <button onclick="exportAllTripsBackup()" class="inline-flex items-center gap-1.5 bg-navy-800 hover:bg-navy-700 text-slate-200 border border-slate-600 font-bold text-xs px-3.5 py-2.5 rounded-xl transition">
+            <i data-lucide="archive" class="w-4 h-4"></i>
+            <span>Backup Total</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Grelha de Cartões das Viagens -->
+      <div id="desktop-trips-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pt-2"></div>
+    </div>
+
+    <!-- ESTÚDIO DE IMPORTAÇÃO PARA A VIAGEM ATIVA -->
     <div class="bg-white rounded-2xl p-6 shadow-sm border border-sand-200 flex flex-col md:flex-row md:items-center justify-between gap-4">
       <div>
-        <span class="text-xs font-bold uppercase tracking-wider text-gold-600 bg-gold-400/20 px-2.5 py-1 rounded-full">Estúdio de Importação v2.4 • Etiquetas [APP:]</span>
-        <h2 class="text-2xl font-bold text-navy-900 mt-2">Importador Inteligente (.PPTX + .KMZ)</h2>
-        <p class="text-sm text-slate-600 mt-1">Carrega o teu PowerPoint e o ficheiro do Google Maps. O motor deteta automaticamente os dias, horários, fichas técnicas e cruza cada paragem com as coordenadas GPS.</p>
+        <span class="text-xs font-bold uppercase tracking-wider text-gold-600 bg-gold-400/20 px-2.5 py-1 rounded-full">Importador Inteligente (.PPTX + .KMZ)</span>
+        <h2 class="text-xl font-bold text-navy-900 mt-2">Alimentar a Viagem Ativa ou Criar Nova por Ficheiros</h2>
+        <p class="text-xs text-slate-600 mt-1">Carrega o PowerPoint com códigos <code class="bg-amber-100 text-amber-900 px-1 rounded">[APP: ...]</code> e o mapa <code class="bg-slate-100 px-1 rounded">.kmz</code>. Podes gravar como uma <strong>nova viagem na biblioteca</strong> ou atualizar a atual.</p>
       </div>
       <div class="flex flex-wrap gap-2">
-        <label class="inline-flex items-center gap-2 bg-emerald-700 hover:bg-emerald-600 text-white font-bold text-xs px-4 py-3 rounded-xl shadow cursor-pointer transition">
-          <i data-lucide="upload" class="w-4 h-4"></i>
-          <span>Carregar Viagem (.json)</span>
-          <input type="file" accept=".json" class="hidden" onchange="importTripJSON(event)" />
-        </label>
         <button onclick="exportTripJSON()" class="inline-flex items-center gap-2 bg-navy-900 hover:bg-navy-800 text-gold-400 font-bold text-xs px-4 py-3 rounded-xl shadow transition">
           <i data-lucide="download" class="w-4 h-4"></i>
-          <span>Exportar Viagem (.json)</span>
+          <span>Exportar Viagem Ativa (.json)</span>
         </button>
         <button onclick="resetToDefaultTrip()" class="inline-flex items-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs px-4 py-3 rounded-xl transition">
           <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
-          <span>Repor "Caminhos do Sul"</span>
+          <span>Restaurar "Caminhos do Sul"</span>
         </button>
       </div>
     </div>
@@ -252,10 +283,13 @@
           <h3 class="font-bold text-lg text-navy-900 mt-1">Ajusta as Etapas Detetadas (<span id="staged-days-total">0</span> Dias)</h3>
           <p class="text-xs text-slate-500">Se algum slide extra foi considerado um dia, usa <strong>"Fundir no anterior"</strong> ou <strong>"Remover"</strong> antes de confirmar.</p>
         </div>
-        <div class="flex items-center gap-2 shrink-0">
+        <div class="flex flex-wrap items-center gap-2 shrink-0">
           <input type="text" id="staged-trip-title" placeholder="Título da Viagem" class="text-xs font-bold px-3 py-2 rounded-lg border border-slate-300" />
-          <button onclick="applyStagedImport()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs px-4 py-2.5 rounded-lg shadow">
-            ✓ Confirmar e Gravar
+          <button onclick="applyStagedImport('new')" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs px-3.5 py-2.5 rounded-lg shadow">
+            + Guardar como Nova Viagem
+          </button>
+          <button onclick="applyStagedImport('replace')" class="bg-navy-900 hover:bg-navy-800 text-gold-400 font-bold text-xs px-3.5 py-2.5 rounded-lg shadow">
+            ↻ Atualizar Viagem Atual
           </button>
         </div>
       </div>
@@ -664,30 +698,102 @@
       ]
     };
 
-    function loadInitialState() {
-      const defaultState = {
-        tripData: DEFAULT_TRIP_DATA,
-        currentDayIdx: 0,
-        currentSubTab: 'cockpit',
-        mainSection: 'route',
+    function cloneObj(obj) {
+      return JSON.parse(JSON.stringify(obj));
+    }
+
+    function buildTripRecord(id, tripData) {
+      return {
+        id: id,
+        updatedAt: new Date().toISOString().slice(0, 10),
+        tripData: cloneObj(tripData),
         checkedItems: {},
         diaryLogs: {}
       };
+    }
+
+    function loadInitialState() {
+      const defaultRecord = buildTripRecord('caminhos-do-sul-default', DEFAULT_TRIP_DATA);
+      const defaultState = {
+        activeTripId: defaultRecord.id,
+        trips: [defaultRecord],
+        currentDayIdx: 0,
+        currentSubTab: 'cockpit',
+        mainSection: 'route'
+      };
+
       try {
-        const raw = localStorage.getItem('caminhos_do_sul_state_v2');
-        if (!raw) return defaultState;
-        const parsed = JSON.parse(raw);
-        if (!parsed || !parsed.tripData || !Array.isArray(parsed.tripData.days) || parsed.tripData.days.length === 0) {
-          return defaultState;
+        // Verificar se existe estado v3
+        const rawV3 = localStorage.getItem('caminhos_do_sul_state_v3');
+        if (rawV3) {
+          const parsed = JSON.parse(rawV3);
+          if (parsed && Array.isArray(parsed.trips) && parsed.trips.length > 0) {
+            return Object.assign({}, defaultState, parsed);
+          }
         }
-        return Object.assign({}, defaultState, parsed);
+
+        // Migrar automaticamente dados da v2 se existirem
+        const rawV2 = localStorage.getItem('caminhos_do_sul_state_v2');
+        if (rawV2) {
+          const parsedV2 = JSON.parse(rawV2);
+          if (parsedV2 && parsedV2.tripData && Array.isArray(parsedV2.tripData.days)) {
+            const migrated = {
+              id: 'migrated-' + Date.now(),
+              updatedAt: new Date().toISOString().slice(0, 10),
+              tripData: parsedV2.tripData,
+              checkedItems: parsedV2.checkedItems || {},
+              diaryLogs: parsedV2.diaryLogs || {}
+            };
+            return {
+              activeTripId: migrated.id,
+              trips: [migrated],
+              currentDayIdx: parsedV2.currentDayIdx || 0,
+              currentSubTab: parsedV2.currentSubTab || 'cockpit',
+              mainSection: parsedV2.mainSection || 'route'
+            };
+          }
+        }
+
+        return defaultState;
       } catch (e) {
-        localStorage.removeItem('caminhos_do_sul_state_v2');
         return defaultState;
       }
     }
 
     let appState = loadInitialState();
+
+    // Getters dinâmicos para a viagem ativa (mantém compatibilidade total com toda a UI)
+    function getActiveTripRecord() {
+      let rec = appState.trips.find(t => t.id === appState.activeTripId);
+      if (!rec) {
+        rec = appState.trips[0];
+        appState.activeTripId = rec.id;
+      }
+      return rec;
+    }
+
+    Object.defineProperty(appState, 'tripData', {
+      get() { return getActiveTripRecord().tripData; },
+      set(val) { getActiveTripRecord().tripData = val; getActiveTripRecord().updatedAt = new Date().toISOString().slice(0, 10); }
+    });
+
+    Object.defineProperty(appState, 'checkedItems', {
+      get() {
+        const rec = getActiveTripRecord();
+        if (!rec.checkedItems) rec.checkedItems = {};
+        return rec.checkedItems;
+      },
+      set(val) { getActiveTripRecord().checkedItems = val; }
+    });
+
+    Object.defineProperty(appState, 'diaryLogs', {
+      get() {
+        const rec = getActiveTripRecord();
+        if (!rec.diaryLogs) rec.diaryLogs = {};
+        return rec.diaryLogs;
+      },
+      set(val) { getActiveTripRecord().diaryLogs = val; }
+    });
 
     let stagingData = {
       pptxDays: null,
@@ -697,7 +803,14 @@
 
     function saveState() {
       try {
-        localStorage.setItem('caminhos_do_sul_state_v2', JSON.stringify(appState));
+        const payload = {
+          activeTripId: appState.activeTripId,
+          trips: appState.trips,
+          currentDayIdx: appState.currentDayIdx,
+          currentSubTab: appState.currentSubTab,
+          mainSection: appState.mainSection
+        };
+        localStorage.setItem('caminhos_do_sul_state_v3', JSON.stringify(payload));
       } catch (e) {}
     }
 
@@ -709,6 +822,185 @@
 
     function escapeAttr(str) {
       return String(str || '').replace(/"/g, '&quot;').replace(/'/g, '');
+    }
+
+    // =====================================================================
+    // GESTOR DE MÚLTIPLAS VIAGENS (BIBLIOTECA)
+    // =====================================================================
+    function calcTripTotalKm(tripData) {
+      let sum = 0;
+      (tripData.days || []).forEach(d => {
+        const m = String(d.distance || '').match(/(\d+(?:[.,]\d+)?)/);
+        if (m) sum += parseFloat(m[1].replace(',', '.'));
+      });
+      return sum > 0 ? `~${Math.round(sum)} km` : '';
+    }
+
+    function selectActiveTrip(tripId) {
+      const exists = appState.trips.find(t => t.id === tripId);
+      if (!exists) return;
+      appState.activeTripId = tripId;
+      appState.currentDayIdx = 0;
+      appState.mainSection = 'route';
+      saveState();
+      closeModal();
+      renderMobileApp();
+      renderDesktopPlanner();
+    }
+
+    function openTripsLibraryModal() {
+      document.getElementById('modal-tag').textContent = 'Garagem de Expedições';
+      document.getElementById('modal-title').textContent = 'Selecionar ou Gerir Viagens';
+      document.getElementById('modal-body').innerHTML = `
+        <p class="text-xs text-slate-600">Escolhe a viagem ativa no telemóvel. Todos os dados ficam guardados offline no dispositivo.</p>
+        <div class="space-y-2.5">
+          ${appState.trips.map(rec => {
+            const isActive = rec.id === appState.activeTripId;
+            const td = rec.tripData;
+            const kmTotal = calcTripTotalKm(td);
+            return `
+              <div class="p-3.5 rounded-xl border-2 transition ${isActive ? 'bg-navy-900 text-white border-gold-500 shadow-md' : 'bg-sand-50 text-navy-900 border-sand-200'}">
+                <div class="flex items-start justify-between gap-2">
+                  <div class="min-w-0">
+                    <div class="flex items-center gap-1.5">
+                      ${isActive ? '<span class="text-[10px] font-extrabold uppercase bg-gold-500 text-navy-900 px-2 py-0.5 rounded">Ativa</span>' : ''}
+                      <span class="text-[11px] ${isActive ? 'text-slate-400' : 'text-slate-500'}">${td.days.length} Dias ${kmTotal ? '• ' + kmTotal : ''}</span>
+                    </div>
+                    <h4 class="font-editorial font-bold text-sm mt-1 truncate ${isActive ? 'text-gold-400' : 'text-navy-900'}">${td.title}</h4>
+                    <p class="text-[11px] truncate ${isActive ? 'text-slate-300' : 'text-slate-500'}">${td.subtitle || ''}</p>
+                  </div>
+                  <div class="flex items-center gap-1.5 shrink-0">
+                    ${!isActive ? `
+                      <button onclick="selectActiveTrip('${rec.id}')" class="bg-gold-500 hover:bg-gold-400 text-navy-900 font-bold text-xs px-3 py-1.5 rounded-lg shadow">
+                        Abrir
+                      </button>
+                    ` : ''}
+                    <button onclick="duplicateTrip('${rec.id}')" title="Duplicar Viagem" class="p-1.5 rounded-lg ${isActive ? 'bg-navy-800 text-slate-300 hover:text-white' : 'bg-white text-slate-600 border border-slate-200'}">
+                      <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+                    </button>
+                    ${appState.trips.length > 1 ? `
+                      <button onclick="deleteTrip('${rec.id}')" title="Eliminar Viagem" class="p-1.5 rounded-lg ${isActive ? 'bg-red-950 text-red-300 hover:text-red-200' : 'bg-red-50 text-red-600 border border-red-200'}">
+                        <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                      </button>
+                    ` : ''}
+                  </div>
+                </div>
+              </div>
+            `;
+          }).join('')}
+        </div>
+        <div class="pt-2 border-t border-slate-200 flex justify-between items-center">
+          <button onclick="closeModal(); switchMode('desktop');" class="text-xs font-bold text-gold-600 hover:underline flex items-center gap-1">
+            <i data-lucide="plus-circle" class="w-3.5 h-3.5"></i> Criar ou Importar Nova Viagem no Planeador
+          </button>
+        </div>
+      `;
+      document.getElementById('modal-overlay').classList.remove('hidden');
+      refreshIcons();
+    }
+
+    function createBlankTrip() {
+      const name = prompt('Nome da nova viagem (ex: Picos da Europa 2027):');
+      if (!name || !name.trim()) return;
+      const cleanName = name.trim().toUpperCase();
+      const blankData = {
+        title: cleanName,
+        subtitle: "Nova Expedição • 1 Etapa",
+        days: [
+          {
+            dayNumber: "01",
+            route: "Partida → Destino Dia 01",
+            via: "Definir percurso",
+            distance: "0 km",
+            duration: "",
+            roadType: "Estradas Panorâmicas",
+            difficulty: "Moderada",
+            summary: "Etapa inicial da nova expedição.",
+            zbeWarning: null,
+            fuelRule: "Verificar autonomia antes da partida.",
+            timeline: [
+              { time: "09:00", title: "Partida", desc: "Início da viagem.", km: "0 km", type: "ride", lat: null, lng: null }
+            ],
+            walkingRoute: { city: "Centro Histórico", estimatedTime: "", parkingNote: "", stops: [] },
+            monuments: []
+          }
+        ],
+        tickets: [],
+        checklist: cloneObj(DEFAULT_TRIP_DATA.checklist)
+      };
+      const newRec = buildTripRecord('trip-' + Date.now(), blankData);
+      appState.trips.unshift(newRec);
+      appState.activeTripId = newRec.id;
+      appState.currentDayIdx = 0;
+      saveState();
+      renderDesktopPlanner();
+      renderMobileApp();
+    }
+
+    function duplicateTrip(tripId) {
+      const source = appState.trips.find(t => t.id === tripId);
+      if (!source) return;
+      const copyData = cloneObj(source.tripData);
+      copyData.title = copyData.title + " (CÓPIA)";
+      const newRec = buildTripRecord('trip-' + Date.now(), copyData);
+      appState.trips.unshift(newRec);
+      appState.activeTripId = newRec.id;
+      appState.currentDayIdx = 0;
+      saveState();
+      renderDesktopPlanner();
+      renderMobileApp();
+      if (!document.getElementById('modal-overlay').classList.contains('hidden')) {
+        openTripsLibraryModal();
+      }
+    }
+
+    function renameTrip(tripId) {
+      const target = appState.trips.find(t => t.id === tripId);
+      if (!target) return;
+      const newName = prompt('Novo título para esta viagem:', target.tripData.title);
+      if (!newName || !newName.trim()) return;
+      target.tripData.title = newName.trim().toUpperCase();
+      target.updatedAt = new Date().toISOString().slice(0, 10);
+      saveState();
+      renderDesktopPlanner();
+      renderMobileApp();
+    }
+
+    function deleteTrip(tripId) {
+      if (appState.trips.length <= 1) {
+        alert('Tem de existir pelo menos uma viagem guardada na biblioteca.');
+        return;
+      }
+      const target = appState.trips.find(t => t.id === tripId);
+      if (!target) return;
+      if (!confirm(`Eliminar permanentemente a viagem "${target.tripData.title}"?`)) return;
+
+      appState.trips = appState.trips.filter(t => t.id !== tripId);
+      if (appState.activeTripId === tripId) {
+        appState.activeTripId = appState.trips[0].id;
+        appState.currentDayIdx = 0;
+      }
+      saveState();
+      renderDesktopPlanner();
+      renderMobileApp();
+      if (!document.getElementById('modal-overlay').classList.contains('hidden')) {
+        openTripsLibraryModal();
+      }
+    }
+
+    function exportAllTripsBackup() {
+      const backupObj = {
+        backupVersion: "3.0",
+        exportedAt: new Date().toISOString(),
+        trips: appState.trips
+      };
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupObj, null, 2));
+      const a = document.createElement('a');
+      a.setAttribute("href", dataStr);
+      a.setAttribute("download", `backup_todas_viagens_${new Date().toISOString().slice(0,10)}.json`);
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
     }
 
     function switchMode(mode) {
@@ -772,6 +1064,8 @@
 
       document.getElementById('app-title').textContent = trip.title;
       document.getElementById('app-subtitle').textContent = trip.subtitle;
+      const badgeEl = document.getElementById('trips-count-badge');
+      if (badgeEl) badgeEl.textContent = appState.trips.length === 1 ? '1 Viagem' : `${appState.trips.length} Viagens`;
 
       ['route', 'wallet', 'checklist', 'diary'].forEach(sec => {
         const el = document.getElementById(`nav-${sec}`);
@@ -1212,6 +1506,62 @@
     // MOTOR DE IMPORTAÇÃO INTELIGENTE (.PPTX + .KMZ)
     // =====================================================================
     function renderDesktopPlanner() {
+      const badgeEl = document.getElementById('trips-count-badge');
+      if (badgeEl) badgeEl.textContent = appState.trips.length === 1 ? '1 Viagem' : `${appState.trips.length} Viagens`;
+
+      const grid = document.getElementById('desktop-trips-grid');
+      if (grid) {
+        grid.innerHTML = appState.trips.map(rec => {
+          const isActive = rec.id === appState.activeTripId;
+          const td = rec.tripData;
+          const kmTotal = calcTripTotalKm(td);
+          return `
+            <div class="rounded-2xl p-4 border-2 transition flex flex-col justify-between ${
+              isActive
+                ? 'bg-navy-800 border-gold-500 shadow-lg'
+                : 'bg-navy-800/40 border-slate-700 hover:border-slate-500'
+            }">
+              <div>
+                <div class="flex items-center justify-between gap-2">
+                  ${isActive
+                    ? '<span class="text-[10px] font-extrabold uppercase bg-gold-500 text-navy-900 px-2 py-0.5 rounded-full">✓ Viagem Ativa</span>'
+                    : '<span class="text-[10px] font-semibold uppercase bg-slate-700 text-slate-300 px-2 py-0.5 rounded-full">Guardada</span>'
+                  }
+                  <span class="text-[10px] text-slate-400">${rec.updatedAt || ''}</span>
+                </div>
+                <h3 class="font-editorial font-bold text-base text-white mt-2 truncate" title="${escapeAttr(td.title)}">${td.title}</h3>
+                <p class="text-[11px] text-slate-300 mt-0.5 truncate">${td.days.length} Etapa(s) ${kmTotal ? '• ' + kmTotal : ''}</p>
+              </div>
+
+              <div class="mt-4 pt-3 border-t border-slate-700/80 flex items-center justify-between gap-1.5">
+                ${!isActive ? `
+                  <button onclick="selectActiveTrip('${rec.id}')" class="bg-gold-500 hover:bg-gold-400 text-navy-900 font-bold text-[11px] px-3 py-1.5 rounded-lg transition">
+                    Ativar Viagem
+                  </button>
+                ` : `
+                  <button onclick="switchMode('mobile')" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-[11px] px-3 py-1.5 rounded-lg transition">
+                    Abrir Modo Viagem →
+                  </button>
+                `}
+                <div class="flex items-center gap-1">
+                  <button onclick="renameTrip('${rec.id}')" title="Renomear" class="p-1.5 rounded-lg bg-navy-900 text-slate-300 hover:text-gold-400">
+                    <i data-lucide="pencil" class="w-3.5 h-3.5"></i>
+                  </button>
+                  <button onclick="duplicateTrip('${rec.id}')" title="Duplicar" class="p-1.5 rounded-lg bg-navy-900 text-slate-300 hover:text-gold-400">
+                    <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+                  </button>
+                  ${appState.trips.length > 1 ? `
+                    <button onclick="deleteTrip('${rec.id}')" title="Eliminar" class="p-1.5 rounded-lg bg-navy-900 text-red-400 hover:text-red-300">
+                      <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                    </button>
+                  ` : ''}
+                </div>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
       const days = appState.tripData.days;
       document.getElementById('desktop-stage-count').textContent = `${days.length} Etapas ativas`;
       const tbody = document.getElementById('desktop-stages-table');
@@ -1925,23 +2275,42 @@
       return [];
     }
 
-    function applyStagedImport() {
+    function applyStagedImport(mode = 'new') {
       const mergedDays = buildMergedDays();
       if (mergedDays.length === 0) return;
 
       const customTitle = document.getElementById('staged-trip-title').value.trim() || "ROTEIRO IMPORTADO";
-      appState.tripData = {
-        ...appState.tripData,
-        title: customTitle.toUpperCase(),
-        subtitle: `Roteiro Personalizado • ${mergedDays.length} Etapa(s)`,
-        days: mergedDays
-      };
-      appState.currentDayIdx = 0;
-      saveState();
+      const kmTotal = calcTripTotalKm({ days: mergedDays });
+      const subtitleStr = `${mergedDays.length} Etapa(s) ${kmTotal ? '• ' + kmTotal : ''}`;
 
+      if (mode === 'new') {
+        const newTripData = {
+          title: customTitle.toUpperCase(),
+          subtitle: subtitleStr,
+          days: mergedDays,
+          tickets: [],
+          checklist: cloneObj(DEFAULT_TRIP_DATA.checklist)
+        };
+        const newRec = buildTripRecord('trip-' + Date.now(), newTripData);
+        appState.trips.unshift(newRec);
+        appState.activeTripId = newRec.id;
+        appState.currentDayIdx = 0;
+      } else {
+        appState.tripData = {
+          ...appState.tripData,
+          title: customTitle.toUpperCase(),
+          subtitle: subtitleStr,
+          days: mergedDays
+        };
+        appState.currentDayIdx = 0;
+      }
+
+      saveState();
       document.getElementById('staging-preview-panel').classList.add('hidden');
       renderDesktopPlanner();
-      alert(`Viagem "${appState.tripData.title}" atualizada com sucesso (${mergedDays.length} etapas)!`);
+      renderMobileApp();
+      refreshIcons();
+      alert(`Viagem "${appState.tripData.title}" gravada na biblioteca com ${mergedDays.length} etapa(s)!`);
     }
 
     function addNewTicket(event) {
@@ -1961,7 +2330,7 @@
       });
       saveState();
       event.target.reset();
-      alert('Bilhete guardado no Cofre Offline!');
+      alert(`Bilhete guardado no Cofre Offline da viagem "${appState.tripData.title}"!`);
     }
 
     function exportTripJSON() {
@@ -1982,13 +2351,35 @@
       reader.onload = (e) => {
         try {
           const data = JSON.parse(e.target.result);
-          if (data && Array.isArray(data.days)) {
-            appState.tripData = data;
+          // Suporta tanto backup completo (v3.0) como ficheiro de viagem única
+          if (data && data.backupVersion && Array.isArray(data.trips)) {
+            let importedCount = 0;
+            data.trips.forEach(rec => {
+              if (rec && rec.tripData && Array.isArray(rec.tripData.days)) {
+                rec.id = 'trip-' + Date.now() + '-' + Math.floor(Math.random() * 1000);
+                appState.trips.unshift(rec);
+                importedCount++;
+              }
+            });
+            if (importedCount > 0) {
+              appState.activeTripId = appState.trips[0].id;
+              appState.currentDayIdx = 0;
+              saveState();
+              renderDesktopPlanner();
+              renderMobileApp();
+              refreshIcons();
+              alert(`${importedCount} viagem(ns) restaurada(s) do backup!`);
+            }
+          } else if (data && Array.isArray(data.days)) {
+            const newRec = buildTripRecord('trip-' + Date.now(), data);
+            appState.trips.unshift(newRec);
+            appState.activeTripId = newRec.id;
             appState.currentDayIdx = 0;
             saveState();
             renderDesktopPlanner();
             renderMobileApp();
-            alert(`Viagem "${data.title}" carregada com sucesso!`);
+            refreshIcons();
+            alert(`Viagem "${data.title}" adicionada à biblioteca!`);
           } else {
             alert('Ficheiro JSON inválido.');
           }
@@ -2000,12 +2391,28 @@
     }
 
     function resetToDefaultTrip() {
-      if (confirm('Repor os dados originais de "Caminhos do Sul"?')) {
-        appState.tripData = DEFAULT_TRIP_DATA;
+      const existingDefault = appState.trips.find(t => t.id === 'caminhos-do-sul-default');
+      if (existingDefault) {
+        if (confirm('Repor os dados originais de "Caminhos do Sul"?')) {
+          existingDefault.tripData = cloneObj(DEFAULT_TRIP_DATA);
+          existingDefault.updatedAt = new Date().toISOString().slice(0, 10);
+          appState.activeTripId = existingDefault.id;
+          appState.currentDayIdx = 0;
+          saveState();
+          renderDesktopPlanner();
+          renderMobileApp();
+          refreshIcons();
+        }
+      } else {
+        const restored = buildTripRecord('caminhos-do-sul-default', DEFAULT_TRIP_DATA);
+        appState.trips.push(restored);
+        appState.activeTripId = restored.id;
         appState.currentDayIdx = 0;
         saveState();
         renderDesktopPlanner();
         renderMobileApp();
+        refreshIcons();
+        alert('"Caminhos do Sul" restaurada na sua biblioteca!');
       }
     }
 

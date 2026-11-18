@@ -1,3 +1,3 @@
-# Caminhos do Sul — Aplicação Web de Moto-Turismo & Guia Cultural (v2.4)
+# Caminhos do Sul — Aplicação Web de Moto-Turismo & Guia Cultural (v3.0 — Gestor Multi-Viagens)
 
-Suporta etiquetas estruturais `[APP: ...]` nas Notas do Apresentador ou nos slides do PowerPoint para importação determinística de dias, horários, percursos a pé, monumentos e alertas ZBE.
+Plataforma PWA offline-first com **Garagem / Biblioteca de Múltiplas Viagens**, importador estrutural `.pptx` (`[APP: ...]`) + `.kmz`/`.kml`, cofre de bilhetes e diário de bordo isolado por expedição.
