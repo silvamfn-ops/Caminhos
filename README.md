@@ -1,3 +1,3 @@
-# MOTOATLAS — Planeador & Guia Cultural em Duas Rodas (v3.1)
+# MOTOATLAS — Planeador & Guia Cultural em Duas Rodas (v3.2)
 
-Aplicação PWA offline-first com identidade **MOTOATLAS**, Garagem Multi-Viagens, importador estrutural `.pptx` (`[APP: ...]`) + `.kmz`/`.kml`, cofre de bilhetes e diário de bordo por expedição.
+Inclui **Editor Visual Completo de Etapas e Pontos** no Planeador (PC) para editar percursos, reordenar paragens, colar coordenadas GPS do Google Maps, gerir roteiros a pé e fichas técnicas de monumentos sem depender de ficheiros externos.

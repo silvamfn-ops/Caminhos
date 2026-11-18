@@ -155,7 +155,7 @@
     <div class="bg-navy-900 text-white rounded-2xl p-6 shadow-md border border-gold-500/30 space-y-4">
       <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <span class="text-[11px] font-bold uppercase tracking-wider text-gold-400 bg-gold-500/20 px-2.5 py-1 rounded-full border border-gold-500/30">MOTOATLAS • Garagem & Biblioteca de Expedições (v3.1)</span>
+          <span class="text-[11px] font-bold uppercase tracking-wider text-gold-400 bg-gold-500/20 px-2.5 py-1 rounded-full border border-gold-500/30">MOTOATLAS • Garagem & Editor Visual de Expedições (v3.2)</span>
           <h2 class="font-editorial text-xl sm:text-2xl font-bold text-white mt-2">As Minhas Viagens Guardadas</h2>
           <p class="text-xs text-slate-300 mt-1">Gere várias expedições em simultâneo. Cada viagem mantém os seus próprios dias, bilhetes, checklist e diário de bordo offline.</p>
         </div>
@@ -318,9 +318,15 @@
       </div>
 
       <div class="lg:col-span-2 bg-white rounded-2xl p-5 shadow-sm border border-sand-200">
-        <div class="flex items-center justify-between mb-4">
-          <h3 class="font-bold text-base text-navy-900">Etapas Ativas na Aplicação</h3>
-          <span class="text-xs font-semibold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full" id="desktop-stage-count">7 Etapas</span>
+        <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
+          <div class="flex items-center gap-2">
+            <h3 class="font-bold text-base text-navy-900">Etapas Ativas na Aplicação</h3>
+            <span class="text-xs font-semibold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full" id="desktop-stage-count">7 Etapas</span>
+          </div>
+          <button onclick="addNewStageToActiveTrip()" class="inline-flex items-center gap-1 bg-navy-900 hover:bg-navy-800 text-gold-400 font-bold text-xs px-3 py-1.5 rounded-xl shadow transition">
+            <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+            <span>Nova Etapa / Dia</span>
+          </button>
         </div>
         <div class="overflow-x-auto">
           <table class="w-full text-left border-collapse">
@@ -335,6 +341,139 @@
             </thead>
             <tbody id="desktop-stages-table" class="divide-y divide-slate-100 text-xs"></tbody>
           </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- EDITOR VISUAL DE ETAPA, PARAGENS, ROTEIRO A PÉ E MONUMENTOS -->
+    <div id="stage-visual-editor" class="hidden bg-white rounded-2xl p-6 shadow-md border-2 border-gold-500/60 space-y-6">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 pb-4">
+        <div>
+          <span class="text-[10px] font-bold uppercase tracking-wider bg-navy-900 text-gold-400 px-2.5 py-1 rounded-full">Editor Visual de Roteiro</span>
+          <h3 class="font-editorial text-xl font-bold text-navy-900 mt-1.5" id="editor-stage-heading">Editar Dia 01</h3>
+          <p class="text-xs text-slate-500">Todas as alterações são guardadas automaticamente no dispositivo e refletidas de imediato no modo iPhone.</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <button onclick="openEditedStageInMobile()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs px-3.5 py-2 rounded-xl shadow flex items-center gap-1.5 transition">
+            <i data-lucide="smartphone" class="w-4 h-4"></i>
+            <span>Ver no iPhone</span>
+          </button>
+          <button onclick="closeStageEditor()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs px-3.5 py-2 rounded-xl transition">
+            Fechar Editor ✕
+          </button>
+        </div>
+      </div>
+
+      <!-- 1. Dados Gerais da Etapa -->
+      <div class="bg-sand-50 rounded-2xl p-4 border border-sand-200 space-y-3">
+        <h4 class="text-xs font-extrabold uppercase tracking-wider text-navy-900 flex items-center gap-1.5">
+          <i data-lucide="sliders" class="w-4 h-4 text-gold-600"></i>
+          <span>1. Dados Gerais, Autonomia & Alerta ZBE</span>
+        </h4>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          <div>
+            <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Percurso (Origem → Destino)</label>
+            <input type="text" id="ed-route" oninput="saveEditedStageMeta()" class="w-full text-xs font-bold px-3 py-2 rounded-xl border border-slate-300 bg-white" />
+          </div>
+          <div>
+            <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Via / Pontos Intermédios</label>
+            <input type="text" id="ed-via" oninput="saveEditedStageMeta()" class="w-full text-xs px-3 py-2 rounded-xl border border-slate-300 bg-white" />
+          </div>
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Distância</label>
+              <input type="text" id="ed-distance" oninput="saveEditedStageMeta()" placeholder="Ex: 250 km" class="w-full text-xs px-3 py-2 rounded-xl border border-slate-300 bg-white" />
+            </div>
+            <div>
+              <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Duração</label>
+              <input type="text" id="ed-duration" oninput="saveEditedStageMeta()" placeholder="Ex: ≈ 3h30" class="w-full text-xs px-3 py-2 rounded-xl border border-slate-300 bg-white" />
+            </div>
+          </div>
+          <div>
+            <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Tipo de Estrada</label>
+            <input type="text" id="ed-roadType" oninput="saveEditedStageMeta()" class="w-full text-xs px-3 py-2 rounded-xl border border-slate-300 bg-white" />
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <div>
+            <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Resumo Narrativo da Etapa</label>
+            <textarea id="ed-summary" rows="2" oninput="saveEditedStageMeta()" class="w-full text-xs p-2.5 rounded-xl border border-slate-300 bg-white"></textarea>
+          </div>
+          <div>
+            <label class="block text-[10px] font-bold uppercase text-amber-700 mb-1">Regra de Combustível / Autonomia</label>
+            <textarea id="ed-fuelRule" rows="2" oninput="saveEditedStageMeta()" placeholder="Opcional..." class="w-full text-xs p-2.5 rounded-xl border border-amber-200 bg-amber-50/40"></textarea>
+          </div>
+          <div>
+            <label class="block text-[10px] font-bold uppercase text-red-700 mb-1">Alerta ZBE / Circulação (Deixar vazio se não houver)</label>
+            <textarea id="ed-zbeWarning" rows="2" oninput="saveEditedStageMeta()" placeholder="Ex: ATENÇÃO ZBE: Não entrar no centro histórico..." class="w-full text-xs p-2.5 rounded-xl border border-red-200 bg-red-50/30"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. Cronograma & Paragens GPS (Estrada & Plano) -->
+      <div class="bg-sand-50 rounded-2xl p-4 border border-sand-200 space-y-3">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <div>
+            <h4 class="text-xs font-extrabold uppercase tracking-wider text-navy-900 flex items-center gap-1.5">
+              <i data-lucide="navigation" class="w-4 h-4 text-gold-600"></i>
+              <span>2. Cronograma, Horários & Coordenadas GPS (<span id="ed-timeline-count">0</span>)</span>
+            </h4>
+            <p class="text-[11px] text-slate-500 mt-0.5">Dica: No Google Maps, clica com o botão direito num local, copia as coordenadas (ex: <code class="bg-white px-1 rounded">37.8789, -4.7794</code>) e cola no campo GPS.</p>
+          </div>
+          <button onclick="addTimelineStop()" class="bg-navy-900 hover:bg-navy-800 text-gold-400 font-bold text-xs px-3 py-2 rounded-xl shadow flex items-center gap-1 transition">
+            <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+            <span>Adicionar Paragem</span>
+          </button>
+        </div>
+
+        <div id="ed-timeline-list" class="space-y-2.5"></div>
+      </div>
+
+      <!-- 3. Roteiro a Pé & Fichas Técnicas -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <!-- Roteiro a Pé -->
+        <div class="bg-sand-50 rounded-2xl p-4 border border-sand-200 space-y-3">
+          <div class="flex items-center justify-between gap-2">
+            <h4 class="text-xs font-extrabold uppercase tracking-wider text-navy-900 flex items-center gap-1.5">
+              <i data-lucide="footprints" class="w-4 h-4 text-teal-600"></i>
+              <span>3. Roteiro a Pé</span>
+            </h4>
+            <button onclick="addWalkingStop()" class="bg-teal-700 hover:bg-teal-600 text-white font-bold text-[11px] px-2.5 py-1.5 rounded-lg flex items-center gap-1 transition">
+              <i data-lucide="plus" class="w-3 h-3"></i>
+              <span>Ponto a Pé</span>
+            </button>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            <div>
+              <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Cidade / Zona Pedonal</label>
+              <input type="text" id="ed-walk-city" oninput="saveEditedWalkMeta()" class="w-full text-xs px-2.5 py-1.5 rounded-lg border border-slate-300 bg-white" />
+            </div>
+            <div>
+              <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Tempo Estimado</label>
+              <input type="text" id="ed-walk-time" oninput="saveEditedWalkMeta()" placeholder="Ex: 2h30" class="w-full text-xs px-2.5 py-1.5 rounded-lg border border-slate-300 bg-white" />
+            </div>
+          </div>
+          <div>
+            <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Nota de Estacionamento das Motas</label>
+            <input type="text" id="ed-walk-parking" oninput="saveEditedWalkMeta()" class="w-full text-xs px-2.5 py-1.5 rounded-lg border border-slate-300 bg-white" />
+          </div>
+          <div id="ed-walk-stops-list" class="space-y-2 max-h-72 overflow-y-auto pr-1"></div>
+        </div>
+
+        <!-- Fichas Técnicas de Monumentos -->
+        <div class="bg-sand-50 rounded-2xl p-4 border border-sand-200 space-y-3">
+          <div class="flex items-center justify-between gap-2">
+            <h4 class="text-xs font-extrabold uppercase tracking-wider text-navy-900 flex items-center gap-1.5">
+              <i data-lucide="landmark" class="w-4 h-4 text-gold-600"></i>
+              <span>4. Fichas Técnicas & Monumentos</span>
+            </h4>
+            <button onclick="addMonumentCard()" class="bg-gold-600 hover:bg-gold-500 text-white font-bold text-[11px] px-2.5 py-1.5 rounded-lg flex items-center gap-1 transition">
+              <i data-lucide="plus" class="w-3 h-3"></i>
+              <span>Nova Ficha</span>
+            </button>
+          </div>
+          <div id="ed-monuments-list" class="space-y-2.5 max-h-96 overflow-y-auto pr-1"></div>
         </div>
       </div>
     </div>
@@ -1573,26 +1712,405 @@
       }
 
       const days = appState.tripData.days;
-      document.getElementById('desktop-stage-count').textContent = `${days.length} Etapas ativas`;
+      document.getElementById('desktop-stage-count').textContent = `${days.length} Etapa(s)`;
       const tbody = document.getElementById('desktop-stages-table');
       tbody.innerHTML = days.map((d, idx) => {
         const gpsCount = d.timeline.filter(t => t.lat && t.lng).length;
+        const isEditing = editingStageIdx === idx && !document.getElementById('stage-visual-editor').classList.contains('hidden');
         return `
-          <tr class="hover:bg-sand-50">
+          <tr class="${isEditing ? 'bg-amber-50/80' : 'hover:bg-sand-50'}">
             <td class="py-3 px-2 font-bold text-navy-900">Dia ${d.dayNumber}</td>
             <td class="py-3 px-2 font-semibold text-slate-800">${d.route}</td>
             <td class="py-3 px-2 text-slate-600">${d.distance || '—'}</td>
             <td class="py-3 px-2 text-slate-600">
               <span class="text-emerald-700 font-semibold">${gpsCount}/${d.timeline.length} GPS</span> • ${d.monuments.length} fichas
             </td>
-            <td class="py-3 px-2 text-right">
-              <button onclick="selectDay(${idx}); switchMode('mobile');" class="font-bold text-gold-600 hover:text-gold-500">
-                Abrir no iPhone →
+            <td class="py-3 px-2 text-right whitespace-nowrap space-x-1">
+              <button onclick="openStageEditor(${idx})" class="inline-flex items-center gap-1 bg-navy-900 hover:bg-navy-800 text-gold-400 font-bold text-[11px] px-2.5 py-1 rounded-lg transition">
+                <i data-lucide="pencil" class="w-3 h-3"></i> Editar
               </button>
+              <button onclick="selectDay(${idx}); switchMode('mobile');" class="inline-flex items-center gap-1 bg-sand-100 hover:bg-sand-200 text-navy-900 font-bold text-[11px] px-2.5 py-1 rounded-lg transition">
+                iPhone →
+              </button>
+              ${days.length > 1 ? `
+                <button onclick="deleteStageFromTrip(${idx})" title="Eliminar Etapa" class="inline-flex items-center bg-red-50 hover:bg-red-100 text-red-600 font-bold text-[11px] px-2 py-1 rounded-lg transition">
+                  ✕
+                </button>
+              ` : ''}
             </td>
           </tr>
         `;
       }).join('');
+      refreshIcons();
+    }
+
+    // =====================================================================
+    // EDITOR VISUAL DE ETAPAS, PARAGENS GPS, ROTEIRO A PÉ E MONUMENTOS
+    // =====================================================================
+    let editingStageIdx = 0;
+
+    function openStageEditor(idx) {
+      const days = appState.tripData.days;
+      if (!days[idx]) return;
+      editingStageIdx = idx;
+      const d = days[idx];
+
+      document.getElementById('editor-stage-heading').textContent = `Editar Dia ${d.dayNumber} • ${d.route}`;
+      document.getElementById('ed-route').value = d.route || '';
+      document.getElementById('ed-via').value = d.via || '';
+      document.getElementById('ed-distance').value = d.distance || '';
+      document.getElementById('ed-duration').value = d.duration || '';
+      document.getElementById('ed-roadType').value = d.roadType || '';
+      document.getElementById('ed-summary').value = d.summary || '';
+      document.getElementById('ed-fuelRule').value = d.fuelRule || '';
+      document.getElementById('ed-zbeWarning').value = d.zbeWarning || '';
+
+      if (!d.walkingRoute) {
+        d.walkingRoute = { city: '', estimatedTime: '', parkingNote: '', stops: [] };
+      }
+      document.getElementById('ed-walk-city').value = d.walkingRoute.city || '';
+      document.getElementById('ed-walk-time').value = d.walkingRoute.estimatedTime || '';
+      document.getElementById('ed-walk-parking').value = d.walkingRoute.parkingNote || '';
+
+      renderEditorTimeline();
+      renderEditorWalkingStops();
+      renderEditorMonuments();
+
+      const panel = document.getElementById('stage-visual-editor');
+      panel.classList.remove('hidden');
+      renderDesktopPlanner();
+      panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function closeStageEditor() {
+      document.getElementById('stage-visual-editor').classList.add('hidden');
+      renderDesktopPlanner();
+    }
+
+    function openEditedStageInMobile() {
+      selectDay(editingStageIdx);
+      switchMode('mobile');
+    }
+
+    function addNewStageToActiveTrip() {
+      const days = appState.tripData.days;
+      const nextNum = String(days.length + 1).padStart(2, '0');
+      days.push({
+        dayNumber: nextNum,
+        route: `Origem → Destino Dia ${nextNum}`,
+        via: '',
+        distance: '0 km',
+        duration: '',
+        roadType: 'Estradas Panorâmicas',
+        difficulty: 'Moderada',
+        summary: '',
+        zbeWarning: null,
+        fuelRule: '',
+        timeline: [
+          { time: '09:00', title: 'Partida', desc: '', km: '0 km', type: 'ride', lat: null, lng: null }
+        ],
+        walkingRoute: { city: `Centro Histórico • Dia ${nextNum}`, estimatedTime: '', parkingNote: '', stops: [] },
+        monuments: []
+      });
+      const kmTotal = calcTripTotalKm(appState.tripData);
+      appState.tripData.subtitle = `${days.length} Etapa(s) ${kmTotal ? '• ' + kmTotal : ''}`;
+      saveState();
+      renderDesktopPlanner();
+      openStageEditor(days.length - 1);
+    }
+
+    function deleteStageFromTrip(idx) {
+      const days = appState.tripData.days;
+      if (days.length <= 1) return;
+      if (!confirm(`Eliminar o Dia ${days[idx].dayNumber} (${days[idx].route})?`)) return;
+      days.splice(idx, 1);
+      days.forEach((d, i) => { d.dayNumber = String(i + 1).padStart(2, '0'); });
+      const kmTotal = calcTripTotalKm(appState.tripData);
+      appState.tripData.subtitle = `${days.length} Etapa(s) ${kmTotal ? '• ' + kmTotal : ''}`;
+      if (appState.currentDayIdx >= days.length) appState.currentDayIdx = 0;
+      if (editingStageIdx >= days.length) closeStageEditor();
+      saveState();
+      renderDesktopPlanner();
+    }
+
+    function saveEditedStageMeta() {
+      const d = appState.tripData.days[editingStageIdx];
+      if (!d) return;
+      d.route = document.getElementById('ed-route').value;
+      d.via = document.getElementById('ed-via').value;
+      d.distance = document.getElementById('ed-distance').value;
+      d.duration = document.getElementById('ed-duration').value;
+      d.roadType = document.getElementById('ed-roadType').value;
+      d.summary = document.getElementById('ed-summary').value;
+      d.fuelRule = document.getElementById('ed-fuelRule').value;
+      const zbeVal = document.getElementById('ed-zbeWarning').value.trim();
+      d.zbeWarning = zbeVal.length > 0 ? zbeVal : null;
+
+      document.getElementById('editor-stage-heading').textContent = `Editar Dia ${d.dayNumber} • ${d.route}`;
+      const kmTotal = calcTripTotalKm(appState.tripData);
+      appState.tripData.subtitle = `${appState.tripData.days.length} Etapa(s) ${kmTotal ? '• ' + kmTotal : ''}`;
+      saveState();
+      renderDesktopPlanner();
+    }
+
+    function renderEditorTimeline() {
+      const d = appState.tripData.days[editingStageIdx];
+      if (!d) return;
+      document.getElementById('ed-timeline-count').textContent = d.timeline.length;
+      const list = document.getElementById('ed-timeline-list');
+
+      const typeOptions = [
+        { val: 'ride', label: 'Estrada' },
+        { val: 'fuel', label: 'Combustível' },
+        { val: 'coffee', label: 'Pausa / Café' },
+        { val: 'food', label: 'Refeição' },
+        { val: 'visit', label: 'Visita' },
+        { val: 'photo', label: 'Miradouro' },
+        { val: 'hotel', label: 'Alojamento' },
+        { val: 'ticket', label: 'Bilhete Fixo' },
+        { val: 'walk', label: 'A Pé' }
+      ];
+
+      list.innerHTML = d.timeline.map((item, idx) => {
+        const coordsStr = (item.lat && item.lng) ? `${item.lat}, ${item.lng}` : '';
+        return `
+          <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm space-y-2">
+            <div class="grid grid-cols-12 gap-2 items-center">
+              <div class="col-span-3 sm:col-span-2">
+                <input type="text" value="${escapeAttr(item.time)}" oninput="updateTimelineField(${idx}, 'time', this.value)" placeholder="09:00" class="w-full text-xs font-extrabold text-navy-900 px-2 py-1.5 rounded-lg border border-slate-300 bg-sand-50" />
+              </div>
+              <div class="col-span-5 sm:col-span-4">
+                <input type="text" value="${escapeAttr(item.title)}" oninput="updateTimelineField(${idx}, 'title', this.value)" placeholder="Título da paragem" class="w-full text-xs font-bold px-2.5 py-1.5 rounded-lg border border-slate-300" />
+              </div>
+              <div class="col-span-4 sm:col-span-2">
+                <select onchange="updateTimelineField(${idx}, 'type', this.value)" class="w-full text-xs px-2 py-1.5 rounded-lg border border-slate-300 bg-white">
+                  ${typeOptions.map(opt => `<option value="${opt.val}" ${item.type === opt.val ? 'selected' : ''}>${opt.label}</option>`).join('')}
+                </select>
+              </div>
+              <div class="col-span-4 sm:col-span-2">
+                <input type="text" value="${escapeAttr(item.km)}" oninput="updateTimelineField(${idx}, 'km', this.value)" placeholder="Km (ex: 180 km)" class="w-full text-xs px-2 py-1.5 rounded-lg border border-slate-300" />
+              </div>
+              <div class="col-span-8 sm:col-span-2 flex items-center justify-end gap-1">
+                <button onclick="moveTimelineStop(${idx}, -1)" ${idx === 0 ? 'disabled' : ''} title="Subir" class="p-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 disabled:opacity-30 text-slate-700 text-xs font-bold">↑</button>
+                <button onclick="moveTimelineStop(${idx}, 1)" ${idx === d.timeline.length - 1 ? 'disabled' : ''} title="Descer" class="p-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 disabled:opacity-30 text-slate-700 text-xs font-bold">↓</button>
+                <button onclick="removeTimelineStop(${idx})" title="Remover" class="p-1.5 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 text-xs font-bold">✕</button>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-12 gap-2 items-center">
+              <div class="sm:col-span-7">
+                <input type="text" value="${escapeAttr(item.desc)}" oninput="updateTimelineField(${idx}, 'desc', this.value)" placeholder="Descrição / notas práticas da paragem..." class="w-full text-xs px-2.5 py-1.5 rounded-lg border border-slate-200 text-slate-600" />
+              </div>
+              <div class="sm:col-span-5 flex items-center gap-1.5">
+                <div class="relative flex-1">
+                  <input type="text" value="${escapeAttr(coordsStr)}" onchange="updateTimelineCoords(${idx}, this.value)" placeholder="Colar GPS: 37.8789, -4.7794" class="w-full text-[11px] font-mono px-2.5 py-1.5 rounded-lg border ${coordsStr ? 'border-emerald-300 bg-emerald-50/40 text-emerald-900' : 'border-slate-200 text-slate-500'}" />
+                </div>
+                <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.title || 'Portugal')}" target="_blank" title="Procurar coordenadas no Google Maps" class="shrink-0 bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px] font-bold px-2 py-1.5 rounded-lg">
+                  Maps ↗
+                </a>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function updateTimelineField(idx, field, val) {
+      const d = appState.tripData.days[editingStageIdx];
+      if (!d || !d.timeline[idx]) return;
+      d.timeline[idx][field] = val;
+      saveState();
+    }
+
+    function updateTimelineCoords(idx, rawCoords) {
+      const d = appState.tripData.days[editingStageIdx];
+      if (!d || !d.timeline[idx]) return;
+      const clean = rawCoords.trim();
+      if (!clean) {
+        d.timeline[idx].lat = null;
+        d.timeline[idx].lng = null;
+      } else {
+        const parts = clean.split(/[\s,;]+/).filter(Boolean);
+        const lat = parseFloat(parts[0]);
+        const lng = parseFloat(parts[1]);
+        if (!isNaN(lat) && !isNaN(lng)) {
+          d.timeline[idx].lat = lat;
+          d.timeline[idx].lng = lng;
+        } else {
+          alert('Formato de coordenadas inválido. Cola no formato: 37.8789, -4.7794');
+        }
+      }
+      saveState();
+      renderEditorTimeline();
+      renderDesktopPlanner();
+    }
+
+    function addTimelineStop() {
+      const d = appState.tripData.days[editingStageIdx];
+      if (!d) return;
+      d.timeline.push({
+        time: '12:00',
+        title: 'Nova Paragem',
+        desc: '',
+        km: '',
+        type: 'visit',
+        lat: null,
+        lng: null
+      });
+      saveState();
+      renderEditorTimeline();
+      renderDesktopPlanner();
+    }
+
+    function moveTimelineStop(idx, dir) {
+      const d = appState.tripData.days[editingStageIdx];
+      if (!d) return;
+      const target = idx + dir;
+      if (target < 0 || target >= d.timeline.length) return;
+      const tmp = d.timeline[idx];
+      d.timeline[idx] = d.timeline[target];
+      d.timeline[target] = tmp;
+      saveState();
+      renderEditorTimeline();
+    }
+
+    function removeTimelineStop(idx) {
+      const d = appState.tripData.days[editingStageIdx];
+      if (!d) return;
+      d.timeline.splice(idx, 1);
+      saveState();
+      renderEditorTimeline();
+      renderDesktopPlanner();
+    }
+
+    // Editor de Roteiro a Pé
+    function saveEditedWalkMeta() {
+      const d = appState.tripData.days[editingStageIdx];
+      if (!d) return;
+      d.walkingRoute.city = document.getElementById('ed-walk-city').value;
+      d.walkingRoute.estimatedTime = document.getElementById('ed-walk-time').value;
+      d.walkingRoute.parkingNote = document.getElementById('ed-walk-parking').value;
+      saveState();
+    }
+
+    function renderEditorWalkingStops() {
+      const d = appState.tripData.days[editingStageIdx];
+      const list = document.getElementById('ed-walk-stops-list');
+      const stops = (d.walkingRoute && d.walkingRoute.stops) ? d.walkingRoute.stops : [];
+
+      list.innerHTML = stops.map((st, idx) => {
+        const coordsStr = (st.lat && st.lng) ? `${st.lat}, ${st.lng}` : '';
+        return `
+          <div class="bg-white p-2.5 rounded-xl border border-slate-200 space-y-1.5">
+            <div class="flex items-center gap-1.5">
+              <span class="w-5 h-5 rounded-full bg-navy-900 text-gold-400 font-bold text-[10px] flex items-center justify-center shrink-0">${idx + 1}</span>
+              <input type="text" value="${escapeAttr(st.name)}" oninput="updateWalkStopField(${idx}, 'name', this.value)" placeholder="Nome do ponto a pé" class="flex-1 text-xs font-bold px-2 py-1 rounded border border-slate-300" />
+              <button onclick="removeWalkStop(${idx})" class="text-red-500 hover:text-red-700 font-bold text-xs px-1.5">✕</button>
+            </div>
+            <input type="text" value="${escapeAttr(st.desc)}" oninput="updateWalkStopField(${idx}, 'desc', this.value)" placeholder="O que ver / descrição..." class="w-full text-[11px] px-2 py-1 rounded border border-slate-200 text-slate-600" />
+            <input type="text" value="${escapeAttr(coordsStr)}" onchange="updateWalkStopCoords(${idx}, this.value)" placeholder="GPS opcional: 37.8768, -4.7779" class="w-full text-[10px] font-mono px-2 py-1 rounded border border-slate-200 text-emerald-800" />
+          </div>
+        `;
+      }).join('');
+    }
+
+    function updateWalkStopField(idx, field, val) {
+      const st = appState.tripData.days[editingStageIdx].walkingRoute.stops[idx];
+      if (st) { st[field] = val; saveState(); }
+    }
+
+    function updateWalkStopCoords(idx, rawCoords) {
+      const st = appState.tripData.days[editingStageIdx].walkingRoute.stops[idx];
+      if (!st) return;
+      const clean = rawCoords.trim();
+      if (!clean) { st.lat = null; st.lng = null; }
+      else {
+        const parts = clean.split(/[\s,;]+/).filter(Boolean);
+        const lat = parseFloat(parts[0]), lng = parseFloat(parts[1]);
+        if (!isNaN(lat) && !isNaN(lng)) { st.lat = lat; st.lng = lng; }
+      }
+      saveState();
+      renderEditorWalkingStops();
+    }
+
+    function addWalkingStop() {
+      const d = appState.tripData.days[editingStageIdx];
+      d.walkingRoute.stops.push({
+        num: d.walkingRoute.stops.length + 1,
+        name: 'Novo Ponto a Pé',
+        desc: '',
+        lat: null,
+        lng: null
+      });
+      saveState();
+      renderEditorWalkingStops();
+    }
+
+    function removeWalkStop(idx) {
+      const stops = appState.tripData.days[editingStageIdx].walkingRoute.stops;
+      stops.splice(idx, 1);
+      stops.forEach((s, i) => { s.num = i + 1; });
+      saveState();
+      renderEditorWalkingStops();
+    }
+
+    // Editor de Monumentos / Fichas Técnicas
+    function renderEditorMonuments() {
+      const d = appState.tripData.days[editingStageIdx];
+      const list = document.getElementById('ed-monuments-list');
+      list.innerHTML = d.monuments.map((m, idx) => `
+        <div class="bg-white p-3 rounded-xl border border-slate-200 space-y-2">
+          <div class="flex items-center gap-1.5">
+            <input type="text" value="${escapeAttr(m.name)}" oninput="updateMonumentField(${idx}, 'name', this.value)" placeholder="Nome do Monumento" class="flex-1 text-xs font-bold px-2 py-1 rounded border border-slate-300" />
+            <input type="text" value="${escapeAttr(m.schedule || '')}" oninput="updateMonumentField(${idx}, 'schedule', this.value)" placeholder="Horário" class="w-28 text-[11px] px-2 py-1 rounded border border-slate-300" />
+            <button onclick="removeMonumentCard(${idx})" class="text-red-500 hover:text-red-700 font-bold text-xs px-1.5">✕</button>
+          </div>
+          <div class="grid grid-cols-2 gap-1.5">
+            <input type="text" value="${escapeAttr(m.location || '')}" oninput="updateMonumentField(${idx}, 'location', this.value)" placeholder="Localização" class="text-[11px] px-2 py-1 rounded border border-slate-200" />
+            <input type="text" value="${escapeAttr(m.classification || '')}" oninput="updateMonumentField(${idx}, 'classification', this.value)" placeholder="Classificação (ex: UNESCO)" class="text-[11px] px-2 py-1 rounded border border-slate-200" />
+          </div>
+          <div>
+            <label class="block text-[10px] font-bold text-slate-400">Destaques (1 por linha)</label>
+            <textarea rows="2" oninput="updateMonumentHighlights(${idx}, this.value)" class="w-full text-[11px] p-1.5 rounded border border-slate-200">${(m.highlights || []).join('\n')}</textarea>
+          </div>
+          <input type="text" value="${escapeAttr(m.tip || '')}" oninput="updateMonumentField(${idx}, 'tip', this.value)" placeholder="Dica de viagem / fotografia..." class="w-full text-[11px] px-2 py-1 rounded border border-amber-200 bg-amber-50/40" />
+        </div>
+      `).join('');
+    }
+
+    function updateMonumentField(idx, field, val) {
+      const m = appState.tripData.days[editingStageIdx].monuments[idx];
+      if (m) { m[field] = val; saveState(); }
+    }
+
+    function updateMonumentHighlights(idx, textVal) {
+      const m = appState.tripData.days[editingStageIdx].monuments[idx];
+      if (m) {
+        m.highlights = textVal.split('\n').map(l => l.trim()).filter(Boolean);
+        saveState();
+      }
+    }
+
+    function addMonumentCard() {
+      const d = appState.tripData.days[editingStageIdx];
+      d.monuments.push({
+        name: 'Novo Monumento / Ponto Cultural',
+        location: d.route.split('→').pop().trim(),
+        classification: 'Património & Cultura',
+        schedule: '',
+        highlights: ['Destaque principal'],
+        tip: ''
+      });
+      saveState();
+      renderEditorMonuments();
+      renderDesktopPlanner();
+    }
+
+    function removeMonumentCard(idx) {
+      appState.tripData.days[editingStageIdx].monuments.splice(idx, 1);
+      saveState();
+      renderEditorMonuments();
+      renderDesktopPlanner();
     }
 
     function normalizeText(str) {
