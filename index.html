@@ -331,7 +331,7 @@
     <div class="bg-navy-900 text-white rounded-2xl p-6 shadow-md border border-gold-500/30 space-y-4">
       <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <span class="text-[11px] font-bold uppercase tracking-wider text-gold-400 bg-gold-500/20 px-2.5 py-1 rounded-full border border-gold-500/30">MOTOATLAS • Visibilidade Adaptativa (Claro/Escuro), Cofre QR & Autonomia (v3.9)</span>
+          <span class="text-[11px] font-bold uppercase tracking-wider text-gold-400 bg-gold-500/20 px-2.5 py-1 rounded-full border border-gold-500/30">MOTOATLAS • Plataforma Híbrida: Expedições de Mota & Viagens Tradicionais (v4.0)</span>
           <h2 class="font-editorial text-xl sm:text-2xl font-bold text-white mt-2">As Minhas Viagens Guardadas</h2>
           <p class="text-xs text-slate-300 mt-1">Gere várias expedições em simultâneo. Cada viagem mantém os seus próprios dias, bilhetes, checklist e diário de bordo offline.</p>
         </div>
@@ -727,6 +727,7 @@
   <script>
     const DEFAULT_TRIP_DATA = {
       title: "CAMINHOS DO SUL",
+      tripType: "moto",
       subtitle: "Andaluzia em Duas Rodas • 7 Dias • ~1.750 km",
       days: [
         {
@@ -1067,15 +1068,180 @@
       ]
     };
 
+
+    const DEFAULT_LEISURE_CHECKLIST = [
+      {
+        category: "✈️ Voos & Documentação",
+        items: [
+          "Cartão de Cidadão / Passaporte válido",
+          "Cartões de embarque guardados no Cofre Offline (QR Code)",
+          "Voucher do Rent-a-Car & Carta de Condução",
+          "Cartão Europeu de Seguro de Doença (CESD)"
+        ]
+      },
+      {
+        category: "🥾 Trilhos, Termas & Natureza",
+        items: [
+          "Botas ou ténis de trilho com boa aderência",
+          "Casaco corta-vento impermeável leve (4 estações num dia)",
+          "Fato de banho escuro e toalha de microfibra (Poça da Dona Beija / Caldeira Velha)",
+          "Mochila de dia (20L) + garrafa reutilizável + protetor solar"
+        ]
+      },
+      {
+        category: "🔌 Tecnologia & Fotografia",
+        items: [
+          "Powerbank + cabos USB para carregamento no carro",
+          "Suporte de telemóvel para grelha/vidro do carro alugado",
+          "Câmara fotográfica / cartões de memória extra"
+        ]
+      }
+    ];
+
+    const DEFAULT_AZORES_TRIP_DATA = {
+      title: "SÃO MIGUEL • AÇORES",
+      tripType: "leisure",
+      subtitle: "Ilha Verde • 3 Dias • Lagoas, Termas & Trilhos",
+      bikeRangeKm: 550,
+      days: [
+        {
+          dayNumber: "01",
+          route: "Chegada → Ponta Delgada & Sete Cidades",
+          via: "Aeroporto PDL • Vista do Rei • Lagoa das Sete Cidades • Ponta da Ferraria",
+          distance: "78 km",
+          duration: "≈ 1h45 condução",
+          roadType: "Estradas Regionais & Miradouros",
+          difficulty: "Fácil",
+          summary: "Levantamento do carro no aeroporto, subida à caldeira das Sete Cidades pelo Miradouro da Vista do Rei, almoço tradicional e banho térmico natural nas piscinas oceânicas da Ponta da Ferraria na maré baixa.",
+          zbeWarning: null,
+          fuelRule: "Viatura alugada: atestar apenas antes da devolução no aeroporto.",
+          timeline: [
+            { time: "09:30", title: "Chegada Aeroporto João Paulo II & Rent-a-Car", desc: "Recolha da viatura e check-in rápido.", km: "0 km", type: "flight", lat: 37.7429, lng: -25.6978 },
+            { time: "11:00", title: "Miradouro da Vista do Rei", desc: "Vista panorâmica icónica sobre as Lagoas Azul e Verde das Sete Cidades.", km: "24 km", type: "photo", lat: 37.8404, lng: -25.7946 },
+            { time: "13:00", title: "Almoço nas Sete Cidades", desc: "Buffet regional açoriano no centro da freguesia junto à lagoa.", km: "32 km", type: "food", lat: 37.8617, lng: -25.7972 },
+            { time: "15:30", title: "Ponta da Ferraria (Termas Oceânicas)", desc: "Banho na piscina natural vulcânica aquecida por nascente termal submarina (verificar tábua de marés).", km: "48 km", type: "beach", lat: 37.8587, lng: -25.8522 },
+            { time: "18:30", title: "Check-in Hotel em Ponta Delgada", desc: "Instalação no centro histórico e passeio pelas Portas da Cidade.", km: "78 km", type: "hotel", lat: 37.7394, lng: -25.6687 }
+          ],
+          walkingRoute: {
+            city: "Centro Histórico de Ponta Delgada",
+            estimatedTime: "1h30 a pé",
+            parkingNote: "Parque subterrâneo da Avenida Infante D. Henrique (junto à Marina).",
+            stops: [
+              { name: "Portas da Cidade", detail: "Arcos setecentistas em basalto na Praça Gonçalo Velho Cabral.", lat: 37.7393, lng: -25.6683 },
+              { name: "Igreja Matriz de São Sebastião", detail: "Fachada manuelina e barroca em pedra vulcânica negra.", lat: 37.7401, lng: -25.6688 },
+              { name: "Mercado da Graça", detail: "Prova de ananás dos Açores, queijo de São Jorge e bolo lêvedo.", lat: 37.7426, lng: -25.6648 }
+            ]
+          },
+          monuments: [
+            {
+              name: "Lagoa das Sete Cidades",
+              period: "Geoparque Açores • Cratera Vulcânica",
+              hours: "Acesso livre 24h",
+              price: "Gratuito",
+              desc: "Uma das Sete Maravilhas Naturais de Portugal, formada por duas lagoas ligadas por uma ponte estreita.",
+              highlights: ["Vista do Rei", "Miradouro da Boca do Inferno", "Ponte dos Regos"]
+            }
+          ]
+        },
+        {
+          dayNumber: "02",
+          route: "Lagoa do Fogo & Ribeira Grande",
+          via: "Ribeira Grande • Caldeira Velha • Miradouro Lagoa do Fogo • Plantação Ananases",
+          distance: "64 km",
+          duration: "≈ 1h20 condução",
+          roadType: "Estrada de Montanha EN5-2A",
+          difficulty: "Fácil",
+          summary: "Subida ao maciço central da Serra de Água de Pau para admirar a Lagoa do Fogo, imersão nas águas férreas quentes da Caldeira Velha e visita às estufas de ananás na Fajã de Baixo.",
+          zbeWarning: null,
+          fuelRule: null,
+          timeline: [
+            { time: "09:30", title: "Miradouro da Lagoa do Fogo", desc: "Ponto mais alto da ilha com vista sobre a lagoa selvagem sem construção humana.", km: "22 km", type: "photo", lat: 37.7689, lng: -25.4792 },
+            { time: "11:15", title: "Caldeira Velha (Reserva antecipada)", desc: "Piscinas termais envolvidas por fetos arbóreos e cascata de água morna.", km: "28 km", type: "beach", lat: 37.7834, lng: -25.4988 },
+            { time: "13:30", title: "Almoço na Ribeira Grande", desc: "Degustação de marisco local (cracas e lapas grelhadas).", km: "36 km", type: "food", lat: 37.8206, lng: -25.5194 },
+            { time: "16:00", title: "Plantação de Ananases A. Arruda", desc: "Visita guiada gratuita às estufas tradicionais de vidro e prova de licor de ananás.", km: "60 km", type: "visit", lat: 37.7575, lng: -25.6419 }
+          ],
+          walkingRoute: {
+            city: "Ribeira Grande (Costa Norte)",
+            estimatedTime: "1h00 a pé",
+            parkingNote: "Estacionamento gratuito junto ao Jardim Municipal.",
+            stops: [
+              { name: "Ponte dos Oito Arcos", detail: "Ex-líbris arquitetónico sobre a ribeira no centro da vila.", lat: 37.8211, lng: -25.5199 },
+              { name: "Areal de Santa Bárbara", detail: "Praia vulcânica extensa famosa pelo surf e vista sobre a costa norte.", lat: 37.8132, lng: -25.5416 }
+            ]
+          },
+          monuments: [
+            {
+              name: "Centro de Interpretação Ambiental da Caldeira Velha",
+              period: "Monumento Natural",
+              hours: "09:00 – 19:00 (bilhete com hora marcada)",
+              price: "10,00 € (com banho termal)",
+              desc: "Fumarola e nascente termal na encosta norte da Serra de Água de Pau.",
+              highlights: ["Cascata Termal", "Vegetação Laurissilva", "Trilho Interpretação"]
+            }
+          ]
+        },
+        {
+          dayNumber: "03",
+          route: "Vale das Furnas & Chá Gorreana",
+          via: "Vila Franca do Campo • Caldeiras das Furnas • Parque Terra Nostra • Chá Gorreana",
+          distance: "92 km",
+          duration: "≈ 1h50 condução",
+          roadType: "Costa Sul & Nordeste",
+          difficulty: "Fácil",
+          summary: "Dia dedicado ao vulcanismo ativo das Furnas: retirada do Cozido das Caldeiras ao meio-dia, banho no tanque termal centenário do Parque Terra Nostra e visita às únicas plantações de chá da Europa.",
+          zbeWarning: null,
+          fuelRule: null,
+          timeline: [
+            { time: "09:30", title: "Miradouro de Santa Iria & Chá Gorreana", desc: "Passeio pelos socalcos verdes das plantações de chá preto e verde.", km: "34 km", type: "trail", lat: 37.8178, lng: -25.4022 },
+            { time: "12:00", title: "Caldeiras da Lagoa das Furnas (Retirada do Cozido)", desc: "Assistir à abertura dos buracos vulcânicos onde o cozido estufa durante 6 horas.", km: "52 km", type: "visit", lat: 37.7634, lng: -25.3247 },
+            { time: "13:00", title: "Almoço: Cozido das Furnas", desc: "Refeição tradicional acompanhada de massa sovada e ananás.", km: "55 km", type: "food", lat: 37.7736, lng: -25.3125 },
+            { time: "15:15", title: "Parque Terra Nostra & Tanque Termal", desc: "Jardim botânico histórico e piscina termal férrea a 38°C.", km: "56 km", type: "beach", lat: 37.7719, lng: -25.3144 },
+            { time: "19:30", title: "Poça da Dona Beija (Banho Noturno)", desc: "Cinco piscinas termais cristalinas iluminadas à noite.", km: "58 km", type: "beach", lat: 37.7705, lng: -25.3189 }
+          ],
+          walkingRoute: {
+            city: "Freguesia das Furnas",
+            estimatedTime: "1h15 a pé",
+            parkingNote: "Parque junto às Caldeiras da Vila das Furnas.",
+            stops: [
+              { name: "Caldeiras das Furnas (Fumarolas)", detail: "Nascentes de água a ferver, lama vulcânica e venda de maçarocas cozidas no vapor.", lat: 37.7758, lng: -25.3039 },
+              { name: "Capela de Nossa Senhora das Vitórias", detail: "Templo neogótico singular na margem sul da Lagoa das Furnas.", lat: 37.7547, lng: -25.3264 }
+            ]
+          },
+          monuments: [
+            {
+              name: "Parque Terra Nostra",
+              period: "Séc. XVIII • Jardim Botânico",
+              hours: "10:30 – 16:30",
+              price: "16,00 €",
+              desc: "Um dos mais belos jardins românticos da Europa, célebre pela coleção de camélias e pelo tanque termal.",
+              highlights: ["Tanque Termal Férreo", "Avenida das Palmeiras", "Coleção de Camélias"]
+            }
+          ]
+        }
+      ],
+      tickets: [
+        { id: 9001, title: "Voo Lisboa → Ponta Delgada (PDL)", day: "Dia 01 • 07:45", code: "TP1863-PDL", note: "Apresentar Cartão de Cidadão e QR Code de embarque." },
+        { id: 9002, title: "Caldeira Velha (Entrada + Banho)", day: "Dia 02 • 11:15", code: "CV-AZORES-2026", note: "Levar fato de banho escuro e toalha." },
+        { id: 9003, title: "Poça da Dona Beija (Sessão Noturna)", day: "Dia 03 • 19:30", code: "PDB-NIGHT-03", note: "Sessão de 1h30 com hora marcada." }
+      ],
+      checklist: DEFAULT_LEISURE_CHECKLIST
+    };
+
     function cloneObj(obj) {
       return JSON.parse(JSON.stringify(obj));
     }
 
+    function getTripMode(td) {
+      return (td && td.tripType === 'leisure') ? 'leisure' : 'moto';
+    }
+
     function buildTripRecord(id, tripData) {
+      const cloned = cloneObj(tripData);
+      if (!cloned.tripType) cloned.tripType = 'moto';
       return {
         id: id,
         updatedAt: new Date().toISOString().slice(0, 10),
-        tripData: cloneObj(tripData),
+        tripData: cloned,
         checkedItems: {},
         diaryLogs: {}
       };
@@ -1083,20 +1249,26 @@
 
     function loadInitialState() {
       const defaultRecord = buildTripRecord('caminhos-do-sul-default', DEFAULT_TRIP_DATA);
+      const azoresRecord = buildTripRecord('sao-miguel-azores-default', DEFAULT_AZORES_TRIP_DATA);
       const defaultState = {
         activeTripId: defaultRecord.id,
-        trips: [defaultRecord],
+        trips: [defaultRecord, azoresRecord],
         currentDayIdx: 0,
         currentSubTab: 'cockpit',
         mainSection: 'route'
       };
 
       try {
-        // Verificar se existe estado v3
+        // Verificar se existe estado v3/v4
         const rawV3 = localStorage.getItem('caminhos_do_sul_state_v3');
         if (rawV3) {
           const parsed = JSON.parse(rawV3);
           if (parsed && Array.isArray(parsed.trips) && parsed.trips.length > 0) {
+            parsed.trips.forEach(r => {
+              if (r && r.tripData && !r.tripData.tripType) {
+                r.tripData.tripType = 'moto';
+              }
+            });
             return Object.assign({}, defaultState, parsed);
           }
         }
@@ -1218,22 +1390,45 @@
       renderDesktopPlanner();
     }
 
+    function toggleTripType(tripId) {
+      const target = appState.trips.find(t => t.id === tripId);
+      if (!target) return;
+      const current = getTripMode(target.tripData);
+      const next = current === 'moto' ? 'leisure' : 'moto';
+      target.tripData.tripType = next;
+      saveState();
+      renderDesktopPlanner();
+      renderMobileApp();
+      if (!document.getElementById('modal-overlay').classList.contains('hidden')) {
+        openTripsLibraryModal();
+      }
+    }
+
     function openTripsLibraryModal() {
-      document.getElementById('modal-tag').textContent = 'Garagem de Expedições';
+      document.getElementById('modal-tag').textContent = 'Biblioteca de Viagens';
       document.getElementById('modal-title').textContent = 'Selecionar ou Gerir Viagens';
       document.getElementById('modal-body').innerHTML = `
-        <p class="text-xs text-slate-600">Escolhe a viagem ativa no telemóvel. Todos os dados ficam guardados offline no dispositivo.</p>
+        <p class="text-xs text-slate-600">Escolhe a viagem ativa no telemóvel. A interface adapta-se automaticamente entre <strong>Expedição de Mota</strong> e <strong>Viagem Tradicional</strong>.</p>
         <div class="space-y-2.5">
           ${appState.trips.map(rec => {
             const isActive = rec.id === appState.activeTripId;
             const td = rec.tripData;
+            const mode = getTripMode(td);
             const kmTotal = calcTripTotalKm(td);
+            const typeBadge = mode === 'moto'
+              ? '<span class="text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-400/40 px-2 py-0.5 rounded">🏍️ Mota</span>'
+              : '<span class="text-[10px] font-bold bg-sky-500/20 text-sky-300 border border-sky-400/40 px-2 py-0.5 rounded">✈️ Tradicional</span>';
+            const typeBadgeInactive = mode === 'moto'
+              ? '<span class="text-[10px] font-bold bg-amber-100 text-amber-800 px-2 py-0.5 rounded">🏍️ Mota</span>'
+              : '<span class="text-[10px] font-bold bg-sky-100 text-sky-800 px-2 py-0.5 rounded">✈️ Tradicional</span>';
+
             return `
               <div class="p-3.5 rounded-xl border-2 transition ${isActive ? 'bg-navy-900 text-white border-gold-500 shadow-md' : 'bg-sand-50 text-navy-900 border-sand-200'}">
                 <div class="flex items-start justify-between gap-2">
                   <div class="min-w-0">
-                    <div class="flex items-center gap-1.5">
+                    <div class="flex flex-wrap items-center gap-1.5">
                       ${isActive ? '<span class="text-[10px] font-extrabold uppercase bg-gold-500 text-navy-900 px-2 py-0.5 rounded">Ativa</span>' : ''}
+                      ${isActive ? typeBadge : typeBadgeInactive}
                       <span class="text-[11px] ${isActive ? 'text-slate-400' : 'text-slate-500'}">${td.days.length} Dias ${kmTotal ? '• ' + kmTotal : ''}</span>
                     </div>
                     <h4 class="font-editorial font-bold text-sm mt-1 truncate ${isActive ? 'text-gold-400' : 'text-navy-900'}">${td.title}</h4>
@@ -1245,6 +1440,9 @@
                         Abrir
                       </button>
                     ` : ''}
+                    <button onclick="toggleTripType('${rec.id}')" title="Alternar tipo: Mota / Tradicional" class="p-1.5 rounded-lg ${isActive ? 'bg-navy-800 text-slate-300 hover:text-gold-400' : 'bg-white text-slate-600 border border-slate-200'}">
+                      <i data-lucide="repeat" class="w-3.5 h-3.5"></i>
+                    </button>
                     <button onclick="duplicateTrip('${rec.id}')" title="Duplicar Viagem" class="p-1.5 rounded-lg ${isActive ? 'bg-navy-800 text-slate-300 hover:text-white' : 'bg-white text-slate-600 border border-slate-200'}">
                       <i data-lucide="copy" class="w-3.5 h-3.5"></i>
                     </button>
@@ -1260,8 +1458,11 @@
           }).join('')}
         </div>
         <div class="pt-2 border-t border-slate-200 flex justify-between items-center">
+          <button onclick="closeModal(); createBlankTrip();" class="text-xs font-bold text-emerald-700 hover:underline flex items-center gap-1">
+            <i data-lucide="plus-circle" class="w-3.5 h-3.5"></i> + Criar Nova Viagem
+          </button>
           <button onclick="closeModal(); switchMode('desktop');" class="text-xs font-bold text-gold-600 hover:underline flex items-center gap-1">
-            <i data-lucide="plus-circle" class="w-3.5 h-3.5"></i> Criar ou Importar Nova Viagem no Planeador
+            Abrir Planeador PC →
           </button>
         </div>
       `;
@@ -1270,39 +1471,102 @@
     }
 
     function createBlankTrip() {
-      const name = prompt('Nome da nova viagem (ex: Picos da Europa 2027):');
-      if (!name || !name.trim()) return;
-      const cleanName = name.trim().toUpperCase();
+      document.getElementById('modal-tag').textContent = 'Nova Viagem';
+      document.getElementById('modal-title').textContent = 'Configurar Perfil da Viagem';
+      document.getElementById('modal-body').innerHTML = `
+        <form onsubmit="submitNewBlankTrip(event)" class="space-y-3">
+          <div>
+            <label class="block text-[11px] font-bold uppercase text-slate-600 mb-1">Nome do Destino / Viagem</label>
+            <input type="text" id="new-trip-name-input" required placeholder="Ex: São Miguel Açores ou Picos da Europa" class="w-full text-xs font-bold px-3 py-2.5 rounded-xl border border-slate-300" />
+          </div>
+
+          <div>
+            <label class="block text-[11px] font-bold uppercase text-slate-600 mb-1.5">Tipo de Viagem</label>
+            <div class="grid grid-cols-2 gap-2.5">
+              <label class="cursor-pointer">
+                <input type="radio" name="new-trip-type" value="moto" checked class="peer sr-only" />
+                <div class="p-3 rounded-xl border-2 border-slate-200 peer-checked:border-gold-500 peer-checked:bg-amber-50/60 transition text-center">
+                  <div class="text-xl mb-1">🏍️</div>
+                  <div class="text-xs font-extrabold text-navy-900">Expedição de Mota</div>
+                  <div class="text-[10px] text-slate-500 mt-0.5">Autonomia, ZBE, Bombas & GPX</div>
+                </div>
+              </label>
+
+              <label class="cursor-pointer">
+                <input type="radio" name="new-trip-type" value="leisure" class="peer sr-only" />
+                <div class="p-3 rounded-xl border-2 border-slate-200 peer-checked:border-sky-500 peer-checked:bg-sky-50/60 transition text-center">
+                  <div class="text-xl mb-1">✈️</div>
+                  <div class="text-xs font-extrabold text-navy-900">Viagem Tradicional</div>
+                  <div class="text-[10px] text-slate-500 mt-0.5">Ilhas, Voos, Trilhos & Cultura</div>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <button type="submit" class="w-full bg-navy-900 hover:bg-navy-800 text-gold-400 font-extrabold text-xs py-3 rounded-xl shadow transition">
+            Criar Viagem Agora
+          </button>
+        </form>
+      `;
+      document.getElementById('modal-overlay').classList.remove('hidden');
+      setTimeout(() => {
+        const inp = document.getElementById('new-trip-name-input');
+        if (inp) inp.focus();
+      }, 60);
+    }
+
+    function submitNewBlankTrip(event) {
+      event.preventDefault();
+      const nameInput = document.getElementById('new-trip-name-input');
+      const typeRadio = document.querySelector('input[name="new-trip-type"]:checked');
+      if (!nameInput || !nameInput.value.trim()) return;
+
+      const cleanName = nameInput.value.trim().toUpperCase();
+      const selectedType = typeRadio ? typeRadio.value : 'moto';
+      const isMoto = selectedType === 'moto';
+
       const blankData = {
         title: cleanName,
-        subtitle: "Nova Expedição • 1 Etapa",
+        tripType: selectedType,
+        subtitle: isMoto ? "Expedição em Duas Rodas • 1 Etapa" : "Viagem & Descoberta • 1 Dia",
+        bikeRangeKm: isMoto ? 320 : 550,
         days: [
           {
             dayNumber: "01",
             route: "Partida → Destino Dia 01",
-            via: "Definir percurso",
+            via: "Definir percurso / pontos de interesse",
             distance: "0 km",
             duration: "",
-            roadType: "Estradas Panorâmicas",
-            difficulty: "Moderada",
-            summary: "Etapa inicial da nova expedição.",
+            roadType: isMoto ? "Estradas Panorâmicas" : "Roteiro Turístico",
+            difficulty: isMoto ? "Moderada" : "Fácil",
+            summary: isMoto ? "Etapa inicial da nova expedição." : "Primeiro dia do roteiro de viagem.",
             zbeWarning: null,
-            fuelRule: "Verificar autonomia antes da partida.",
+            fuelRule: isMoto ? "Verificar autonomia antes da partida." : null,
             timeline: [
-              { time: "09:00", title: "Partida", desc: "Início da viagem.", km: "0 km", type: "ride", lat: null, lng: null }
+              {
+                time: "09:00",
+                title: isMoto ? "Partida" : "Início do Dia / Chegada",
+                desc: "Início do itinerário.",
+                km: "0 km",
+                type: isMoto ? "ride" : "flight",
+                lat: null,
+                lng: null
+              }
             ],
             walkingRoute: { city: "Centro Histórico", estimatedTime: "", parkingNote: "", stops: [] },
             monuments: []
           }
         ],
         tickets: [],
-        checklist: cloneObj(DEFAULT_TRIP_DATA.checklist)
+        checklist: cloneObj(isMoto ? DEFAULT_TRIP_DATA.checklist : DEFAULT_LEISURE_CHECKLIST)
       };
+
       const newRec = buildTripRecord('trip-' + Date.now(), blankData);
       appState.trips.unshift(newRec);
       appState.activeTripId = newRec.id;
       appState.currentDayIdx = 0;
       saveState();
+      closeModal();
       renderDesktopPlanner();
       renderMobileApp();
     }
@@ -1430,10 +1694,16 @@
     }
 
     function updateBrandHeader(trip) {
+      const mode = getTripMode(trip);
+      const brandEl = document.getElementById('app-brand');
+      if (brandEl) {
+        brandEl.textContent = mode === 'moto' ? 'MOTOATLAS' : 'MOTOATLAS • VIAGENS';
+      }
       const subEl = document.getElementById('app-subtitle');
       if (subEl && trip) {
+        const modeIcon = mode === 'moto' ? '🏍️' : '✈️';
         const extra = trip.subtitle ? ` • ${trip.subtitle}` : '';
-        subEl.innerHTML = `<span class="text-gold-400/90 font-semibold uppercase">Ativa:</span> <span class="font-bold text-white">${trip.title}</span><span class="text-slate-300">${extra}</span>`;
+        subEl.innerHTML = `<span class="text-gold-400/90 font-semibold uppercase">${modeIcon} Ativa:</span> <span class="font-bold text-white">${trip.title}</span><span class="text-slate-300">${extra}</span>`;
       }
       const badgeEl = document.getElementById('trips-count-badge');
       if (badgeEl) {
@@ -1495,6 +1765,22 @@
         `;
       }).join('');
 
+      const mode = getTripMode(trip);
+      const isMoto = mode === 'moto';
+
+      const subCockpitBtn = document.getElementById('subtab-cockpit');
+      if (subCockpitBtn) {
+        subCockpitBtn.innerHTML = isMoto
+          ? '<i data-lucide="navigation" class="w-4 h-4"></i><span>Estrada & Plano</span>'
+          : '<i data-lucide="calendar-clock" class="w-4 h-4"></i><span>Plano do Dia</span>';
+      }
+
+      const navDiaryEl = document.getElementById('nav-diary');
+      if (navDiaryEl) {
+        const spanEl = navDiaryEl.querySelector('span');
+        if (spanEl) spanEl.textContent = isMoto ? 'Diário & Km' : 'Diário & Gastos';
+      }
+
       const day = trip.days[appState.currentDayIdx];
       const stopWithCoords = [...day.timeline].reverse().find(s => s.lat && s.lng);
 
@@ -1502,8 +1788,8 @@
         <div class="bg-navy-900 text-white rounded-2xl p-4 shadow-lg border border-gold-500/30 relative overflow-hidden">
           <div class="flex items-start justify-between gap-2">
             <div>
-              <span class="inline-block text-[10px] font-bold uppercase tracking-widest bg-gold-500/20 text-gold-400 px-2.5 py-0.5 rounded-full border border-gold-500/30">
-                Etapa ${day.dayNumber} • ${day.roadType || 'Roteiro Moto'}
+              <span class="inline-block text-[10px] font-bold uppercase tracking-widest ${isMoto ? 'bg-gold-500/20 text-gold-400 border-gold-500/30' : 'bg-sky-500/20 text-sky-300 border-sky-400/30'} px-2.5 py-0.5 rounded-full border">
+                ${isMoto ? '🏍️ Etapa' : '✈️ Dia'} ${day.dayNumber} • ${day.roadType || (isMoto ? 'Roteiro Moto' : 'Itinerário')}
               </span>
               <h2 class="font-editorial text-xl font-bold text-white mt-1.5">${day.route}</h2>
               <p class="text-xs text-slate-300 mt-0.5">${day.via || ''}</p>
@@ -1518,7 +1804,7 @@
             ${day.summary || ''}
           </p>
 
-          ${day.zbeWarning ? `
+          ${(isMoto && day.zbeWarning) ? `
             <div class="mt-3 bg-red-950/70 border border-red-500/50 rounded-xl p-3 flex items-start gap-2.5">
               <i data-lucide="alert-triangle" class="w-5 h-5 text-red-400 shrink-0 mt-0.5"></i>
               <div class="text-xs text-red-100 leading-snug">
@@ -1577,8 +1863,14 @@
     }
 
     function getTypeBadge(type) {
+      const isMoto = getTripMode(appState.tripData) === 'moto';
       const map = {
-        ride: { icon: 'bike', color: 'bg-slate-100 text-slate-700', label: 'Estrada' },
+        ride: isMoto
+          ? { icon: 'bike', color: 'bg-slate-100 text-slate-700', label: 'Estrada' }
+          : { icon: 'car', color: 'bg-slate-100 text-slate-700', label: 'Deslocação' },
+        flight: { icon: 'plane', color: 'bg-sky-100 text-sky-800', label: 'Voo / Ferry' },
+        beach: { icon: 'waves', color: 'bg-cyan-100 text-cyan-800', label: 'Praia / Termas' },
+        trail: { icon: 'trees', color: 'bg-lime-100 text-lime-800', label: 'Trilho / Natureza' },
         fuel: { icon: 'fuel', color: 'bg-amber-100 text-amber-800', label: 'Combustível' },
         coffee: { icon: 'coffee', color: 'bg-orange-100 text-orange-800', label: 'Pausa' },
         food: { icon: 'utensils', color: 'bg-emerald-100 text-emerald-800', label: 'Refeição' },
@@ -1696,8 +1988,10 @@
         statusSub = `Recomendado atestar antes da reserva (${fuelStats.fuelStopsCount} abastecimento(s) na etapa).`;
       }
 
-      container.innerHTML = `
-        <!-- Painel Inteligente de Autonomia & Mapa de Bombas de Combustível -->
+      const isMotoMode = getTripMode(appState.tripData) === 'moto';
+
+      const topStageCardHtml = isMotoMode ? `
+        <!-- Painel Inteligente de Autonomia & Mapa de Bombas de Combustível (Modo Mota) -->
         <div class="${statusBannerClass} border rounded-2xl p-3.5 space-y-2.5 shadow-sm">
           <div class="flex items-start justify-between gap-2">
             <div class="flex items-start gap-2.5">
@@ -1725,6 +2019,28 @@
             </button>
           </div>
         </div>
+      ` : `
+        <!-- Barra de Apoio Rápido (Modo Viagem Tradicional / Ilha) -->
+        <div class="bg-white border border-sand-200 rounded-2xl p-3 flex flex-wrap items-center justify-between gap-2 shadow-sm">
+          <div class="flex items-center gap-2 text-xs text-navy-900 font-bold">
+            <span class="w-7 h-7 rounded-lg bg-sky-100 text-sky-800 flex items-center justify-center">🧭</span>
+            <span>${day.timeline.length} Atividade(s) planeada(s)</span>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <button onclick="openCurrentGpsFuelMap()" class="bg-sand-100 hover:bg-sand-200 text-navy-900 font-bold text-[11px] px-2.5 py-1.5 rounded-lg flex items-center gap-1 transition" title="Postos de combustível para viatura alugada">
+              <i data-lucide="fuel" class="w-3.5 h-3.5 text-amber-600"></i>
+              <span>Bombas na Área</span>
+            </button>
+            <button onclick="showMainMobileSection('wallet')" class="bg-navy-900 text-gold-400 font-bold text-[11px] px-2.5 py-1.5 rounded-lg flex items-center gap-1 transition">
+              <i data-lucide="qr-code" class="w-3.5 h-3.5"></i>
+              <span>Bilhetes</span>
+            </button>
+          </div>
+        </div>
+      `;
+
+      container.innerHTML = `
+        ${topStageCardHtml}
 
         <div class="space-y-3">
           ${day.timeline.map((item, idx) => {
@@ -1738,8 +2054,8 @@
                     <span class="inline-flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-md ${badge.color}">
                       <i data-lucide="${badge.icon}" class="w-3 h-3"></i> ${badge.label}
                     </span>
-                    ${legInfo.status === 'danger' ? `<span class="text-[10px] font-extrabold bg-red-600 text-white px-2 py-0.5 rounded-md">⚠️ +${Math.round(legInfo.legKm)} km sem atestar</span>` : ''}
-                    ${legInfo.status === 'warn' ? `<span class="text-[10px] font-bold bg-amber-500 text-navy-900 px-2 py-0.5 rounded-md">⛽ ${Math.round(legInfo.legKm)} km desde depósito</span>` : ''}
+                    ${(isMotoMode && legInfo.status === 'danger') ? `<span class="text-[10px] font-extrabold bg-red-600 text-white px-2 py-0.5 rounded-md">⚠️ +${Math.round(legInfo.legKm)} km sem atestar</span>` : ''}
+                    ${(isMotoMode && legInfo.status === 'warn') ? `<span class="text-[10px] font-bold bg-amber-500 text-navy-900 px-2 py-0.5 rounded-md">⛽ ${Math.round(legInfo.legKm)} km desde depósito</span>` : ''}
                   </div>
                   <span class="text-xs font-bold text-slate-400 shrink-0">${item.km || ''}</span>
                 </div>
@@ -1974,10 +2290,16 @@
         refreshPdfCardsUI();
         refreshTicketBadgesUI();
       } else if (section === 'checklist') {
+        const isMotoCheck = getTripMode(trip) === 'moto';
         container.innerHTML = `
-          <div class="bg-navy-900 text-white rounded-2xl p-4 shadow-md border border-gold-500/30">
-            <h2 class="font-editorial text-lg font-bold text-gold-400">Checklist do Motociclista</h2>
-            <p class="text-xs text-slate-300 mt-0.5">Regra de Ouro: prepara-te para calor, chuva, vento e frio de altitude no mesmo dia.</p>
+          <div class="bg-navy-900 text-white rounded-2xl p-4 shadow-md border border-gold-500/30 flex items-start justify-between gap-2">
+            <div>
+              <h2 class="font-editorial text-lg font-bold text-gold-400">${isMotoCheck ? 'Checklist do Motociclista' : 'Checklist de Viagem & Bagagem'}</h2>
+              <p class="text-xs text-slate-300 mt-0.5">${isMotoCheck ? 'Regra de Ouro: prepara-te para calor, chuva, vento e frio de altitude no mesmo dia.' : 'Documentação, voos, equipamento para trilhos, banhos termais e tecnologia.'}</p>
+            </div>
+            <button onclick="applyChecklistTemplate('${isMotoCheck ? 'leisure' : 'moto'}')" class="shrink-0 bg-navy-800 hover:bg-navy-700 text-gold-400 border border-gold-500/40 text-[10px] font-bold px-2.5 py-1.5 rounded-lg transition" title="Carregar lista base alternativa">
+              ${isMotoCheck ? '✈️ Lista Lazer' : '🏍️ Lista Mota'}
+            </button>
           </div>
 
           ${trip.checklist.map((cat, cIdx) => `
@@ -2074,34 +2396,50 @@
               <span class="text-[11px] font-semibold text-slate-500">${daysWithData}/${trip.days.length} dias registados</span>
             </div>
 
-            <!-- 4 KPIs Principais -->
-            <div class="grid grid-cols-2 gap-2.5">
-              <div class="bg-sand-50 p-3 rounded-xl border border-sand-200">
-                <div class="text-[10px] font-bold uppercase text-slate-500">Quilómetros Reais</div>
-                <div class="text-base font-extrabold text-navy-900 mt-0.5">${realKmTotal.toFixed(0)} <span class="text-xs font-normal text-slate-500">/ ${plannedKmTotal.toFixed(0)} km</span></div>
-                <div class="w-full bg-slate-200 h-1.5 rounded-full mt-2 overflow-hidden">
-                  <div class="bg-emerald-600 h-full rounded-full" style="width: ${kmProgressPct}%"></div>
+            <!-- KPIs Principais Adaptados ao Tipo de Viagem -->
+            ${getTripMode(trip) === 'moto' ? `
+              <div class="grid grid-cols-2 gap-2.5">
+                <div class="bg-sand-50 p-3 rounded-xl border border-sand-200">
+                  <div class="text-[10px] font-bold uppercase text-slate-500">Quilómetros Reais</div>
+                  <div class="text-base font-extrabold text-navy-900 mt-0.5">${realKmTotal.toFixed(0)} <span class="text-xs font-normal text-slate-500">/ ${plannedKmTotal.toFixed(0)} km</span></div>
+                  <div class="w-full bg-slate-200 h-1.5 rounded-full mt-2 overflow-hidden">
+                    <div class="bg-emerald-600 h-full rounded-full" style="width: ${kmProgressPct}%"></div>
+                  </div>
+                </div>
+
+                <div class="bg-sand-50 p-3 rounded-xl border border-sand-200">
+                  <div class="text-[10px] font-bold uppercase text-slate-500">Consumo Médio</div>
+                  <div class="text-base font-extrabold text-navy-900 mt-0.5">${avgConsumption ? avgConsumption + ' L/100' : '—'}</div>
+                  <div class="text-[11px] text-slate-500 mt-1">${totalLiters.toFixed(1)} L abastecidos</div>
+                </div>
+
+                <div class="bg-sand-50 p-3 rounded-xl border border-sand-200">
+                  <div class="text-[10px] font-bold uppercase text-slate-500">Média Diária</div>
+                  <div class="text-base font-extrabold text-navy-900 mt-0.5">${avgCostPerDay} €<span class="text-xs font-normal text-slate-500">/dia</span></div>
+                  <div class="text-[11px] text-slate-500 mt-1">Com base nos dias ativos</div>
+                </div>
+
+                <div class="bg-sand-50 p-3 rounded-xl border border-sand-200">
+                  <div class="text-[10px] font-bold uppercase text-slate-500">Custo por 100 km</div>
+                  <div class="text-base font-extrabold text-navy-900 mt-0.5">${realKmTotal > 0 ? ((totalFuelCost / realKmTotal) * 100).toFixed(2) + ' €' : '—'}</div>
+                  <div class="text-[11px] text-slate-500 mt-1">Apenas combustível</div>
                 </div>
               </div>
+            ` : `
+              <div class="grid grid-cols-2 gap-2.5">
+                <div class="bg-sand-50 p-3 rounded-xl border border-sand-200">
+                  <div class="text-[10px] font-bold uppercase text-slate-500">Total Investido</div>
+                  <div class="text-base font-extrabold text-navy-900 mt-0.5">${grandTotalCost.toFixed(2)} €</div>
+                  <div class="text-[11px] text-slate-500 mt-1">${trip.days.length} dias de roteiro</div>
+                </div>
 
-              <div class="bg-sand-50 p-3 rounded-xl border border-sand-200">
-                <div class="text-[10px] font-bold uppercase text-slate-500">Consumo Médio</div>
-                <div class="text-base font-extrabold text-navy-900 mt-0.5">${avgConsumption ? avgConsumption + ' L/100' : '—'}</div>
-                <div class="text-[11px] text-slate-500 mt-1">${totalLiters.toFixed(1)} L abastecidos</div>
+                <div class="bg-sand-50 p-3 rounded-xl border border-sand-200">
+                  <div class="text-[10px] font-bold uppercase text-slate-500">Média Diária</div>
+                  <div class="text-base font-extrabold text-navy-900 mt-0.5">${avgCostPerDay} €<span class="text-xs font-normal text-slate-500">/dia</span></div>
+                  <div class="text-[11px] text-slate-500 mt-1">Nos dias com registo</div>
+                </div>
               </div>
-
-              <div class="bg-sand-50 p-3 rounded-xl border border-sand-200">
-                <div class="text-[10px] font-bold uppercase text-slate-500">Média Diária</div>
-                <div class="text-base font-extrabold text-navy-900 mt-0.5">${avgCostPerDay} €<span class="text-xs font-normal text-slate-500">/dia</span></div>
-                <div class="text-[11px] text-slate-500 mt-1">Com base nos dias ativos</div>
-              </div>
-
-              <div class="bg-sand-50 p-3 rounded-xl border border-sand-200">
-                <div class="text-[10px] font-bold uppercase text-slate-500">Custo por 100 km</div>
-                <div class="text-base font-extrabold text-navy-900 mt-0.5">${realKmTotal > 0 ? ((totalFuelCost / realKmTotal) * 100).toFixed(2) + ' €' : '—'}</div>
-                <div class="text-[11px] text-slate-500 mt-1">Apenas combustível</div>
-              </div>
-            </div>
+            `}
 
             <!-- Distribuição Financeira por Categoria -->
             <div class="pt-2 border-t border-slate-100 space-y-2">
@@ -2118,7 +2456,7 @@
                 <div class="flex items-center gap-1.5">
                   <span class="w-2.5 h-2.5 rounded-full bg-amber-500 shrink-0"></span>
                   <div>
-                    <div class="text-slate-500">Combustível</div>
+                    <div class="text-slate-500">${getTripMode(trip) === "moto" ? "Combustível" : "Transportes/Carro"}</div>
                     <div class="font-bold text-navy-900">${totalFuelCost.toFixed(2)} €</div>
                   </div>
                 </div>
@@ -2165,7 +2503,7 @@
 
             <div class="grid grid-cols-3 gap-2">
               <div>
-                <label class="block text-[10px] font-bold uppercase text-amber-700 mb-1">Combust. (€)</label>
+                <label class="block text-[10px] font-bold uppercase text-amber-700 mb-1">${getTripMode(trip) === "moto" ? "Combust. (€)" : "Transp./Carro (€)"}</label>
                 <input type="number" step="0.5" value="${log.fuelCost}" onchange="updateDiary('${day.dayNumber}', 'fuelCost', this.value)" placeholder="0.00" class="w-full text-xs px-2.5 py-2 rounded-xl border border-amber-200 bg-amber-50/30" />
               </div>
               <div>
@@ -2222,6 +2560,15 @@
       appState.checkedItems[key] = !appState.checkedItems[key];
       saveState();
       renderGlobalSection('checklist');
+    }
+
+    function applyChecklistTemplate(templateType) {
+      if (!confirm('Substituir a checklist atual desta viagem pelo modelo ' + (templateType === 'moto' ? 'de Motociclista' : 'de Viagem Tradicional') + '?')) return;
+      appState.tripData.checklist = cloneObj(templateType === 'moto' ? DEFAULT_TRIP_DATA.checklist : DEFAULT_LEISURE_CHECKLIST);
+      appState.checkedItems = {};
+      saveState();
+      renderGlobalSection('checklist');
+      refreshIcons();
     }
 
     function selectDayForDiary(idxStr) {
@@ -2368,10 +2715,19 @@
             }">
               <div>
                 <div class="flex items-center justify-between gap-2">
-                  ${isActive
-                    ? '<span class="text-[10px] font-extrabold uppercase bg-gold-500 text-navy-900 px-2 py-0.5 rounded-full">✓ Viagem Ativa</span>'
-                    : '<span class="text-[10px] font-semibold uppercase bg-slate-700 text-slate-300 px-2 py-0.5 rounded-full">Guardada</span>'
-                  }
+                  <div class="flex items-center gap-1.5">
+                    ${isActive
+                      ? '<span class="text-[10px] font-extrabold uppercase bg-gold-500 text-navy-900 px-2 py-0.5 rounded-full">✓ Ativa</span>'
+                      : '<span class="text-[10px] font-semibold uppercase bg-slate-700 text-slate-300 px-2 py-0.5 rounded-full">Guardada</span>'
+                    }
+                    <button onclick="toggleTripType('${rec.id}')" title="Clique para alternar entre Mota e Viagem Tradicional" class="text-[10px] font-bold px-2 py-0.5 rounded-full border transition ${
+                      getTripMode(td) === 'moto'
+                        ? 'bg-amber-500/20 text-amber-300 border-amber-400/40 hover:bg-amber-500/30'
+                        : 'bg-sky-500/20 text-sky-300 border-sky-400/40 hover:bg-sky-500/30'
+                    }">
+                      ${getTripMode(td) === 'moto' ? '🏍️ Mota' : '✈️ Tradicional'}
+                    </button>
+                  </div>
                   <span class="text-[10px] text-slate-400">${rec.updatedAt || ''}</span>
                 </div>
                 <h3 class="font-editorial font-bold text-base text-white mt-2 truncate" title="${escapeAttr(td.title)}">${td.title}</h3>
@@ -2560,7 +2916,10 @@
       const list = document.getElementById('ed-timeline-list');
 
       const typeOptions = [
-        { val: 'ride', label: 'Estrada' },
+        { val: 'ride', label: 'Estrada / Carro' },
+        { val: 'flight', label: 'Voo / Ferry' },
+        { val: 'beach', label: 'Praia / Termas' },
+        { val: 'trail', label: 'Trilho / Natureza' },
         { val: 'fuel', label: 'Combustível' },
         { val: 'coffee', label: 'Pausa / Café' },
         { val: 'food', label: 'Refeição' },
