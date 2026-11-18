@@ -1,18 +1,32 @@
 {
+  "id": "./index.html",
   "name": "MOTOATLAS — Planeador & Guia Cultural em Duas Rodas",
   "short_name": "MOTOATLAS",
-  "description": "Biblioteca de expedições de mota, navegação GPS offline, diário financeiro e guia cultural.",
+  "description": "Biblioteca de expedições de mota, navegação GPS offline, cofre PDF, GPX e diário financeiro.",
   "start_url": "./index.html",
+  "scope": "./",
   "display": "standalone",
   "background_color": "#0B1120",
   "theme_color": "#0B1120",
-  "orientation": "portrait",
+  "orientation": "any",
   "icons": [
     {
-      "src": "icon-512.png",
+      "src": "./icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "./icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ]
 }

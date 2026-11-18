@@ -1,6 +1,7 @@
-# MOTOATLAS — Planeador, Telemetria & Guia Cultural em Duas Rodas (v3.5)
+# MOTOATLAS — Planeador, Telemetria, GPX & Guia Cultural em Duas Rodas (v3.7)
 
+Aplicação PWA instalável em **iPhone/iPad (iOS)**, **Android** e **Windows (Chrome / Edge)**.
 Inclui:
-- **Cofre Offline de Ficheiros PDF (IndexedDB)**: armazena o PDF do roteiro (versão de impressão) localmente por expedição para consulta imediata e download sem internet.
-- **Gerador de Caderno de Estrada para Imprimir**: exporta qualquer expedição para uma vista limpa pronta a imprimir ou guardar em PDF.
-- **Identidade MOTOATLAS (`icon-512.png`)**, **Telemetria Financeira**, **Garagem Multi-Viagens** e **Editor Visual**.
+- Ícones oficiais detalhados `./icon-192.png` e `./icon-512.png` + fallback embutido para carregamento instantâneo.
+- Botão **Instalar App** no cabeçalho com suporte nativo `beforeinstallprompt` (Windows/Android) e guia visual (iOS).
+- Garagem Multi-Viagens, Editor Visual, Cofre PDF Offline (IndexedDB), Exportação GPX 1.1 e Telemetria Financeira.
