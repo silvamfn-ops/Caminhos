@@ -1,8 +1,9 @@
-const CACHE_NAME = 'motoatlas-v3.2';
+const CACHE_NAME = 'motoatlas-v3.5';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
-  './manifest.json'
+  './manifest.json',
+  './icon-512.png'
 ];
 
 self.addEventListener('install', (event) => {

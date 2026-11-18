@@ -9,6 +9,8 @@
   <meta name="theme-color" content="#0F172A" />
   <title>MOTOATLAS — Planeador & Guia Cultural em Duas Rodas</title>
   <link rel="manifest" href="manifest.json" />
+  <link rel="icon" type="image/png" href="icon-512.png" />
+  <link rel="apple-touch-icon" href="icon-512.png" />
   
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -63,9 +65,7 @@
   <header class="bg-navy-900 text-white sticky top-0 z-50 border-b border-gold-500/30 shadow-lg">
     <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between gap-2">
       <div class="flex items-center gap-3 min-w-0">
-        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-gold-400 to-gold-600 flex items-center justify-center text-navy-900 shadow-md shrink-0">
-          <i data-lucide="compass" class="w-6 h-6 stroke-[2.2]"></i>
-        </div>
+        <img src="icon-512.png" alt="MOTOATLAS" class="w-10 h-10 rounded-xl object-cover border border-gold-500/50 shadow-md shrink-0" />
         <div class="min-w-0">
           <div class="flex items-center gap-2">
             <h1 class="font-editorial text-base sm:text-lg font-bold tracking-widest text-gold-400 leading-tight shrink-0" id="app-brand">MOTOATLAS</h1>
@@ -135,7 +135,7 @@
         </button>
         <button onclick="showMainMobileSection('wallet')" id="nav-wallet" class="flex flex-col items-center justify-center gap-1 py-1 hover:text-white">
           <i data-lucide="ticket" class="w-5 h-5"></i>
-          <span class="text-[10px] font-semibold">Bilhetes & ZBE</span>
+          <span class="text-[10px] font-semibold">Cofre & PDF</span>
         </button>
         <button onclick="showMainMobileSection('checklist')" id="nav-checklist" class="flex flex-col items-center justify-center gap-1 py-1 hover:text-white">
           <i data-lucide="check-square" class="w-5 h-5"></i>
@@ -155,7 +155,7 @@
     <div class="bg-navy-900 text-white rounded-2xl p-6 shadow-md border border-gold-500/30 space-y-4">
       <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <span class="text-[11px] font-bold uppercase tracking-wider text-gold-400 bg-gold-500/20 px-2.5 py-1 rounded-full border border-gold-500/30">MOTOATLAS • Garagem & Editor Visual de Expedições (v3.2)</span>
+          <span class="text-[11px] font-bold uppercase tracking-wider text-gold-400 bg-gold-500/20 px-2.5 py-1 rounded-full border border-gold-500/30">MOTOATLAS • Garagem, Editor Visual, Cofre PDF & Telemetria (v3.5)</span>
           <h2 class="font-editorial text-xl sm:text-2xl font-bold text-white mt-2">As Minhas Viagens Guardadas</h2>
           <p class="text-xs text-slate-300 mt-1">Gere várias expedições em simultâneo. Cada viagem mantém os seus próprios dias, bilhetes, checklist e diário de bordo offline.</p>
         </div>
@@ -300,11 +300,45 @@
 
     <!-- Bilhetes + Tabela -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      <div class="bg-white rounded-2xl p-5 shadow-sm border border-sand-200">
-        <h3 class="font-bold text-base text-navy-900 flex items-center gap-2">
-          <i data-lucide="qr-code" class="w-4 h-4 text-gold-600"></i>
-          <span>Adicionar Reserva / Bilhete</span>
-        </h3>
+      <div class="space-y-5">
+        <!-- Cartão PDF do Roteiro (IndexedDB Offline) -->
+        <div class="bg-navy-900 text-white rounded-2xl p-5 shadow-md border border-gold-500/40 space-y-3">
+          <div class="flex items-start justify-between gap-2">
+            <div>
+              <span class="text-[10px] font-bold uppercase tracking-wider text-gold-400">Documento Offline</span>
+              <h3 class="font-bold text-base text-white flex items-center gap-2 mt-0.5">
+                <i data-lucide="file-text" class="w-4 h-4 text-gold-400"></i>
+                <span>PDF do Roteiro (Impressão)</span>
+              </h3>
+            </div>
+            <button onclick="openPrintSummaryWindow()" title="Gerar vista formatada para imprimir" class="bg-navy-800 hover:bg-navy-700 text-gold-400 border border-gold-500/30 text-[11px] font-bold px-2.5 py-1.5 rounded-lg flex items-center gap-1 transition">
+              <i data-lucide="printer" class="w-3.5 h-3.5"></i>
+              <span>Imprimir</span>
+            </button>
+          </div>
+          <p class="text-xs text-slate-300 leading-relaxed">
+            Guarda o ficheiro <strong>.PDF</strong> desta expedição no cofre offline do navegador para consulta e download sem internet.
+          </p>
+
+          <div id="desktop-pdf-status" class="bg-navy-800/90 border border-slate-700 rounded-xl p-3 text-xs">
+            <span class="text-slate-400">A verificar documento guardado...</span>
+          </div>
+
+          <div class="flex flex-wrap gap-2">
+            <label class="flex-1 inline-flex items-center justify-center gap-1.5 bg-gold-500 hover:bg-gold-400 text-navy-900 font-extrabold text-xs px-3 py-2.5 rounded-xl shadow cursor-pointer transition">
+              <i data-lucide="upload" class="w-4 h-4"></i>
+              <span>Anexar / Substituir PDF</span>
+              <input type="file" accept="application/pdf,.pdf" class="hidden" onchange="handlePdfUpload(event)" />
+            </label>
+          </div>
+        </div>
+
+        <!-- Cartão Adicionar Reserva / Bilhete -->
+        <div class="bg-white rounded-2xl p-5 shadow-sm border border-sand-200">
+          <h3 class="font-bold text-base text-navy-900 flex items-center gap-2">
+            <i data-lucide="qr-code" class="w-4 h-4 text-gold-600"></i>
+            <span>Adicionar Reserva / Bilhete</span>
+          </h3>
         <p class="text-xs text-slate-500 mt-1">Guarda códigos de entrada ou hotéis no cofre offline.</p>
         <form onsubmit="addNewTicket(event)" class="mt-4 space-y-2.5">
           <input type="text" id="ticket-title" required placeholder="Ex: Alhambra - Palácios Nasridas" class="w-full text-xs px-3 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:border-gold-500" />
@@ -315,6 +349,7 @@
             + Guardar no Cofre Offline
           </button>
         </form>
+        </div>
       </div>
 
       <div class="lg:col-span-2 bg-white rounded-2xl p-5 shadow-sm border border-sand-200">
@@ -1117,6 +1152,7 @@
       if (!confirm(`Eliminar permanentemente a viagem "${target.tripData.title}"?`)) return;
 
       appState.trips = appState.trips.filter(t => t.id !== tripId);
+      deleteTripPdfRecord(tripId).catch(() => {});
       if (appState.activeTripId === tripId) {
         appState.activeTripId = appState.trips[0].id;
         appState.currentDayIdx = 0;
@@ -1518,8 +1554,30 @@
       if (section === 'wallet') {
         container.innerHTML = `
           <div class="bg-navy-900 text-white rounded-2xl p-4 shadow-md border border-gold-500/30">
-            <h2 class="font-editorial text-lg font-bold text-gold-400">Cofre de Bilhetes & Emergência</h2>
-            <p class="text-xs text-slate-300 mt-0.5">Acesso rápido offline nas bilheteiras e contactos em Espanha.</p>
+            <h2 class="font-editorial text-lg font-bold text-gold-400">Cofre de Roteiro PDF, Bilhetes & Emergência</h2>
+            <p class="text-xs text-slate-300 mt-0.5">Documento oficial para imprimir, reservas offline e contactos de emergência.</p>
+          </div>
+
+          <!-- Cartão PDF do Roteiro no Telemóvel -->
+          <div class="bg-white rounded-2xl p-4 shadow-sm border-2 border-gold-500/40 space-y-3">
+            <div class="flex items-start justify-between gap-2">
+              <div class="flex items-center gap-2.5">
+                <div class="w-10 h-10 rounded-xl bg-navy-900 text-gold-400 flex items-center justify-center shrink-0">
+                  <i data-lucide="file-text" class="w-5 h-5"></i>
+                </div>
+                <div>
+                  <span class="text-[10px] font-bold uppercase tracking-wider text-gold-600">Roteiro Completo (Versão Impressão)</span>
+                  <h3 class="font-bold text-sm text-navy-900">Ficheiro PDF da Expedição</h3>
+                </div>
+              </div>
+              <button onclick="openPrintSummaryWindow()" class="bg-sand-100 hover:bg-sand-200 text-navy-900 font-bold text-[11px] px-2.5 py-1.5 rounded-lg flex items-center gap-1 shrink-0">
+                <i data-lucide="printer" class="w-3.5 h-3.5"></i> Imprimir
+              </button>
+            </div>
+
+            <div id="mobile-pdf-status" class="text-xs text-slate-600 bg-sand-50 p-3 rounded-xl border border-sand-200">
+              A verificar ficheiro PDF guardado...
+            </div>
           </div>
 
           <div class="bg-red-50 border border-red-200 rounded-2xl p-4">
@@ -1557,6 +1615,7 @@
             `).join('')}
           </div>
         `;
+        refreshPdfCardsUI();
       } else if (section === 'checklist') {
         container.innerHTML = `
           <div class="bg-navy-900 text-white rounded-2xl p-4 shadow-md border border-gold-500/30">
@@ -1584,31 +1643,218 @@
         `;
       } else if (section === 'diary') {
         const day = trip.days[appState.currentDayIdx];
-        const log = appState.diaryLogs[day.dayNumber] || { km: '', fuel: '', expense: '', notes: '' };
+        const rawLog = appState.diaryLogs[day.dayNumber] || {};
+        const log = {
+          km: rawLog.km || '',
+          fuel: rawLog.fuel || '',
+          fuelCost: rawLog.fuelCost || rawLog.expense || '',
+          hotelCost: rawLog.hotelCost || '',
+          foodCost: rawLog.foodCost || '',
+          notes: rawLog.notes || ''
+        };
+
+        // Calcular estatísticas globais de toda a expedição
+        let plannedKmTotal = 0;
+        let realKmTotal = 0;
+        let totalLiters = 0;
+        let totalFuelCost = 0;
+        let totalHotelCost = 0;
+        let totalFoodCost = 0;
+        let daysWithData = 0;
+
+        trip.days.forEach(d => {
+          const pm = String(d.distance || '').match(/(\d+(?:[.,]\d+)?)/);
+          if (pm) plannedKmTotal += parseFloat(pm[1].replace(',', '.'));
+
+          const dl = appState.diaryLogs[d.dayNumber];
+          if (dl) {
+            const k = parseFloat(dl.km) || 0;
+            const l = parseFloat(dl.fuel) || 0;
+            const fc = parseFloat(dl.fuelCost !== undefined ? dl.fuelCost : dl.expense) || 0;
+            const hc = parseFloat(dl.hotelCost) || 0;
+            const oc = parseFloat(dl.foodCost) || 0;
+
+            if (k > 0 || l > 0 || fc > 0 || hc > 0 || oc > 0) daysWithData++;
+            realKmTotal += k;
+            totalLiters += l;
+            totalFuelCost += fc;
+            totalHotelCost += hc;
+            totalFoodCost += oc;
+          }
+        });
+
+        const grandTotalCost = totalFuelCost + totalHotelCost + totalFoodCost;
+        const avgConsumption = (realKmTotal > 0 && totalLiters > 0) ? ((totalLiters / realKmTotal) * 100).toFixed(2) : null;
+        const avgCostPerDay = daysWithData > 0 ? (grandTotalCost / daysWithData).toFixed(2) : '0.00';
+        const kmProgressPct = plannedKmTotal > 0 ? Math.min(100, Math.round((realKmTotal / plannedKmTotal) * 100)) : 0;
+
+        // Percentagens para barra de distribuição de despesas
+        const fuelPct = grandTotalCost > 0 ? Math.round((totalFuelCost / grandTotalCost) * 100) : 0;
+        const hotelPct = grandTotalCost > 0 ? Math.round((totalHotelCost / grandTotalCost) * 100) : 0;
+        const foodPct = grandTotalCost > 0 ? Math.max(0, 100 - fuelPct - hotelPct) : 0;
+
         container.innerHTML = `
-          <div class="bg-navy-900 text-white rounded-2xl p-4 shadow-md border border-gold-500/30">
-            <h2 class="font-editorial text-lg font-bold text-gold-400">Diário de Bordo • Dia ${day.dayNumber}</h2>
-            <p class="text-xs text-slate-300 mt-0.5">${day.route} (Guardado offline no telemóvel)</p>
+          <!-- Cabeçalho do Diário -->
+          <div class="bg-navy-900 text-white rounded-2xl p-4 shadow-md border border-gold-500/30 flex items-center justify-between gap-3">
+            <div>
+              <span class="text-[10px] font-bold uppercase tracking-widest text-gold-400">MOTOATLAS • Telemetria & Finanças</span>
+              <h2 class="font-editorial text-lg font-bold text-white mt-0.5">Resumo Financeiro & Diário</h2>
+              <p class="text-xs text-slate-300 mt-0.5">${trip.title} • ${trip.days.length} Etapas</p>
+            </div>
+            <div class="text-right bg-navy-800 px-3 py-2 rounded-xl border border-gold-500/30 shrink-0">
+              <div class="text-[10px] uppercase text-slate-400 font-bold">Total Gasto</div>
+              <div class="text-base font-extrabold text-gold-400">${grandTotalCost.toFixed(2)} €</div>
+            </div>
           </div>
 
-          <div class="bg-white rounded-2xl p-4 shadow-sm border border-sand-200 space-y-3">
-            <div class="grid grid-cols-3 gap-2">
-              <div>
-                <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Km Reais</label>
-                <input type="number" value="${log.km}" onchange="updateDiary('${day.dayNumber}', 'km', this.value)" placeholder="Ex: 515" class="w-full text-xs px-3 py-2 rounded-xl border border-slate-300" />
+          <!-- Painel de Estatísticas Globais da Expedição -->
+          <div class="bg-white rounded-2xl p-4 shadow-sm border border-sand-200 space-y-4">
+            <div class="flex items-center justify-between">
+              <h3 class="text-xs font-extrabold uppercase tracking-wider text-navy-900 flex items-center gap-1.5">
+                <i data-lucide="bar-chart-3" class="w-4 h-4 text-gold-600"></i>
+                <span>Estatísticas Acumuladas da Viagem</span>
+              </h3>
+              <span class="text-[11px] font-semibold text-slate-500">${daysWithData}/${trip.days.length} dias registados</span>
+            </div>
+
+            <!-- 4 KPIs Principais -->
+            <div class="grid grid-cols-2 gap-2.5">
+              <div class="bg-sand-50 p-3 rounded-xl border border-sand-200">
+                <div class="text-[10px] font-bold uppercase text-slate-500">Quilómetros Reais</div>
+                <div class="text-base font-extrabold text-navy-900 mt-0.5">${realKmTotal.toFixed(0)} <span class="text-xs font-normal text-slate-500">/ ${plannedKmTotal.toFixed(0)} km</span></div>
+                <div class="w-full bg-slate-200 h-1.5 rounded-full mt-2 overflow-hidden">
+                  <div class="bg-emerald-600 h-full rounded-full" style="width: ${kmProgressPct}%"></div>
+                </div>
               </div>
-              <div>
-                <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Litros Comb.</label>
-                <input type="number" step="0.1" value="${log.fuel}" onchange="updateDiary('${day.dayNumber}', 'fuel', this.value)" placeholder="Ex: 18.5" class="w-full text-xs px-3 py-2 rounded-xl border border-slate-300" />
+
+              <div class="bg-sand-50 p-3 rounded-xl border border-sand-200">
+                <div class="text-[10px] font-bold uppercase text-slate-500">Consumo Médio</div>
+                <div class="text-base font-extrabold text-navy-900 mt-0.5">${avgConsumption ? avgConsumption + ' L/100' : '—'}</div>
+                <div class="text-[11px] text-slate-500 mt-1">${totalLiters.toFixed(1)} L abastecidos</div>
               </div>
-              <div>
-                <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Despesas (€)</label>
-                <input type="number" step="0.5" value="${log.expense}" onchange="updateDiary('${day.dayNumber}', 'expense', this.value)" placeholder="Ex: 85" class="w-full text-xs px-3 py-2 rounded-xl border border-slate-300" />
+
+              <div class="bg-sand-50 p-3 rounded-xl border border-sand-200">
+                <div class="text-[10px] font-bold uppercase text-slate-500">Média Diária</div>
+                <div class="text-base font-extrabold text-navy-900 mt-0.5">${avgCostPerDay} €<span class="text-xs font-normal text-slate-500">/dia</span></div>
+                <div class="text-[11px] text-slate-500 mt-1">Com base nos dias ativos</div>
+              </div>
+
+              <div class="bg-sand-50 p-3 rounded-xl border border-sand-200">
+                <div class="text-[10px] font-bold uppercase text-slate-500">Custo por 100 km</div>
+                <div class="text-base font-extrabold text-navy-900 mt-0.5">${realKmTotal > 0 ? ((totalFuelCost / realKmTotal) * 100).toFixed(2) + ' €' : '—'}</div>
+                <div class="text-[11px] text-slate-500 mt-1">Apenas combustível</div>
               </div>
             </div>
+
+            <!-- Distribuição Financeira por Categoria -->
+            <div class="pt-2 border-t border-slate-100 space-y-2">
+              <div class="flex items-center justify-between text-[11px] font-bold text-slate-600">
+                <span>Distribuição de Despesas</span>
+                <span>${grandTotalCost.toFixed(2)} €</span>
+              </div>
+              <div class="w-full h-2.5 rounded-full bg-slate-100 overflow-hidden flex">
+                <div class="bg-amber-500 h-full" style="width: ${fuelPct}%" title="Combustível"></div>
+                <div class="bg-indigo-600 h-full" style="width: ${hotelPct}%" title="Alojamento"></div>
+                <div class="bg-emerald-600 h-full" style="width: ${foodPct}%" title="Refeições & Outros"></div>
+              </div>
+              <div class="grid grid-cols-3 gap-2 text-[11px] pt-1">
+                <div class="flex items-center gap-1.5">
+                  <span class="w-2.5 h-2.5 rounded-full bg-amber-500 shrink-0"></span>
+                  <div>
+                    <div class="text-slate-500">Combustível</div>
+                    <div class="font-bold text-navy-900">${totalFuelCost.toFixed(2)} €</div>
+                  </div>
+                </div>
+                <div class="flex items-center gap-1.5">
+                  <span class="w-2.5 h-2.5 rounded-full bg-indigo-600 shrink-0"></span>
+                  <div>
+                    <div class="text-slate-500">Alojamento</div>
+                    <div class="font-bold text-navy-900">${totalHotelCost.toFixed(2)} €</div>
+                  </div>
+                </div>
+                <div class="flex items-center gap-1.5">
+                  <span class="w-2.5 h-2.5 rounded-full bg-emerald-600 shrink-0"></span>
+                  <div>
+                    <div class="text-slate-500">Refeições/Outros</div>
+                    <div class="font-bold text-navy-900">${totalFoodCost.toFixed(2)} €</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Seletor Rápido do Dia a Registar -->
+          <div class="bg-white rounded-2xl p-4 shadow-sm border border-sand-200 space-y-3">
+            <div class="flex items-center justify-between gap-2 border-b border-slate-100 pb-2.5">
+              <div>
+                <span class="text-[10px] font-bold uppercase text-gold-600">Registo da Etapa</span>
+                <h3 class="font-bold text-sm text-navy-900">Dia ${day.dayNumber} • ${day.route}</h3>
+              </div>
+              <select onchange="selectDayForDiary(this.value)" class="text-xs font-bold bg-navy-900 text-gold-400 px-2.5 py-1.5 rounded-xl">
+                ${trip.days.map((d, i) => `<option value="${i}" ${i === appState.currentDayIdx ? 'selected' : ''}>Dia ${d.dayNumber}</option>`).join('')}
+              </select>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2.5">
+              <div>
+                <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Km Percorridos (Real)</label>
+                <input type="number" step="1" value="${log.km}" onchange="updateDiary('${day.dayNumber}', 'km', this.value)" placeholder="Plan: ${day.distance}" class="w-full text-xs font-bold px-3 py-2 rounded-xl border border-slate-300" />
+              </div>
+              <div>
+                <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Combustível (Litros)</label>
+                <input type="number" step="0.1" value="${log.fuel}" onchange="updateDiary('${day.dayNumber}', 'fuel', this.value)" placeholder="Ex: 16.4" class="w-full text-xs font-bold px-3 py-2 rounded-xl border border-slate-300" />
+              </div>
+            </div>
+
+            <div class="grid grid-cols-3 gap-2">
+              <div>
+                <label class="block text-[10px] font-bold uppercase text-amber-700 mb-1">Combust. (€)</label>
+                <input type="number" step="0.5" value="${log.fuelCost}" onchange="updateDiary('${day.dayNumber}', 'fuelCost', this.value)" placeholder="0.00" class="w-full text-xs px-2.5 py-2 rounded-xl border border-amber-200 bg-amber-50/30" />
+              </div>
+              <div>
+                <label class="block text-[10px] font-bold uppercase text-indigo-700 mb-1">Hotel (€)</label>
+                <input type="number" step="0.5" value="${log.hotelCost}" onchange="updateDiary('${day.dayNumber}', 'hotelCost', this.value)" placeholder="0.00" class="w-full text-xs px-2.5 py-2 rounded-xl border border-indigo-200 bg-indigo-50/30" />
+              </div>
+              <div>
+                <label class="block text-[10px] font-bold uppercase text-emerald-700 mb-1">Comida/Outros (€)</label>
+                <input type="number" step="0.5" value="${log.foodCost}" onchange="updateDiary('${day.dayNumber}', 'foodCost', this.value)" placeholder="0.00" class="w-full text-xs px-2.5 py-2 rounded-xl border border-emerald-200 bg-emerald-50/30" />
+              </div>
+            </div>
+
             <div>
               <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Notas & Memórias da Etapa</label>
-              <textarea rows="4" onchange="updateDiary('${day.dayNumber}', 'notes', this.value)" placeholder="Regista restaurantes descobertos, estado das estradas ou melhores fotos..." class="w-full text-xs p-3 rounded-xl border border-slate-300">${log.notes}</textarea>
+              <textarea rows="3" onchange="updateDiary('${day.dayNumber}', 'notes', this.value)" placeholder="Regista restaurantes descobertos, estado das estradas ou melhores fotos..." class="w-full text-xs p-3 rounded-xl border border-slate-300">${log.notes}</textarea>
+            </div>
+          </div>
+
+          <!-- Tabela Resumo por Etapa -->
+          <div class="bg-white rounded-2xl p-4 shadow-sm border border-sand-200">
+            <h3 class="text-xs font-extrabold uppercase tracking-wider text-navy-900 mb-2.5">Detalhe por Etapa</h3>
+            <div class="overflow-x-auto">
+              <table class="w-full text-left border-collapse text-[11px]">
+                <thead>
+                  <tr class="border-b border-slate-200 text-slate-400 uppercase">
+                    <th class="py-1.5">Dia</th>
+                    <th class="py-1.5">Km</th>
+                    <th class="py-1.5">Litros</th>
+                    <th class="py-1.5 text-right">Total (€)</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                  ${trip.days.map((d, idx) => {
+                    const dl = appState.diaryLogs[d.dayNumber] || {};
+                    const dCost = (parseFloat(dl.fuelCost !== undefined ? dl.fuelCost : dl.expense) || 0) + (parseFloat(dl.hotelCost) || 0) + (parseFloat(dl.foodCost) || 0);
+                    return `
+                      <tr onclick="selectDayForDiary(${idx})" class="cursor-pointer ${idx === appState.currentDayIdx ? 'bg-amber-50 font-bold' : 'hover:bg-slate-50'}">
+                        <td class="py-2 text-navy-900">Dia ${d.dayNumber}</td>
+                        <td class="py-2 text-slate-600">${dl.km ? dl.km + ' km' : '—'}</td>
+                        <td class="py-2 text-slate-600">${dl.fuel ? dl.fuel + ' L' : '—'}</td>
+                        <td class="py-2 text-right font-semibold text-navy-900">${dCost > 0 ? dCost.toFixed(2) + ' €' : '—'}</td>
+                      </tr>
+                    `;
+                  }).join('')}
+                </tbody>
+              </table>
             </div>
           </div>
         `;
@@ -1621,10 +1867,19 @@
       renderGlobalSection('checklist');
     }
 
+    function selectDayForDiary(idxStr) {
+      appState.currentDayIdx = parseInt(idxStr, 10) || 0;
+      saveState();
+      renderGlobalSection('diary');
+      refreshIcons();
+    }
+
     function updateDiary(dayNum, field, val) {
       if (!appState.diaryLogs[dayNum]) appState.diaryLogs[dayNum] = {};
       appState.diaryLogs[dayNum][field] = val;
       saveState();
+      renderGlobalSection('diary');
+      refreshIcons();
     }
 
     function openTicketModal(id) {
@@ -1741,6 +1996,7 @@
           </tr>
         `;
       }).join('');
+      refreshPdfCardsUI();
       refreshIcons();
     }
 
@@ -2942,6 +3198,292 @@
         refreshIcons();
         alert('"Caminhos do Sul" restaurada na sua biblioteca!');
       }
+    }
+
+
+    // =====================================================================
+    // MOTOR INDEXEDDB PARA ARMAZENAMENTO OFFLINE DE PDF POR EXPEDIÇÃO
+    // =====================================================================
+    const PDF_DB_NAME = 'MotoAtlasPdfVaultDB';
+    const PDF_STORE_NAME = 'tripPdfs';
+
+    function openPdfDB() {
+      return new Promise((resolve, reject) => {
+        if (!window.indexedDB) {
+          reject(new Error('IndexedDB não suportado neste navegador.'));
+          return;
+        }
+        const req = indexedDB.open(PDF_DB_NAME, 1);
+        req.onupgradeneeded = (e) => {
+          const db = e.target.result;
+          if (!db.objectStoreNames.contains(PDF_STORE_NAME)) {
+            db.createObjectStore(PDF_STORE_NAME, { keyPath: 'tripId' });
+          }
+        };
+        req.onsuccess = () => resolve(req.result);
+        req.onerror = () => reject(req.error);
+      });
+    }
+
+    async function saveTripPdfRecord(tripId, fileName, blob) {
+      const db = await openPdfDB();
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction(PDF_STORE_NAME, 'readwrite');
+        const store = tx.objectStore(PDF_STORE_NAME);
+        store.put({
+          tripId: tripId,
+          fileName: fileName,
+          fileSize: blob.size,
+          updatedAt: new Date().toISOString().slice(0, 10),
+          blob: blob
+        });
+        tx.oncomplete = () => resolve();
+        tx.onerror = () => reject(tx.error);
+      });
+    }
+
+    async function getTripPdfRecord(tripId) {
+      try {
+        const db = await openPdfDB();
+        return new Promise((resolve, reject) => {
+          const tx = db.transaction(PDF_STORE_NAME, 'readonly');
+          const store = tx.objectStore(PDF_STORE_NAME);
+          const req = store.get(tripId);
+          req.onsuccess = () => resolve(req.result || null);
+          req.onerror = () => reject(req.error);
+        });
+      } catch (e) {
+        return null;
+      }
+    }
+
+    async function deleteTripPdfRecord(tripId) {
+      const db = await openPdfDB();
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction(PDF_STORE_NAME, 'readwrite');
+        const store = tx.objectStore(PDF_STORE_NAME);
+        store.delete(tripId);
+        tx.oncomplete = () => resolve();
+        tx.onerror = () => reject(tx.error);
+      });
+    }
+
+    function formatBytes(bytes) {
+      if (!bytes) return '0 KB';
+      const kb = bytes / 1024;
+      if (kb < 1024) return `${Math.round(kb)} KB`;
+      return `${(kb / 1024).toFixed(2)} MB`;
+    }
+
+    async function handlePdfUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      try {
+        await saveTripPdfRecord(appState.activeTripId, file.name, file);
+        await refreshPdfCardsUI();
+        alert(`Ficheiro "${file.name}" (${formatBytes(file.size)}) guardado no cofre offline desta expedição!`);
+      } catch (err) {
+        alert('Erro ao guardar o PDF: ' + err.message);
+      }
+      event.target.value = '';
+    }
+
+    async function viewStoredPdf() {
+      const rec = await getTripPdfRecord(appState.activeTripId);
+      if (!rec || !rec.blob) {
+        alert('Nenhum ficheiro PDF anexado a esta viagem.');
+        return;
+      }
+      const blobUrl = URL.createObjectURL(rec.blob);
+      window.open(blobUrl, '_blank');
+    }
+
+    async function downloadStoredPdf() {
+      const rec = await getTripPdfRecord(appState.activeTripId);
+      if (!rec || !rec.blob) {
+        alert('Nenhum ficheiro PDF anexado a esta viagem.');
+        return;
+      }
+      const blobUrl = URL.createObjectURL(rec.blob);
+      const a = document.createElement('a');
+      a.href = blobUrl;
+      a.download = rec.fileName || 'roteiro_motoatlas.pdf';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(blobUrl), 5000);
+    }
+
+    async function removeStoredPdf() {
+      if (!confirm('Remover o ficheiro PDF guardado desta viagem?')) return;
+      await deleteTripPdfRecord(appState.activeTripId);
+      await refreshPdfCardsUI();
+    }
+
+    async function refreshPdfCardsUI() {
+      const rec = await getTripPdfRecord(appState.activeTripId);
+      const desktopBox = document.getElementById('desktop-pdf-status');
+      const mobileBox = document.getElementById('mobile-pdf-status');
+
+      if (desktopBox) {
+        if (rec) {
+          desktopBox.innerHTML = `
+            <div class="flex items-center justify-between gap-2">
+              <div class="min-w-0">
+                <div class="font-bold text-emerald-400 truncate" title="${escapeAttr(rec.fileName)}">✓ ${rec.fileName}</div>
+                <div class="text-[11px] text-slate-400 mt-0.5">${formatBytes(rec.fileSize)} • Guardado offline (${rec.updatedAt})</div>
+              </div>
+              <div class="flex items-center gap-1.5 shrink-0">
+                <button onclick="viewStoredPdf()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-[11px] px-2.5 py-1.5 rounded-lg">Consultar</button>
+                <button onclick="downloadStoredPdf()" class="bg-navy-700 hover:bg-navy-600 text-gold-400 font-bold text-[11px] px-2.5 py-1.5 rounded-lg">Download</button>
+                <button onclick="removeStoredPdf()" title="Remover PDF" class="bg-red-950 hover:bg-red-900 text-red-300 font-bold text-[11px] px-2 py-1.5 rounded-lg">✕</button>
+              </div>
+            </div>
+          `;
+        } else {
+          desktopBox.innerHTML = `<span class="text-slate-400">Nenhum ficheiro PDF anexado a esta expedição. Usa o botão abaixo para guardar o PDF de impressão.</span>`;
+        }
+      }
+
+      if (mobileBox) {
+        if (rec) {
+          mobileBox.innerHTML = `
+            <div class="space-y-2.5">
+              <div class="flex items-center justify-between gap-2">
+                <div class="min-w-0">
+                  <div class="font-bold text-navy-900 truncate">📄 ${rec.fileName}</div>
+                  <div class="text-[11px] text-emerald-700 font-semibold">✓ Disponível Offline • ${formatBytes(rec.fileSize)}</div>
+                </div>
+              </div>
+              <div class="grid grid-cols-2 gap-2">
+                <button onclick="viewStoredPdf()" class="bg-navy-900 hover:bg-navy-800 text-gold-400 font-bold text-xs py-2.5 px-3 rounded-xl flex items-center justify-center gap-1.5 shadow">
+                  <i data-lucide="eye" class="w-4 h-4"></i>
+                  <span>Consultar PDF</span>
+                </button>
+                <button onclick="downloadStoredPdf()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs py-2.5 px-3 rounded-xl flex items-center justify-center gap-1.5 shadow">
+                  <i data-lucide="download" class="w-4 h-4"></i>
+                  <span>Descarregar</span>
+                </button>
+              </div>
+              <div class="pt-1 border-t border-slate-200 flex items-center justify-between">
+                <label class="text-[11px] font-bold text-gold-600 cursor-pointer hover:underline">
+                  Substituir ficheiro PDF
+                  <input type="file" accept="application/pdf,.pdf" class="hidden" onchange="handlePdfUpload(event)" />
+                </label>
+                <button onclick="removeStoredPdf()" class="text-[11px] text-red-600 font-semibold">Remover</button>
+              </div>
+            </div>
+          `;
+        } else {
+          mobileBox.innerHTML = `
+            <div class="space-y-2.5">
+              <p class="text-xs text-slate-600">Ainda não anexaste o ficheiro PDF desta viagem. Carrega-o agora para o teres sempre disponível offline:</p>
+              <label class="w-full bg-navy-900 hover:bg-navy-800 text-gold-400 font-bold text-xs py-2.5 px-3 rounded-xl flex items-center justify-center gap-1.5 shadow cursor-pointer">
+                <i data-lucide="upload" class="w-4 h-4"></i>
+                <span>Carregar Ficheiro PDF</span>
+                <input type="file" accept="application/pdf,.pdf" class="hidden" onchange="handlePdfUpload(event)" />
+              </label>
+            </div>
+          `;
+        }
+      }
+      refreshIcons();
+    }
+
+    // Gerador de Versão Formatada para Impressão / Guardar como PDF
+    function openPrintSummaryWindow() {
+      const trip = appState.tripData;
+      const printWin = window.open('', '_blank');
+      if (!printWin) {
+        alert('Permite janelas pop-up no navegador para abrir a versão de impressão.');
+        return;
+      }
+
+      const daysHtml = trip.days.map(d => `
+        <div class="day-block">
+          <div class="day-header">
+            <span class="day-badge">DIA ${d.dayNumber}</span>
+            <h2>${d.route}</h2>
+            <span class="day-meta">${d.distance || ''} ${d.duration ? '• ' + d.duration : ''}</span>
+          </div>
+          ${d.via ? `<p class="via"><strong>Percurso:</strong> ${d.via}</p>` : ''}
+          ${d.summary ? `<p class="summary">${d.summary}</p>` : ''}
+          ${d.zbeWarning ? `<div class="zbe"><strong>ALERTA ZBE:</strong> ${d.zbeWarning}</div>` : ''}
+          <table>
+            <thead>
+              <tr><th style="width:70px;">Hora</th><th style="width:220px;">Paragem</th><th>Detalhes & Notas</th><th style="width:80px;">Km</th></tr>
+            </thead>
+            <tbody>
+              ${d.timeline.map(t => `
+                <tr>
+                  <td><strong>${t.time}</strong></td>
+                  <td><strong>${t.title}</strong></td>
+                  <td>${t.desc || ''} ${t.lat && t.lng ? `<br><small style="color:#047857;">GPS: ${t.lat.toFixed(4)}, ${t.lng.toFixed(4)}</small>` : ''}</td>
+                  <td>${t.km || ''}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+          ${d.walkingRoute && d.walkingRoute.stops && d.walkingRoute.stops.length > 0 ? `
+            <div class="sub-box">
+              <strong>Roteiro a Pé (${d.walkingRoute.city || ''}):</strong>
+              <ol>
+                ${d.walkingRoute.stops.map(s => `<li><strong>${s.name}:</strong> ${s.desc || ''}</li>`).join('')}
+              </ol>
+            </div>
+          ` : ''}
+          ${d.monuments && d.monuments.length > 0 ? `
+            <div class="sub-box">
+              <strong>Fichas Técnicas & Monumentos:</strong>
+              <ul>
+                ${d.monuments.map(m => `<li><strong>${m.name}</strong> (${m.schedule || m.classification || ''}) — ${m.tip || (m.highlights || []).join('; ')}</li>`).join('')}
+              </ul>
+            </div>
+          ` : ''}
+        </div>
+      `).join('');
+
+      printWin.document.write(`
+        <!DOCTYPE html>
+        <html lang="pt-PT">
+        <head>
+          <meta charset="UTF-8" />
+          <title>${trip.title} — Versão para Imprimir (MOTOATLAS)</title>
+          <style>
+            body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; color: #0f172a; margin: 24px; line-height: 1.45; font-size: 12px; }
+            .top-bar { display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid #0B1120; padding-bottom: 12px; margin-bottom: 20px; }
+            .brand { font-size: 11px; font-weight: 800; letter-spacing: 2px; color: #b45309; text-transform: uppercase; }
+            h1 { margin: 4px 0 0 0; font-size: 22px; color: #0B1120; }
+            .print-btn { background: #0B1120; color: #FBBF24; border: none; padding: 10px 16px; border-radius: 8px; font-weight: 700; cursor: pointer; }
+            .day-block { border: 1px solid #cbd5e1; border-radius: 10px; padding: 14px; margin-bottom: 18px; page-break-inside: avoid; }
+            .day-header { display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px; margin-bottom: 8px; }
+            .day-badge { background: #0B1120; color: #FBBF24; font-weight: 800; padding: 3px 8px; border-radius: 5px; font-size: 11px; }
+            .day-header h2 { margin: 0; font-size: 16px; flex: 1; }
+            .day-meta { font-weight: 700; color: #475569; }
+            .via, .summary { margin: 4px 0 8px 0; color: #334155; }
+            .zbe { background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; padding: 8px; border-radius: 6px; margin-bottom: 8px; }
+            table { width: 100%; border-collapse: collapse; margin-top: 6px; }
+            th, td { border: 1px solid #e2e8f0; padding: 6px 8px; text-align: left; vertical-align: top; }
+            th { background: #f8fafc; font-size: 11px; text-transform: uppercase; color: #475569; }
+            .sub-box { background: #faf8f5; border: 1px solid #e5dec9; padding: 8px 12px; border-radius: 6px; margin-top: 8px; }
+            .sub-box ol, .sub-box ul { margin: 4px 0 0 18px; padding: 0; }
+            @media print { .no-print { display: none; } body { margin: 0; } }
+          </style>
+        </head>
+        <body>
+          <div class="top-bar">
+            <div>
+              <div class="brand">MOTOATLAS • Caderno de Estrada</div>
+              <h1>${trip.title}</h1>
+              <div style="color:#475569; margin-top:2px;">${trip.subtitle || ''}</div>
+            </div>
+            <button class="print-btn no-print" onclick="window.print()">🖨️ Imprimir / Guardar PDF</button>
+          </div>
+          ${daysHtml}
+        </body>
+        </html>
+      `);
+      printWin.document.close();
     }
 
     if ('serviceWorker' in navigator) {

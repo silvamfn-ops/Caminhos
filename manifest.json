@@ -1,7 +1,7 @@
 {
   "name": "MOTOATLAS — Planeador & Guia Cultural em Duas Rodas",
   "short_name": "MOTOATLAS",
-  "description": "Biblioteca de expedições de mota, navegação GPS offline e guia cultural.",
+  "description": "Biblioteca de expedições de mota, navegação GPS offline, diário financeiro e guia cultural.",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#0B1120",
@@ -9,9 +9,10 @@
   "orientation": "portrait",
   "icons": [
     {
-      "src": "https://cdn-icons-png.flaticon.com/512/854/854878.png",
+      "src": "icon-512.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ]
 }
