@@ -1,7 +1,6 @@
-# MOTOATLAS — Planeador, Telemetria, GPX & Guia Cultural em Duas Rodas (v3.7)
+# MOTOATLAS — Planeador, Telemetria, GPX & Guia Cultural em Duas Rodas (v3.8)
 
-Aplicação PWA instalável em **iPhone/iPad (iOS)**, **Android** e **Windows (Chrome / Edge)**.
-Inclui:
-- Ícones oficiais detalhados `./icon-192.png` e `./icon-512.png` + fallback embutido para carregamento instantâneo.
-- Botão **Instalar App** no cabeçalho com suporte nativo `beforeinstallprompt` (Windows/Android) e guia visual (iOS).
-- Garagem Multi-Viagens, Editor Visual, Cofre PDF Offline (IndexedDB), Exportação GPX 1.1 e Telemetria Financeira.
+Novidades da versão `v3.8`:
+- **Cofre Visual de Bilhetes e Reservas (IndexedDB Offline)**: permite anexar fotografias ou capturas de ecrã de códigos QR (Alhambra, ferries, hotéis) diretamente no PC ou no telemóvel, comprimidas localmente para acesso instantâneo sem rede.
+- **Calculadora de Autonomia & Alerta de Reserva**: define a autonomia por depósito da mota (`km`) e monitoriza automaticamente a distância acumulada entre abastecimentos em cada etapa.
+- **Mapa Rápido de Bombas de Combustível**: botões diretos para abrir o mapa de postos de combustível perto da tua localização GPS atual, no destino da etapa ou na área de cada paragem.

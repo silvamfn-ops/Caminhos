@@ -164,11 +164,17 @@
     <div class="bg-navy-900 text-white rounded-2xl p-6 shadow-md border border-gold-500/30 space-y-4">
       <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <span class="text-[11px] font-bold uppercase tracking-wider text-gold-400 bg-gold-500/20 px-2.5 py-1 rounded-full border border-gold-500/30">MOTOATLAS • Garagem, Editor Visual, Cofre PDF, GPX & Multi-Plataforma (v3.7)</span>
+          <span class="text-[11px] font-bold uppercase tracking-wider text-gold-400 bg-gold-500/20 px-2.5 py-1 rounded-full border border-gold-500/30">MOTOATLAS • Cofre Visual QR, Autonomia & Mapa de Bombas (v3.8)</span>
           <h2 class="font-editorial text-xl sm:text-2xl font-bold text-white mt-2">As Minhas Viagens Guardadas</h2>
           <p class="text-xs text-slate-300 mt-1">Gere várias expedições em simultâneo. Cada viagem mantém os seus próprios dias, bilhetes, checklist e diário de bordo offline.</p>
         </div>
-        <div class="flex flex-wrap gap-2">
+        <div class="flex flex-wrap items-center gap-2">
+          <div class="flex items-center gap-1.5 bg-navy-800 border border-gold-500/40 px-3 py-1.5 rounded-xl">
+            <i data-lucide="fuel" class="w-4 h-4 text-gold-400"></i>
+            <span class="text-[11px] font-bold text-slate-300">Autonomia Mota:</span>
+            <input type="number" id="trip-bike-range-input" min="80" max="900" step="10" value="320" onchange="updateTripBikeRange(this.value)" class="w-14 bg-navy-900 text-gold-400 font-extrabold text-xs px-2 py-1 rounded border border-slate-600 text-center" />
+            <span class="text-[11px] text-slate-400">km</span>
+          </div>
           <button onclick="createBlankTrip()" class="inline-flex items-center gap-1.5 bg-gold-500 hover:bg-gold-400 text-navy-900 font-extrabold text-xs px-3.5 py-2.5 rounded-xl shadow transition">
             <i data-lucide="plus-circle" class="w-4 h-4"></i>
             <span>Nova Viagem Vazia</span>
@@ -358,6 +364,13 @@
           <input type="text" id="ticket-day" required placeholder="Dia e Hora (ex: Dia 02 • 15:30)" class="w-full text-xs px-3 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:border-gold-500" />
           <input type="text" id="ticket-code" required placeholder="Código / Referência" class="w-full text-xs px-3 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:border-gold-500" />
           <input type="text" id="ticket-note" placeholder="Nota (ex: Levar CC original)" class="w-full text-xs px-3 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:border-gold-500" />
+          <label class="w-full flex items-center justify-between gap-2 text-xs px-3 py-2 rounded-xl border border-dashed border-gold-500/70 bg-amber-50/40 text-navy-900 cursor-pointer hover:bg-amber-50 transition">
+            <span class="flex items-center gap-1.5 font-semibold truncate" id="ticket-image-label">
+              <i data-lucide="image-plus" class="w-4 h-4 text-gold-600 shrink-0"></i>
+              <span>Anexar Foto / QR Code (opcional)</span>
+            </span>
+            <input type="file" id="ticket-image-input" accept="image/*" class="hidden" onchange="updateTicketFileLabel(this)" />
+          </label>
           <button type="submit" class="w-full bg-navy-900 hover:bg-navy-800 text-gold-400 font-bold text-xs py-2.5 rounded-xl transition">
             + Guardar no Cofre Offline
           </button>
@@ -1410,42 +1423,173 @@
       return map[type] || map.ride;
     }
 
+    function updateTripBikeRange(val) {
+      const num = parseInt(val, 10);
+      if (!isNaN(num) && num >= 50) {
+        appState.tripData.bikeRangeKm = num;
+        saveState();
+        renderMobileApp();
+        renderDesktopPlanner();
+      }
+    }
+
+    function openNearbyFuelMap(lat, lng, placeLabel) {
+      if (lat && lng) {
+        window.open(`https://www.google.com/maps/search/postos+de+combustivel/@${lat},${lng},13z`, '_blank');
+      } else if (placeLabel) {
+        window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent('postos de combustivel perto de ' + placeLabel)}`, '_blank');
+      } else {
+        window.open('https://www.google.com/maps/search/postos+de+combustivel+perto+de+mim', '_blank');
+      }
+    }
+
+    function openCurrentGpsFuelMap() {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (pos) => {
+            openNearbyFuelMap(pos.coords.latitude, pos.coords.longitude, '');
+          },
+          () => {
+            openNearbyFuelMap(null, null, '');
+          },
+          { timeout: 4000 }
+        );
+      } else {
+        openNearbyFuelMap(null, null, '');
+      }
+    }
+
+    function parseKmValue(kmStr) {
+      const m = String(kmStr || '').match(/(\d+(?:[.,]\d+)?)/);
+      return m ? parseFloat(m[1].replace(',', '.')) : null;
+    }
+
+    function computeStageFuelAnalysis(day, bikeRangeKm) {
+      const range = bikeRangeKm || 320;
+      const safeLimit = Math.round(range * 0.85);
+      const stageDist = parseKmValue(day.distance) || 0;
+      let lastFuelKm = 0;
+      let maxLegKm = 0;
+      let fuelStopsCount = 0;
+      const itemAlerts = [];
+
+      (day.timeline || []).forEach((item, idx) => {
+        const curKm = parseKmValue(item.km);
+        const legKm = (curKm !== null) ? Math.max(0, curKm - lastFuelKm) : 0;
+        if (legKm > maxLegKm) maxLegKm = legKm;
+
+        let status = 'ok';
+        if (legKm > range) status = 'danger';
+        else if (legKm >= safeLimit) status = 'warn';
+
+        itemAlerts[idx] = { legKm, status };
+
+        if (item.type === 'fuel') {
+          fuelStopsCount++;
+          if (curKm !== null) lastFuelKm = curKm;
+        }
+      });
+
+      // Verificar troço final desde o último abastecimento até ao fim da etapa
+      const finalLegKm = Math.max(0, stageDist - lastFuelKm);
+      if (finalLegKm > maxLegKm) maxLegKm = finalLegKm;
+
+      let overallStatus = 'ok';
+      if (maxLegKm > range) overallStatus = 'danger';
+      else if (maxLegKm >= safeLimit) overallStatus = 'warn';
+
+      return { range, safeLimit, stageDist, maxLegKm, fuelStopsCount, overallStatus, itemAlerts };
+    }
+
     function renderCockpitTimeline(day) {
       const container = document.getElementById('mobile-content');
+      const bikeRange = appState.tripData.bikeRangeKm || 320;
+      const fuelStats = computeStageFuelAnalysis(day, bikeRange);
+      const firstCoordStop = (day.timeline || []).find(s => s.lat && s.lng);
+      const lastCoordStop = [...(day.timeline || [])].reverse().find(s => s.lat && s.lng);
+      const destCity = day.route.includes('→') ? day.route.split('→').pop().trim() : day.route;
+
+      let statusBannerClass = 'bg-emerald-50 border-emerald-200 text-emerald-900';
+      let statusIcon = 'check-circle-2';
+      let statusTitle = `Autonomia Segura (${bikeRange} km/depósito)`;
+      let statusSub = fuelStats.maxLegKm > 0
+        ? `Maior troço sem abastecer: ${Math.round(fuelStats.maxLegKm)} km • ${fuelStats.fuelStopsCount} abastecimento(s) planeado(s).`
+        : `Etapa de ${day.distance || '0 km'} dentro da margem de segurança.`;
+
+      if (fuelStats.overallStatus === 'danger') {
+        statusBannerClass = 'bg-red-50 border-red-300 text-red-950';
+        statusIcon = 'alert-octagon';
+        statusTitle = `ALERTA DE RESERVA: Troço de ${Math.round(fuelStats.maxLegKm)} km excede os ${bikeRange} km!`;
+        statusSub = `Adiciona uma paragem de combustível intermédia ou consulta já as bombas na rota.`;
+      } else if (fuelStats.overallStatus === 'warn') {
+        statusBannerClass = 'bg-amber-50 border-amber-300 text-amber-950';
+        statusIcon = 'alert-triangle';
+        statusTitle = `Atenção ao Depósito: Troço de ${Math.round(fuelStats.maxLegKm)} km (perto do limite de ${bikeRange} km)`;
+        statusSub = `Recomendado atestar antes da reserva (${fuelStats.fuelStopsCount} abastecimento(s) na etapa).`;
+      }
+
       container.innerHTML = `
-        ${day.fuelRule ? `
-          <div class="bg-amber-50 border border-amber-200 rounded-xl p-3 flex items-center gap-2.5 text-xs text-amber-900">
-            <i data-lucide="fuel" class="w-4 h-4 text-amber-600 shrink-0"></i>
-            <span><strong>Gestão de Autonomia:</strong> ${day.fuelRule}</span>
+        <!-- Painel Inteligente de Autonomia & Mapa de Bombas de Combustível -->
+        <div class="${statusBannerClass} border rounded-2xl p-3.5 space-y-2.5 shadow-sm">
+          <div class="flex items-start justify-between gap-2">
+            <div class="flex items-start gap-2.5">
+              <i data-lucide="${statusIcon}" class="w-5 h-5 shrink-0 mt-0.5"></i>
+              <div class="text-xs leading-snug">
+                <div class="font-extrabold">${statusTitle}</div>
+                <div class="opacity-90 mt-0.5">${statusSub}</div>
+                ${day.fuelRule ? `<div class="mt-1 font-semibold">Nota: ${day.fuelRule}</div>` : ''}
+              </div>
+            </div>
+            <button onclick="promptQuickBikeRange()" class="shrink-0 bg-white/80 hover:bg-white text-navy-900 font-bold text-[10px] px-2 py-1 rounded-lg border border-black/10" title="Alterar autonomia da mota">
+              ⚙️ ${bikeRange} km
+            </button>
           </div>
-        ` : ''}
+
+          <!-- Atalhos Diretos para Mapa de Bombas de Combustível -->
+          <div class="grid grid-cols-2 gap-2 pt-1 border-t border-black/10">
+            <button onclick="openCurrentGpsFuelMap()" class="bg-navy-900 hover:bg-navy-800 text-gold-400 font-bold text-[11px] py-2 px-2.5 rounded-xl flex items-center justify-center gap-1.5 shadow-sm transition">
+              <i data-lucide="fuel" class="w-3.5 h-3.5"></i>
+              <span>Bombas Perto de Mim</span>
+            </button>
+            <button onclick="openNearbyFuelMap(${lastCoordStop ? lastCoordStop.lat : 'null'}, ${lastCoordStop ? lastCoordStop.lng : 'null'}, '${escapeAttr(destCity)}')" class="bg-white hover:bg-slate-50 text-navy-900 border border-slate-300 font-bold text-[11px] py-2 px-2.5 rounded-xl flex items-center justify-center gap-1.5 transition">
+              <i data-lucide="map" class="w-3.5 h-3.5 text-amber-600"></i>
+              <span>Bombas no Destino</span>
+            </button>
+          </div>
+        </div>
 
         <div class="space-y-3">
-          ${day.timeline.map(item => {
+          ${day.timeline.map((item, idx) => {
             const badge = getTypeBadge(item.type);
+            const legInfo = fuelStats.itemAlerts[idx] || { legKm: 0, status: 'ok' };
             return `
-              <div class="bg-white rounded-2xl p-4 shadow-sm border border-sand-200 relative">
+              <div class="bg-white rounded-2xl p-4 shadow-sm border ${legInfo.status === 'danger' ? 'border-red-400 ring-1 ring-red-200' : 'border-sand-200'} relative">
                 <div class="flex items-start justify-between gap-3">
-                  <div class="flex items-center gap-2.5">
+                  <div class="flex flex-wrap items-center gap-2">
                     <span class="bg-navy-900 text-gold-400 font-extrabold text-xs px-2.5 py-1 rounded-lg">${item.time}</span>
                     <span class="inline-flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-md ${badge.color}">
                       <i data-lucide="${badge.icon}" class="w-3 h-3"></i> ${badge.label}
                     </span>
+                    ${legInfo.status === 'danger' ? `<span class="text-[10px] font-extrabold bg-red-600 text-white px-2 py-0.5 rounded-md">⚠️ +${Math.round(legInfo.legKm)} km sem atestar</span>` : ''}
+                    ${legInfo.status === 'warn' ? `<span class="text-[10px] font-bold bg-amber-500 text-navy-900 px-2 py-0.5 rounded-md">⛽ ${Math.round(legInfo.legKm)} km desde depósito</span>` : ''}
                   </div>
-                  <span class="text-xs font-bold text-slate-400">${item.km || ''}</span>
+                  <span class="text-xs font-bold text-slate-400 shrink-0">${item.km || ''}</span>
                 </div>
 
                 <h4 class="font-bold text-base text-navy-900 mt-2">${item.title}</h4>
                 <p class="text-xs text-slate-600 mt-1 leading-relaxed">${item.desc}</p>
 
                 ${item.lat && item.lng ? `
-                  <div class="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between gap-2">
+                  <div class="mt-3 pt-2.5 border-t border-slate-100 flex flex-wrap items-center justify-between gap-2">
                     <span class="text-[11px] text-emerald-700 font-mono font-semibold flex items-center gap-1">
                       <i data-lucide="map-pin" class="w-3 h-3"></i> ${item.lat.toFixed(4)}, ${item.lng.toFixed(4)}
                     </span>
-                    <div class="flex gap-1.5">
+                    <div class="flex items-center gap-1.5">
+                      <button onclick="openNearbyFuelMap(${item.lat}, ${item.lng}, '${escapeAttr(item.title)}')" title="Ver bombas de combustível num raio desta paragem" class="bg-amber-100 hover:bg-amber-200 text-amber-900 text-xs font-bold px-2.5 py-1.5 rounded-lg flex items-center gap-1 transition">
+                        <i data-lucide="fuel" class="w-3.5 h-3.5"></i> Bombas
+                      </button>
                       <button onclick="openGPS('google', ${item.lat}, ${item.lng}, '${escapeAttr(item.title)}')" class="bg-navy-900 hover:bg-navy-800 text-gold-400 text-xs font-bold px-3 py-1.5 rounded-lg flex items-center gap-1 transition">
-                        <i data-lucide="navigation" class="w-3.5 h-3.5"></i> Ir para aqui
+                        <i data-lucide="navigation" class="w-3.5 h-3.5"></i> Ir
                       </button>
                       <button onclick="openGPS('waze', ${item.lat}, ${item.lng}, '${escapeAttr(item.title)}')" class="bg-sky-100 hover:bg-sky-200 text-sky-800 text-xs font-bold px-2.5 py-1.5 rounded-lg transition">
                         Waze
@@ -1455,7 +1599,14 @@
                 ` : `
                   <div class="mt-2 pt-2 border-t border-slate-100 flex items-center justify-between">
                     <span class="text-[11px] text-slate-400 italic">Sem coordenadas GPS associadas</span>
-                    <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.title)}" target="_blank" class="text-[11px] font-bold text-gold-600 hover:underline">Pesquisar no Maps →</a>
+                    <div class="flex items-center gap-2">
+                      <button onclick="openNearbyFuelMap(null, null, '${escapeAttr(item.title)}')" class="text-[11px] font-bold text-amber-700 hover:underline flex items-center gap-1">
+                        <i data-lucide="fuel" class="w-3 h-3"></i> Bombas na zona
+                      </button>
+                      <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.title)}" target="_blank" class="text-[11px] font-bold text-gold-600 hover:underline">
+                        Pesquisar →
+                      </a>
+                    </div>
                   </div>
                 `}
               </div>
@@ -1463,6 +1614,12 @@
           }).join('')}
         </div>
       `;
+    }
+
+    function promptQuickBikeRange() {
+      const current = appState.tripData.bikeRangeKm || 320;
+      const val = prompt('Qual é a autonomia média da mota por depósito (em km)?', current);
+      if (val) updateTripBikeRange(val);
     }
 
     function renderWalkingGuide(day) {
@@ -1620,21 +1777,34 @@
           </div>
 
           <div class="space-y-3">
-            ${trip.tickets.map(t => `
-              <div onclick="openTicketModal(${t.id})" class="bg-white rounded-2xl p-4 shadow-sm border border-sand-200 flex items-center justify-between gap-3 cursor-pointer hover:border-gold-500 transition">
-                <div>
-                  <span class="text-[10px] font-bold uppercase text-gold-600">${t.day}</span>
-                  <h4 class="font-bold text-sm text-navy-900 mt-0.5">${t.title}</h4>
-                  <p class="text-xs text-slate-500 font-mono mt-1">Ref: ${t.code}</p>
+            <div class="flex items-center justify-between px-1">
+              <h3 class="text-xs font-extrabold uppercase tracking-wider text-navy-900">Reservas & Bilhetes (${trip.tickets.length})</h3>
+              <button onclick="openQuickAddTicketModal()" class="inline-flex items-center gap-1 bg-navy-900 hover:bg-navy-800 text-gold-400 font-bold text-[11px] px-2.5 py-1.5 rounded-lg shadow transition">
+                <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                <span>Novo Bilhete</span>
+              </button>
+            </div>
+            <div id="wallet-tickets-container" class="space-y-2.5">
+              ${trip.tickets.map(t => `
+                <div onclick="openTicketModal(${t.id})" class="bg-white rounded-2xl p-4 shadow-sm border border-sand-200 flex items-center justify-between gap-3 cursor-pointer hover:border-gold-500 transition">
+                  <div class="min-w-0">
+                    <div class="flex items-center gap-2">
+                      <span class="text-[10px] font-bold uppercase text-gold-600">${t.day}</span>
+                      <span id="ticket-badge-img-${t.id}" class="hidden text-[10px] font-bold bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded">📷 QR/Foto</span>
+                    </div>
+                    <h4 class="font-bold text-sm text-navy-900 mt-0.5 truncate">${t.title}</h4>
+                    <p class="text-xs text-slate-500 font-mono mt-1 truncate">Ref: ${t.code}</p>
+                  </div>
+                  <div class="w-11 h-11 rounded-xl bg-navy-900 text-gold-400 flex items-center justify-center shrink-0">
+                    <i data-lucide="qr-code" class="w-6 h-6"></i>
+                  </div>
                 </div>
-                <div class="w-11 h-11 rounded-xl bg-navy-900 text-gold-400 flex items-center justify-center shrink-0">
-                  <i data-lucide="qr-code" class="w-6 h-6"></i>
-                </div>
-              </div>
-            `).join('')}
+              `).join('')}
+            </div>
           </div>
         `;
         refreshPdfCardsUI();
+        refreshTicketBadgesUI();
       } else if (section === 'checklist') {
         container.innerHTML = `
           <div class="bg-navy-900 text-white rounded-2xl p-4 shadow-md border border-gold-500/30">
@@ -1901,24 +2071,106 @@
       refreshIcons();
     }
 
-    function openTicketModal(id) {
+    async function openTicketModal(id) {
       const t = appState.tripData.tickets.find(item => item.id === id);
       if (!t) return;
+      const imgRec = await getTicketImageRecord(id);
+      let visualHtml = '';
+
+      if (imgRec && imgRec.blob) {
+        const imgUrl = URL.createObjectURL(imgRec.blob);
+        visualHtml = `
+          <div class="bg-white p-2 rounded-2xl shadow-sm border border-slate-200 mb-3 w-full">
+            <img src="${imgUrl}" alt="Bilhete / QR Code" class="w-full max-h-80 object-contain rounded-xl mx-auto" />
+          </div>
+          <div class="flex items-center justify-center gap-2 mb-2">
+            <a href="${imgUrl}" target="_blank" class="text-[11px] font-bold bg-navy-900 text-gold-400 px-3 py-1.5 rounded-lg">Ampliar Imagem</a>
+            <button onclick="removeTicketImage(${t.id})" class="text-[11px] font-bold bg-red-50 text-red-600 px-3 py-1.5 rounded-lg border border-red-200">Remover Foto</button>
+          </div>
+        `;
+      } else {
+        visualHtml = `
+          <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 mb-3">
+            <i data-lucide="qr-code" class="w-28 h-28 text-navy-900"></i>
+          </div>
+          <label class="inline-flex items-center gap-1.5 bg-navy-900 hover:bg-navy-800 text-gold-400 font-bold text-xs px-3.5 py-2 rounded-xl shadow cursor-pointer mb-2 transition">
+            <i data-lucide="camera" class="w-4 h-4"></i>
+            <span>Anexar Captura de QR Code / Foto</span>
+            <input type="file" accept="image/*" class="hidden" onchange="attachImageToExistingTicket(${t.id}, event)" />
+          </label>
+        `;
+      }
+
       document.getElementById('modal-tag').textContent = t.day;
       document.getElementById('modal-title').textContent = t.title;
       document.getElementById('modal-body').innerHTML = `
-        <div class="bg-sand-100 p-6 rounded-2xl border border-sand-200 flex flex-col items-center text-center">
-          <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 mb-3">
-            <i data-lucide="qr-code" class="w-32 h-32 text-navy-900"></i>
-          </div>
-          <div class="font-mono font-extrabold text-base text-navy-900 tracking-wider">${t.code}</div>
+        <div class="bg-sand-100 p-4 rounded-2xl border border-sand-200 flex flex-col items-center text-center">
+          ${visualHtml}
+          <div class="font-mono font-extrabold text-base text-navy-900 tracking-wider select-all">${t.code}</div>
           <div class="text-[11px] text-emerald-700 font-bold mt-1">✓ Disponível Offline</div>
         </div>
         <div class="bg-amber-50 border border-amber-200 rounded-xl p-3 text-xs text-amber-900">
           <strong>Nota de Acesso:</strong> ${t.note || 'Apresentar na entrada.'}
         </div>
+        <div class="pt-2 border-t border-slate-200 flex justify-between items-center">
+          <label class="text-[11px] font-bold text-gold-600 cursor-pointer hover:underline">
+            Substituir imagem anexada
+            <input type="file" accept="image/*" class="hidden" onchange="attachImageToExistingTicket(${t.id}, event)" />
+          </label>
+          <button onclick="deleteTicket(${t.id})" class="text-[11px] font-bold text-red-600 hover:underline">Eliminar Bilhete</button>
+        </div>
       `;
       document.getElementById('modal-overlay').classList.remove('hidden');
+      refreshIcons();
+    }
+
+    function openQuickAddTicketModal() {
+      document.getElementById('modal-tag').textContent = 'Cofre Offline';
+      document.getElementById('modal-title').textContent = 'Adicionar Bilhete / Reserva';
+      document.getElementById('modal-body').innerHTML = `
+        <form onsubmit="addQuickTicketFromMobile(event)" class="space-y-2.5">
+          <input type="text" id="m-ticket-title" required placeholder="Título (ex: Bilhete Alhambra)" class="w-full text-xs px-3 py-2.5 rounded-xl border border-slate-300" />
+          <input type="text" id="m-ticket-day" required placeholder="Dia e Hora (ex: Dia 02 • 15:30)" class="w-full text-xs px-3 py-2.5 rounded-xl border border-slate-300" />
+          <input type="text" id="m-ticket-code" required placeholder="Código / Referência" class="w-full text-xs px-3 py-2.5 rounded-xl border border-slate-300" />
+          <input type="text" id="m-ticket-note" placeholder="Nota opcional" class="w-full text-xs px-3 py-2.5 rounded-xl border border-slate-300" />
+          <label class="w-full flex items-center gap-2 text-xs px-3 py-2.5 rounded-xl border border-dashed border-gold-500 bg-amber-50/50 text-navy-900 cursor-pointer">
+            <i data-lucide="camera" class="w-4 h-4 text-gold-600 shrink-0"></i>
+            <span id="m-ticket-img-label" class="font-semibold truncate">Anexar Foto / QR Code (opcional)</span>
+            <input type="file" id="m-ticket-img" accept="image/*" class="hidden" onchange="document.getElementById('m-ticket-img-label').textContent = this.files[0] ? this.files[0].name : 'Anexar Foto / QR Code'" />
+          </label>
+          <button type="submit" class="w-full bg-navy-900 text-gold-400 font-bold text-xs py-3 rounded-xl shadow">
+            + Guardar no Cofre Offline
+          </button>
+        </form>
+      `;
+      document.getElementById('modal-overlay').classList.remove('hidden');
+      refreshIcons();
+    }
+
+    async function addQuickTicketFromMobile(event) {
+      event.preventDefault();
+      const title = document.getElementById('m-ticket-title').value.trim();
+      const day = document.getElementById('m-ticket-day').value.trim();
+      const code = document.getElementById('m-ticket-code').value.trim();
+      const note = document.getElementById('m-ticket-note').value.trim();
+      const imgInput = document.getElementById('m-ticket-img');
+      if (!title || !day || !code) return;
+
+      const newId = Date.now();
+      appState.tripData.tickets.push({
+        id: newId,
+        title,
+        day,
+        code,
+        note: note || 'Adicionado no telemóvel.'
+      });
+      if (imgInput && imgInput.files && imgInput.files[0]) {
+        const compressed = await compressImageToBlob(imgInput.files[0]);
+        await saveTicketImageRecord(newId, compressed);
+      }
+      saveState();
+      closeModal();
+      renderGlobalSection('wallet');
       refreshIcons();
     }
 
@@ -1931,6 +2183,8 @@
     // =====================================================================
     function renderDesktopPlanner() {
       updateBrandHeader(appState.tripData);
+      const rangeInp = document.getElementById('trip-bike-range-input');
+      if (rangeInp) rangeInp.value = appState.tripData.bikeRangeKm || 320;
 
       const grid = document.getElementById('desktop-trips-grid');
       if (grid) {
@@ -3119,23 +3373,45 @@
       alert(`Viagem "${appState.tripData.title}" gravada na biblioteca com ${mergedDays.length} etapa(s)!`);
     }
 
-    function addNewTicket(event) {
+    function updateTicketFileLabel(input) {
+      const lbl = document.getElementById('ticket-image-label');
+      if (!lbl) return;
+      if (input.files && input.files[0]) {
+        lbl.innerHTML = `<i data-lucide="check-circle" class="w-4 h-4 text-emerald-600 shrink-0"></i><span class="text-emerald-800 truncate">${input.files[0].name}</span>`;
+      } else {
+        lbl.innerHTML = `<i data-lucide="image-plus" class="w-4 h-4 text-gold-600 shrink-0"></i><span>Anexar Foto / QR Code (opcional)</span>`;
+      }
+      refreshIcons();
+    }
+
+    async function addNewTicket(event) {
       event.preventDefault();
       const title = document.getElementById('ticket-title').value.trim();
       const day = document.getElementById('ticket-day').value.trim();
       const code = document.getElementById('ticket-code').value.trim();
       const note = document.getElementById('ticket-note').value.trim();
+      const imgInput = document.getElementById('ticket-image-input');
       if (!title || !day || !code) return;
 
+      const newId = Date.now();
       appState.tripData.tickets.push({
-        id: Date.now(),
+        id: newId,
         title,
         day,
         code,
         note: note || "Adicionado no Planeador PC."
       });
+
+      if (imgInput && imgInput.files && imgInput.files[0]) {
+        try {
+          const compressed = await compressImageToBlob(imgInput.files[0]);
+          await saveTicketImageRecord(newId, compressed);
+        } catch (e) {}
+      }
+
       saveState();
       event.target.reset();
+      updateTicketFileLabel({ files: [] });
       alert(`Bilhete guardado no Cofre Offline da viagem "${appState.tripData.title}"!`);
     }
 
@@ -3330,11 +3606,14 @@ ${wptsXml}${rtesXml}</gpx>`;
           reject(new Error('IndexedDB não suportado neste navegador.'));
           return;
         }
-        const req = indexedDB.open(PDF_DB_NAME, 1);
+        const req = indexedDB.open(PDF_DB_NAME, 2);
         req.onupgradeneeded = (e) => {
           const db = e.target.result;
           if (!db.objectStoreNames.contains(PDF_STORE_NAME)) {
             db.createObjectStore(PDF_STORE_NAME, { keyPath: 'tripId' });
+          }
+          if (!db.objectStoreNames.contains('ticketImages')) {
+            db.createObjectStore('ticketImages', { keyPath: 'ticketId' });
           }
         };
         req.onsuccess = () => resolve(req.result);
@@ -3390,6 +3669,106 @@ ${wptsXml}${rtesXml}</gpx>`;
       const kb = bytes / 1024;
       if (kb < 1024) return `${Math.round(kb)} KB`;
       return `${(kb / 1024).toFixed(2)} MB`;
+    }
+
+
+    // Funções de armazenamento de imagens de bilhetes / QR Codes (IndexedDB)
+    function compressImageToBlob(file, maxDim = 1400, quality = 0.85) {
+      return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const img = new Image();
+          img.onload = () => {
+            let w = img.width, h = img.height;
+            if (w > maxDim || h > maxDim) {
+              if (w > h) { h = Math.round(h * (maxDim / w)); w = maxDim; }
+              else { w = Math.round(w * (maxDim / h)); h = maxDim; }
+            }
+            const canvas = document.createElement('canvas');
+            canvas.width = w;
+            canvas.height = h;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, w, h);
+            canvas.toBlob((blob) => resolve(blob || file), 'image/jpeg', quality);
+          };
+          img.onerror = () => resolve(file);
+          img.src = e.target.result;
+        };
+        reader.onerror = () => resolve(file);
+        reader.readAsDataURL(file);
+      });
+    }
+
+    async function saveTicketImageRecord(ticketId, blob) {
+      const db = await openPdfDB();
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction('ticketImages', 'readwrite');
+        tx.objectStore('ticketImages').put({ ticketId: Number(ticketId), blob: blob });
+        tx.oncomplete = () => resolve();
+        tx.onerror = () => reject(tx.error);
+      });
+    }
+
+    async function getTicketImageRecord(ticketId) {
+      try {
+        const db = await openPdfDB();
+        return new Promise((resolve) => {
+          const tx = db.transaction('ticketImages', 'readonly');
+          const req = tx.objectStore('ticketImages').get(Number(ticketId));
+          req.onsuccess = () => resolve(req.result || null);
+          req.onerror = () => resolve(null);
+        });
+      } catch (e) {
+        return null;
+      }
+    }
+
+    async function deleteTicketImageRecord(ticketId) {
+      try {
+        const db = await openPdfDB();
+        return new Promise((resolve) => {
+          const tx = db.transaction('ticketImages', 'readwrite');
+          tx.objectStore('ticketImages').delete(Number(ticketId));
+          tx.oncomplete = () => resolve();
+          tx.onerror = () => resolve();
+        });
+      } catch (e) {}
+    }
+
+    async function attachImageToExistingTicket(ticketId, event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const compressed = await compressImageToBlob(file);
+      await saveTicketImageRecord(ticketId, compressed);
+      await refreshTicketBadgesUI();
+      openTicketModal(ticketId);
+    }
+
+    async function removeTicketImage(ticketId) {
+      await deleteTicketImageRecord(ticketId);
+      await refreshTicketBadgesUI();
+      openTicketModal(ticketId);
+    }
+
+    async function deleteTicket(ticketId) {
+      if (!confirm('Eliminar este bilhete do cofre?')) return;
+      appState.tripData.tickets = appState.tripData.tickets.filter(t => t.id !== ticketId);
+      await deleteTicketImageRecord(ticketId);
+      saveState();
+      closeModal();
+      renderGlobalSection('wallet');
+      refreshIcons();
+    }
+
+    async function refreshTicketBadgesUI() {
+      const tickets = appState.tripData.tickets || [];
+      for (const t of tickets) {
+        const rec = await getTicketImageRecord(t.id);
+        const badge = document.getElementById(`ticket-badge-img-${t.id}`);
+        if (badge && rec && rec.blob) {
+          badge.classList.remove('hidden');
+        }
+      }
     }
 
     async function handlePdfUpload(event) {
