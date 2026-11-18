@@ -1,7 +1,7 @@
 {
-  "name": "Caminhos do Sul — Moto-Turismo & Guia Cultural",
-  "short_name": "Caminhos do Sul",
-  "description": "Guia de viagem de mota, navegação e roteiros apeados culturais.",
+  "name": "MOTOATLAS — Planeador & Guia Cultural em Duas Rodas",
+  "short_name": "MOTOATLAS",
+  "description": "Biblioteca de expedições de mota, navegação GPS offline e guia cultural.",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#0B1120",

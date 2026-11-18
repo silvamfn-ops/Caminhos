@@ -1,4 +1,4 @@
-const CACHE_NAME = 'caminhos-do-sul-v3.0';
+const CACHE_NAME = 'motoatlas-v3.1';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',

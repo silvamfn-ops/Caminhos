@@ -5,9 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="apple-mobile-web-app-title" content="Caminhos do Sul" />
+  <meta name="apple-mobile-web-app-title" content="MOTOATLAS" />
   <meta name="theme-color" content="#0F172A" />
-  <title>Caminhos do Sul — Moto-Turismo & Guia Cultural</title>
+  <title>MOTOATLAS — Planeador & Guia Cultural em Duas Rodas</title>
   <link rel="manifest" href="manifest.json" />
   
   <!-- Tailwind CSS -->
@@ -68,13 +68,15 @@
         </div>
         <div class="min-w-0">
           <div class="flex items-center gap-2">
-            <h1 class="font-editorial text-sm sm:text-lg font-bold tracking-wider text-gold-400 leading-tight truncate" id="app-title">CAMINHOS DO SUL</h1>
+            <h1 class="font-editorial text-base sm:text-lg font-bold tracking-widest text-gold-400 leading-tight shrink-0" id="app-brand">MOTOATLAS</h1>
             <button onclick="openTripsLibraryModal()" title="Trocar ou Gerir Viagens" class="inline-flex items-center gap-1 bg-navy-800 hover:bg-navy-700 text-gold-400 border border-gold-500/40 px-2 py-0.5 rounded-lg text-[10px] font-bold shrink-0 transition">
               <i data-lucide="folder-kanban" class="w-3 h-3"></i>
               <span id="trips-count-badge">1 Viagem</span>
             </button>
           </div>
-          <p class="text-[11px] text-slate-300 tracking-wide uppercase truncate" id="app-subtitle">Andaluzia em Duas Rodas • 7 Dias • ~1.750 km</p>
+          <p class="text-[11px] text-slate-200 tracking-wide truncate mt-0.5" id="app-subtitle">
+            <span class="text-gold-400/90 font-semibold uppercase">Ativa:</span> <span class="font-bold text-white">CAMINHOS DO SUL</span> • 7 Dias • ~1.750 km
+          </p>
         </div>
       </div>
 
@@ -153,7 +155,7 @@
     <div class="bg-navy-900 text-white rounded-2xl p-6 shadow-md border border-gold-500/30 space-y-4">
       <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <span class="text-[11px] font-bold uppercase tracking-wider text-gold-400 bg-gold-500/20 px-2.5 py-1 rounded-full border border-gold-500/30">Garagem & Biblioteca de Expedições • v3.0</span>
+          <span class="text-[11px] font-bold uppercase tracking-wider text-gold-400 bg-gold-500/20 px-2.5 py-1 rounded-full border border-gold-500/30">MOTOATLAS • Garagem & Biblioteca de Expedições (v3.1)</span>
           <h2 class="font-editorial text-xl sm:text-2xl font-bold text-white mt-2">As Minhas Viagens Guardadas</h2>
           <p class="text-xs text-slate-300 mt-1">Gere várias expedições em simultâneo. Cada viagem mantém os seus próprios dias, bilhetes, checklist e diário de bordo offline.</p>
         </div>
@@ -1058,14 +1060,23 @@
       renderMobileApp();
     }
 
+    function updateBrandHeader(trip) {
+      const subEl = document.getElementById('app-subtitle');
+      if (subEl && trip) {
+        const extra = trip.subtitle ? ` • ${trip.subtitle}` : '';
+        subEl.innerHTML = `<span class="text-gold-400/90 font-semibold uppercase">Ativa:</span> <span class="font-bold text-white">${trip.title}</span><span class="text-slate-300">${extra}</span>`;
+      }
+      const badgeEl = document.getElementById('trips-count-badge');
+      if (badgeEl) {
+        badgeEl.textContent = appState.trips.length === 1 ? '1 Viagem' : `${appState.trips.length} Viagens`;
+      }
+    }
+
     function renderMobileApp() {
       const trip = appState.tripData;
       if (appState.currentDayIdx >= trip.days.length) appState.currentDayIdx = 0;
 
-      document.getElementById('app-title').textContent = trip.title;
-      document.getElementById('app-subtitle').textContent = trip.subtitle;
-      const badgeEl = document.getElementById('trips-count-badge');
-      if (badgeEl) badgeEl.textContent = appState.trips.length === 1 ? '1 Viagem' : `${appState.trips.length} Viagens`;
+      updateBrandHeader(trip);
 
       ['route', 'wallet', 'checklist', 'diary'].forEach(sec => {
         const el = document.getElementById(`nav-${sec}`);
@@ -1506,8 +1517,7 @@
     // MOTOR DE IMPORTAÇÃO INTELIGENTE (.PPTX + .KMZ)
     // =====================================================================
     function renderDesktopPlanner() {
-      const badgeEl = document.getElementById('trips-count-badge');
-      if (badgeEl) badgeEl.textContent = appState.trips.length === 1 ? '1 Viagem' : `${appState.trips.length} Viagens`;
+      updateBrandHeader(appState.tripData);
 
       const grid = document.getElementById('desktop-trips-grid');
       if (grid) {

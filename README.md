@@ -1,3 +1,3 @@
-# Caminhos do Sul — Aplicação Web de Moto-Turismo & Guia Cultural (v3.0 — Gestor Multi-Viagens)
+# MOTOATLAS — Planeador & Guia Cultural em Duas Rodas (v3.1)
 
-Plataforma PWA offline-first com **Garagem / Biblioteca de Múltiplas Viagens**, importador estrutural `.pptx` (`[APP: ...]`) + `.kmz`/`.kml`, cofre de bilhetes e diário de bordo isolado por expedição.
+Aplicação PWA offline-first com identidade **MOTOATLAS**, Garagem Multi-Viagens, importador estrutural `.pptx` (`[APP: ...]`) + `.kmz`/`.kml`, cofre de bilhetes e diário de bordo por expedição.
