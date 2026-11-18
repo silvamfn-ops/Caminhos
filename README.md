@@ -1,7 +1,4 @@
-# MOTOATLAS — Planeador, Telemetria, GPX & Guia Cultural em Duas Rodas (v3.9)
+# MOTOATLAS — Planeador, Telemetria, GPX & Guia Cultural em Duas Rodas (v3.9.1)
 
-Novidades da versão `v3.9`:
-- **Adaptação às Condições de Visibilidade (Tema Claro, Tema Escuro e Modo Automático)**:
-  - **Auto (padrão)**: acompanha em tempo real o sensor de luminosidade / modo dia-noite do iPhone, Android ou Windows.
-  - **Claro (Sol Direto)**: alto contraste sobre fundo claro quente (`#FAF8F5`) para leitura nítida sob luz solar intensa no suporte da mota.
-  - **Escuro (Condução Noturna / Túneis)**: paleta noturna profunda (`#060A14` / `#0F172A`) sem encandeamento, preservando os destaques dourados e alertas de segurança.
+Correção visual na versão `v3.9.1`:
+- **Contraste no Modo Escuro**: ajustado o fundo dos botões e etiquetas âmbar (`bg-amber-100`, incluindo o botão **Bombas** em cada paragem) para âmbar escuro translúcido com borda dourada, garantindo leitura perfeita do texto claro sobre fundo escuro.

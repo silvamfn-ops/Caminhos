@@ -1,4 +1,4 @@
-const CACHE_NAME = 'motoatlas-v3.9';
+const CACHE_NAME = 'motoatlas-v3.9.1';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
