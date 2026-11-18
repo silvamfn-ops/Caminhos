@@ -45,11 +45,18 @@
     }
   </script>
   <style>
+    :root {
+      color-scheme: light;
+    }
+    html.dark {
+      color-scheme: dark;
+    }
     body {
       font-family: 'Plus Jakarta Sans', sans-serif;
       background-color: #FAF8F5;
       color: #0F172A;
       -webkit-tap-highlight-color: transparent;
+      transition: background-color 0.2s ease, color 0.2s ease;
     }
     .font-editorial { font-family: 'Cinzel', serif; }
     .no-scrollbar::-webkit-scrollbar { display: none; }
@@ -59,7 +66,154 @@
       color: #FBBF24;
       box-shadow: 0 4px 12px rgba(11, 17, 32, 0.25);
     }
+
+    /* =====================================================================
+       TEMA ESCURO (VISIBILIDADE NOTURNA / CONDUÇÃO À NOITE / TÚNEIS)
+       ===================================================================== */
+    html.dark body,
+    html.dark body.bg-sand-50 {
+      background-color: #060A14 !important;
+      color: #F1F5F9 !important;
+    }
+
+    html.dark .bg-white {
+      background-color: #0F172A !important;
+      color: #F1F5F9 !important;
+    }
+    html.dark .bg-sand-50 {
+      background-color: #131C31 !important;
+    }
+    html.dark .bg-sand-100 {
+      background-color: #1A253C !important;
+    }
+    html.dark .bg-sand-200,
+    html.dark .bg-sand-200\/70 {
+      background-color: #1E293B !important;
+    }
+    html.dark .bg-slate-50,
+    html.dark .bg-slate-100 {
+      background-color: #1E293B !important;
+      color: #E2E8F0 !important;
+    }
+    html.dark .hover\:bg-slate-50:hover,
+    html.dark .hover\:bg-slate-200:hover,
+    html.dark .hover\:bg-sand-50:hover,
+    html.dark .hover\:bg-sand-200:hover {
+      background-color: #27354F !important;
+    }
+
+    html.dark .border-sand-200,
+    html.dark .border-slate-100,
+    html.dark .border-slate-200,
+    html.dark .border-slate-300 {
+      border-color: #27354F !important;
+    }
+    html.dark .divide-slate-100 > :not([hidden]) ~ :not([hidden]) {
+      border-color: #1E293B !important;
+    }
+
+    html.dark .text-navy-900,
+    html.dark .text-slate-900,
+    html.dark .text-slate-800 {
+      color: #F8FAFC !important;
+    }
+    html.dark .text-slate-700,
+    html.dark .text-slate-600 {
+      color: #CBD5E1 !important;
+    }
+    html.dark .text-slate-500,
+    html.dark .text-slate-400 {
+      color: #94A3B8 !important;
+    }
+    html.dark .text-gold-600 {
+      color: #FBBF24 !important;
+    }
+    html.dark .text-emerald-700,
+    html.dark .text-emerald-800 {
+      color: #34D399 !important;
+    }
+
+    html.dark .bg-amber-50,
+    html.dark .bg-amber-50\/30,
+    html.dark .bg-amber-50\/40,
+    html.dark .bg-amber-50\/50,
+    html.dark .bg-amber-50\/80 {
+      background-color: rgba(120, 53, 15, 0.32) !important;
+    }
+    html.dark .border-amber-200 {
+      border-color: rgba(217, 119, 6, 0.45) !important;
+    }
+    html.dark .text-amber-900,
+    html.dark .text-amber-950,
+    html.dark .text-amber-800,
+    html.dark .text-amber-700 {
+      color: #FDE68A !important;
+    }
+
+    html.dark .bg-emerald-50 {
+      background-color: rgba(6, 78, 59, 0.35) !important;
+    }
+    html.dark .border-emerald-200 {
+      border-color: rgba(16, 185, 129, 0.4) !important;
+    }
+    html.dark .text-emerald-900,
+    html.dark .text-emerald-950 {
+      color: #A7F3D0 !important;
+    }
+
+    html.dark .bg-red-50,
+    html.dark .bg-red-50\/30 {
+      background-color: rgba(127, 29, 29, 0.35) !important;
+    }
+    html.dark .border-red-200,
+    html.dark .border-red-300 {
+      border-color: rgba(248, 113, 113, 0.45) !important;
+    }
+    html.dark .text-red-950,
+    html.dark .text-red-800,
+    html.dark .text-red-700,
+    html.dark .text-red-600 {
+      color: #FECACA !important;
+    }
+
+    html.dark .bg-indigo-50\/30 {
+      background-color: rgba(49, 46, 129, 0.35) !important;
+    }
+    html.dark .border-indigo-200 {
+      border-color: rgba(129, 140, 248, 0.4) !important;
+    }
+    html.dark .text-indigo-700 {
+      color: #C7D2FE !important;
+    }
+
+    html.dark input,
+    html.dark select,
+    html.dark textarea {
+      background-color: #0B1120 !important;
+      color: #F8FAFC !important;
+      border-color: #334155 !important;
+    }
+    html.dark input::placeholder,
+    html.dark textarea::placeholder {
+      color: #64748B !important;
+    }
+
+    html.dark .tab-active {
+      background-color: #D97706 !important;
+      color: #0B1120 !important;
+      box-shadow: 0 4px 12px rgba(217, 119, 6, 0.35);
+    }
   </style>
+  <script>
+    (function() {
+      try {
+        const savedTheme = localStorage.getItem('motoatlas_theme_mode') || 'auto';
+        const sysDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const isDark = savedTheme === 'dark' || (savedTheme === 'auto' && sysDark);
+        if (isDark) document.documentElement.classList.add('dark');
+      } catch (e) {}
+    })();
+  </script>
 </head>
 <body class="bg-sand-50 min-h-screen flex flex-col">
 
@@ -83,6 +237,12 @@
       </div>
 
       <div class="flex items-center gap-2 shrink-0">
+        <!-- Alternador de Visibilidade: Auto (Sistema) / Claro (Sol) / Escuro (Noite) -->
+        <button id="theme-toggle-btn" onclick="cycleVisibilityTheme()" title="Alternar Modo de Visibilidade: Auto / Claro / Escuro" class="inline-flex items-center gap-1.5 bg-navy-800 hover:bg-navy-700 text-gold-400 border border-slate-700 px-2.5 py-1.5 rounded-xl text-xs font-bold transition">
+          <span id="theme-toggle-icon" class="flex items-center"><i data-lucide="sun-moon" class="w-4 h-4"></i></span>
+          <span id="theme-toggle-label" class="hidden sm:inline">Auto</span>
+        </button>
+
         <button id="pwa-install-btn" onclick="triggerPwaInstall()" title="Instalar MOTOATLAS no iPhone, Android ou Windows" class="inline-flex items-center gap-1.5 bg-gold-500/15 hover:bg-gold-500/25 text-gold-400 border border-gold-500/40 px-2.5 py-1.5 rounded-xl text-xs font-bold transition">
           <i data-lucide="download-cloud" class="w-4 h-4"></i>
           <span class="hidden md:inline">Instalar App</span>
@@ -164,7 +324,7 @@
     <div class="bg-navy-900 text-white rounded-2xl p-6 shadow-md border border-gold-500/30 space-y-4">
       <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <span class="text-[11px] font-bold uppercase tracking-wider text-gold-400 bg-gold-500/20 px-2.5 py-1 rounded-full border border-gold-500/30">MOTOATLAS • Cofre Visual QR, Autonomia & Mapa de Bombas (v3.8)</span>
+          <span class="text-[11px] font-bold uppercase tracking-wider text-gold-400 bg-gold-500/20 px-2.5 py-1 rounded-full border border-gold-500/30">MOTOATLAS • Visibilidade Adaptativa (Claro/Escuro), Cofre QR & Autonomia (v3.9)</span>
           <h2 class="font-editorial text-xl sm:text-2xl font-bold text-white mt-2">As Minhas Viagens Guardadas</h2>
           <p class="text-xs text-slate-300 mt-1">Gere várias expedições em simultâneo. Cada viagem mantém os seus próprios dias, bilhetes, checklist e diário de bordo offline.</p>
         </div>
@@ -1046,7 +1206,8 @@
       appState.mainSection = 'route';
       saveState();
       closeModal();
-      renderMobileApp();
+      applyVisibilityTheme(currentThemeMode);
+    renderMobileApp();
       renderDesktopPlanner();
     }
 
@@ -3986,6 +4147,62 @@ ${wptsXml}${rtesXml}</gpx>`;
     // =====================================================================
     // INSTALAÇÃO PWA MULTI-PLATAFORMA (IPHONE / ANDROID / WINDOWS)
     // =====================================================================
+    // =====================================================================
+    // GESTOR DE VISIBILIDADE: TEMA CLARO (SOL) / TEMA ESCURO (NOITE) / AUTO
+    // =====================================================================
+    let currentThemeMode = localStorage.getItem('motoatlas_theme_mode') || 'auto';
+
+    function applyVisibilityTheme(mode) {
+      currentThemeMode = mode;
+      try {
+        localStorage.setItem('motoatlas_theme_mode', mode);
+      } catch (err) {}
+
+      const sysDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const shouldBeDark = (mode === 'dark') || (mode === 'auto' && sysDark);
+
+      if (shouldBeDark) {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+
+      const metaTheme = document.querySelector('meta[name="theme-color"]');
+      if (metaTheme) {
+        metaTheme.setAttribute('content', shouldBeDark ? '#060A14' : '#0B1120');
+      }
+
+      const iconWrap = document.getElementById('theme-toggle-icon');
+      const labelEl = document.getElementById('theme-toggle-label');
+      if (iconWrap && labelEl) {
+        if (mode === 'light') {
+          iconWrap.innerHTML = '<i data-lucide="sun" class="w-4 h-4 text-amber-400"></i>';
+          labelEl.textContent = 'Claro';
+        } else if (mode === 'dark') {
+          iconWrap.innerHTML = '<i data-lucide="moon" class="w-4 h-4 text-sky-400"></i>';
+          labelEl.textContent = 'Escuro';
+        } else {
+          iconWrap.innerHTML = '<i data-lucide="sun-moon" class="w-4 h-4 text-gold-400"></i>';
+          labelEl.textContent = 'Auto';
+        }
+        refreshIcons();
+      }
+    }
+
+    function cycleVisibilityTheme() {
+      const order = ['auto', 'light', 'dark'];
+      const next = order[(order.indexOf(currentThemeMode) + 1) % order.length];
+      applyVisibilityTheme(next);
+    }
+
+    if (window.matchMedia) {
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+        if (currentThemeMode === 'auto') {
+          applyVisibilityTheme('auto');
+        }
+      });
+    }
+
     let deferredInstallPrompt = null;
 
     window.addEventListener('beforeinstallprompt', (e) => {
